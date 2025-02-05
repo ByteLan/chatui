@@ -23,6 +23,7 @@ import {
     SmileOutlined,
 } from '@ant-design/icons';
 import { Badge, Button, type GetProp, Space } from 'antd';
+import { MarkdownRender } from '@douyinfe/semi-ui';
 
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
@@ -44,12 +45,14 @@ const defaultConversationsItems = [
 ];
 
 const useStyle = createStyles(({ token, css }) => {
+    // 隐藏菜单的媒体宽度
     const hideMenuMediaWidth = 850;
     return {
         layout: css`
       width: 100%;
       min-width: 300px;
-      height: 1000px;
+      height: 97vh;
+      min-height: 400px;
       border-radius: ${token.borderRadius}px;
       display: flex;
       background: ${token.colorBgContainer};
@@ -192,6 +195,13 @@ const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     },
 ];
 
+
+const mdComponents = {};
+
+const semiMarkdownRender = (content?: string) => {
+    return <MarkdownRender raw={content} format="md" components={mdComponents} />
+};
+
 const roles: GetProp<typeof Bubble.List, 'roles'> = {
     ai: {
         placement: 'start',
@@ -201,10 +211,12 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
                 borderRadius: 16,
             },
         },
+        messageRender: semiMarkdownRender,
     },
     local: {
         placement: 'end',
         variant: 'shadow',
+        messageRender: semiMarkdownRender,
     },
 };
 
@@ -360,7 +372,7 @@ const FullChatApp:React.FC = () => {
                 draggable={false}
                 alt="logo"
             />
-            <span>BITCS917 Design</span>
+            <span>BIT</span>
         </div>
     );
 
@@ -394,6 +406,7 @@ const FullChatApp:React.FC = () => {
                     roles={roles}
                     className={styles.messages}
                 />
+
                 {/* 🌟 提示词 */}
                 <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
                 {/* 🌟 输入框 */}
