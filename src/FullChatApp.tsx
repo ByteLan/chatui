@@ -26,17 +26,6 @@ import { Badge, type GetProp, Space, Button} from 'antd';
 import { MarkdownRender, SideSheet, Notification } from '@douyinfe/semi-ui';
 import { JSX } from 'react/jsx-runtime';
 
-// import { type NotificationArgsProps, notification } from 'antd';
-// type NotificationPlacement = NotificationArgsProps['placement'];
-// const Context = React.createContext({ name: 'Default' });
-// const [api, contextHolder] = notification.useNotification();
-// const openNotification = (placement: NotificationPlacement) => {
-//     api.info({
-//         message: `Notification ${placement}`,
-//         description: <Context.Consumer>{({ name }) => `Hello, ${name}!`}</Context.Consumer>,
-//         placement,
-//     });
-// };
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -112,9 +101,31 @@ const useStyle = createStyles(({token, css}) => {
             flex-direction: column;
             padding: ${token.paddingLG}px;
             gap: 16px;
+
         `,
         messages: css`
             flex: 1;
+            //定义滚动条高宽及背景，高宽分别对应横竖滚动条的尺寸
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+                background-color: rgba(0,0,0,.2);
+            }
+
+            //定义滚动条轨道，内阴影+圆角
+            ::-webkit-scrollbar-track
+            {
+                -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.3);
+                border-radius:10px;
+                background-color:#F5F5F5;
+            }
+            //定义滑块内阴影+圆角
+            ::-webkit-scrollbar-thumb
+            {
+                border-radius:10px;
+                -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.3);
+                background-color: #b3b3b3;
+            }
         `,
         placeholder: css`
             padding-top: 32px;
@@ -197,20 +208,20 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     },
     {
         key: '3',
-        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
-        description: '描述',
+        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '看这里'),
+        description: '点下面按钮',
         children: [
             {
                 key: '3-1',
-                description: `引导问题1`,
+                description: `帮助`,
             },
             {
                 key: '3-2',
-                description: `引导问题2`,
+                description: `使用指导`,
             },
             {
                 key: '3-3',
-                description: `引导问题3`,
+                description: `help`,
             },
         ],
     },
@@ -219,7 +230,7 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
 const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     {
         key: '1',
-        description: '热门信息',
+        description: 'help',
         icon: <FireOutlined style={{color: '#FF4D4F'}}/>,
     },
     {
