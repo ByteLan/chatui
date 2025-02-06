@@ -19,7 +19,7 @@ import {
     PaperClipOutlined,
     PlusOutlined,
     ReadOutlined,
-    ShareAltOutlined,
+    // ShareAltOutlined,
     SmileOutlined,
 } from '@ant-design/icons';
 import { Badge, Button, type GetProp, Space } from 'antd';
@@ -44,9 +44,11 @@ const defaultConversationsItems = [
     }
 ];
 
+// 隐藏菜单的媒体宽度
+const hideMenuMediaWidth = 850;
+
 const useStyle = createStyles(({ token, css }) => {
-    // 隐藏菜单的媒体宽度
-    const hideMenuMediaWidth = 850;
+
     return {
         layout: css`
       width: 100%;
@@ -63,24 +65,25 @@ const useStyle = createStyles(({ token, css }) => {
       }
     `,
         menu: css`
-            @media (min-width: ${hideMenuMediaWidth}px) {
+            //@media (min-width: ${hideMenuMediaWidth}px) {
+
                 background: ${token.colorBgLayout}80;
                 width: 20%;
-                max-width: 250px;
+                max-width: 300px;
                 height: 100%;
                 display: flex;
                 flex-direction: column;
                 border-radius: ${token.borderRadius}px;
-            }
-            @media (max-width: ${hideMenuMediaWidth}px) {
-                background: ${token.colorBgLayout}80;
-                width: 0;
-                visibility: hidden;
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                border-radius: ${token.borderRadius}px;
-            }
+            //}
+            // @media (max-width: ${hideMenuMediaWidth}px) {
+            //     background: ${token.colorBgLayout}80;
+            //     width: 0;
+            //     visibility: hidden;
+            //     height: 100%;
+            //     display: flex;
+            //     flex-direction: column;
+            //     border-radius: ${token.borderRadius}px;
+            // }
       
     `,
         conversations: css`
@@ -141,42 +144,61 @@ const useStyle = createStyles(({ token, css }) => {
 const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     {
         key: '1',
-        label: renderTitle(<FireOutlined style={{ color: '#FF4D4F' }} />, 'Hot Topics'),
-        description: 'What are you interested in?',
+        label: renderTitle(<FireOutlined style={{ color: '#FF4D4F' }} />, '标题'),
+        description: '描述',
         children: [
             {
                 key: '1-1',
-                description: `What's new in X?`,
+                description: `引导问题1`,
             },
             {
                 key: '1-2',
-                description: `What's AGI?`,
+                description: `引导问题2`,
             },
             {
                 key: '1-3',
-                description: `Where is the doc?`,
+                description: `引导问题3`,
             },
         ],
     },
     {
         key: '2',
-        label: renderTitle(<ReadOutlined style={{ color: '#1890FF' }} />, 'Design Guide'),
-        description: 'How to design a good product?',
+        label: renderTitle(<ReadOutlined style={{ color: '#1890FF' }} />, '评估供应链韧性'),
+        description: '我可以帮助你评估供应链韧性，你可以尝试这样问：',
         children: [
             {
                 key: '2-1',
                 icon: <HeartOutlined />,
-                description: `Know the well`,
+                description: `生成供应链网络结构图`,
             },
             {
                 key: '2-2',
                 icon: <SmileOutlined />,
-                description: `Set the AI role`,
+                description: `我要对供应链结构进行仿真`,
             },
             {
                 key: '2-3',
                 icon: <CommentOutlined />,
-                description: `Express the feeling`,
+                description: `666`,
+            },
+        ],
+    },
+    {
+        key: '3',
+        label: renderTitle(<FireOutlined style={{ color: '#FF4D4F' }} />, '标题'),
+        description: '描述',
+        children: [
+            {
+                key: '3-1',
+                description: `引导问题1`,
+            },
+            {
+                key: '3-2',
+                description: `引导问题2`,
+            },
+            {
+                key: '3-3',
+                description: `引导问题3`,
             },
         ],
     },
@@ -220,7 +242,7 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
     },
 };
 
-const FullChatApp:React.FC = () => {
+const FullChatApp = React.forwardRef((props, ref) => {
     // ==================== Style ====================
     const { styles } = useStyle();
 
@@ -236,6 +258,13 @@ const FullChatApp:React.FC = () => {
     const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
         [],
     );
+
+    const [menuWidth, setMenuWidth] = React.useState('20%');// 初始宽度
+    const [chatWidth, setChatWidth] = React.useState('80%');// 初始宽度
+    const [menuVisible, setMenuVisible] = React.useState('visible');
+    const layoutRef = React.useRef<HTMLDivElement>(null);
+
+
 
     // ==================== Runtime ====================
     const [agent] = useXAgent({
@@ -263,6 +292,40 @@ const FullChatApp:React.FC = () => {
             setMessages([]);
         }
     }, [activeKey]);
+
+    const handleResize = () => {
+        if (layoutRef.current) {
+            const layoutWidth = layoutRef.current.offsetWidth;
+            // 根据.layout的宽度设置menu的宽度逻辑
+            if (layoutWidth > hideMenuMediaWidth) {
+                setMenuWidth('20%');
+                setChatWidth('80%');
+                setMenuVisible('visible');
+            } else {
+                setMenuWidth('0');
+                setChatWidth('98%');
+                setMenuVisible('hidden');
+            }
+        }
+    };
+
+
+
+    React.useImperativeHandle(ref, () => ({
+        handleResize
+    }))
+
+
+    useEffect(() => {
+
+        window.addEventListener('resize', handleResize);
+        // 初始执行一次
+        handleResize();
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
 
     // ==================== Event ====================
     const onSubmit = (nextContent: string) => {
@@ -293,23 +356,27 @@ const FullChatApp:React.FC = () => {
     const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
         setAttachedFiles(info.fileList);
 
+    const openLinkInNewTab = (url:string) => {
+        window.open(url, '_blank');
+    }
+
     // ==================== Nodes ====================
     const placeholderNode = (
         <Space direction="vertical" size={16} className={styles.placeholder}>
             <Welcome
                 variant="borderless"
                 icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-                title="Hello, I'm Ant Design X"
-                description="Base on Ant Design, AGI product interface solution, create a better intelligent vision~"
+                title="你好，这是一个Chat Demo"
+                description="Base on Ant Design, Semi Design."
                 extra={
                     <Space>
-                        <Button icon={<ShareAltOutlined />} />
-                        <Button icon={<EllipsisOutlined />} />
+                        {/*<Button icon={<ShareAltOutlined />} />*/}
+                        <Button icon={<EllipsisOutlined />} onClick={()=>openLinkInNewTab("https://www.bytelan.cn/")}/>
                     </Space>
                 }
             />
             <Prompts
-                title="Do you want?"
+                title="这是一个默认的提示词面板，发送消息后会自动消失。"
                 items={placeholderPromptsItems}
                 styles={{
                     list: {
@@ -378,8 +445,8 @@ const FullChatApp:React.FC = () => {
 
     // ==================== Render =================
     return (
-        <div className={styles.layout}>
-            <div className={styles.menu}>
+        <div className={styles.layout} ref={layoutRef}>
+            <div className={styles.menu} style={{ width: menuWidth, visibility: menuVisible }}>
                 {/* 🌟 Logo */}
                 {logoNode}
                 {/* 🌟 添加会话 */}
@@ -399,7 +466,7 @@ const FullChatApp:React.FC = () => {
                     onActiveChange={onConversationClick}
                 />
             </div>
-            <div className={styles.chat}>
+            <div className={styles.chat} style={{ width: chatWidth}}>
                 {/* 🌟 消息列表 */}
                 <Bubble.List
                     items={items.length > 0 ? items : [{ content: placeholderNode, variant: 'borderless' }]}
@@ -422,6 +489,6 @@ const FullChatApp:React.FC = () => {
             </div>
         </div>
     );
-}
+});
 
 export default FullChatApp

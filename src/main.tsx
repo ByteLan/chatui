@@ -1,9 +1,11 @@
-import { StrictMode } from 'react'
+import {StrictMode} from 'react'
 import { createRoot } from 'react-dom/client'
-import FullChatApp from './FullChatApp.tsx'
+import ChatWeb from "./ChatWeb.tsx";
+
+
 
 createRoot(document.getElementById('ChatRoot')!).render(
   <StrictMode>
-    <FullChatApp />
+    <ChatWeb />
   </StrictMode>,
 )
