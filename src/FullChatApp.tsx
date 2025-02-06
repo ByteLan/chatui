@@ -22,9 +22,21 @@ import {
     // ShareAltOutlined,
     SmileOutlined,
 } from '@ant-design/icons';
-import { Badge, Button, type GetProp, Space } from 'antd';
-import { MarkdownRender } from '@douyinfe/semi-ui';
+import { Badge, type GetProp, Space, Button} from 'antd';
+import { MarkdownRender, SideSheet, Notification } from '@douyinfe/semi-ui';
+import { JSX } from 'react/jsx-runtime';
 
+// import { type NotificationArgsProps, notification } from 'antd';
+// type NotificationPlacement = NotificationArgsProps['placement'];
+// const Context = React.createContext({ name: 'Default' });
+// const [api, contextHolder] = notification.useNotification();
+// const openNotification = (placement: NotificationPlacement) => {
+//     api.info({
+//         message: `Notification ${placement}`,
+//         description: <Context.Consumer>{({ name }) => `Hello, ${name}!`}</Context.Consumer>,
+//         placement,
+//     });
+// };
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -47,104 +59,104 @@ const defaultConversationsItems = [
 // 隐藏菜单的媒体宽度
 const hideMenuMediaWidth = 850;
 
-const useStyle = createStyles(({ token, css }) => {
+const useStyle = createStyles(({token, css}) => {
 
     return {
         layout: css`
-      width: 100%;
-      min-width: 300px;
-      height: 97vh;
-      min-height: 400px;
-      border-radius: ${token.borderRadius}px;
-      display: flex;
-      background: ${token.colorBgContainer};
-      font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
+            width: 100%;
+            min-width: 300px;
+            height: 97vh;
+            min-height: 400px;
+            border-radius: ${token.borderRadius}px;
+            display: flex;
+            background: ${token.colorBgContainer};
+            font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
 
-      .ant-prompts {
-        color: ${token.colorText};
-      }
-    `,
+            .ant-prompts {
+                color: ${token.colorText};
+            }
+        `,
         menu: css`
-            //@media (min-width: ${hideMenuMediaWidth}px) {
+                //@media (min-width: ${hideMenuMediaWidth}px) {
 
-                background: ${token.colorBgLayout}80;
-                width: 20%;
-                max-width: 300px;
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                border-radius: ${token.borderRadius}px;
+            background: ${token.colorBgLayout}80;
+            width: 20%;
+            max-width: 300px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border-radius: ${token.borderRadius}px;
             //}
-            // @media (max-width: ${hideMenuMediaWidth}px) {
-            //     background: ${token.colorBgLayout}80;
+                // @media (max-width: ${hideMenuMediaWidth}px) {
+                //     background: ${token.colorBgLayout}80;
             //     width: 0;
             //     visibility: hidden;
             //     height: 100%;
             //     display: flex;
             //     flex-direction: column;
-            //     border-radius: ${token.borderRadius}px;
+                //     border-radius: ${token.borderRadius}px;
             // }
-      
-    `,
+
+        `,
         conversations: css`
-      padding: 0 12px;
-      flex: 1;
-      overflow-y: auto;
-    `,
+            padding: 0 12px;
+            flex: 1;
+            overflow-y: auto;
+        `,
         chat: css`
-      height: 100%;
-      width: 80%;
-      margin: 0 auto;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      padding: ${token.paddingLG}px;
-      gap: 16px;
-    `,
+            height: 100%;
+            width: 80%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            padding: ${token.paddingLG}px;
+            gap: 16px;
+        `,
         messages: css`
-      flex: 1;
-    `,
+            flex: 1;
+        `,
         placeholder: css`
-      padding-top: 32px;
-    `,
+            padding-top: 32px;
+        `,
         sender: css`
-      box-shadow: ${token.boxShadow};
-    `,
+            box-shadow: ${token.boxShadow};
+        `,
         logo: css`
-      display: flex;
-      height: 72px;
-      align-items: center;
-      justify-content: start;
-      padding: 0 24px;
-      box-sizing: border-box;
+            display: flex;
+            height: 72px;
+            align-items: center;
+            justify-content: start;
+            padding: 0 24px;
+            box-sizing: border-box;
 
-      img {
-        width: 24px;
-        height: 24px;
-        display: inline-block;
-      }
+            img {
+                width: 24px;
+                height: 24px;
+                display: inline-block;
+            }
 
-      span {
-        display: inline-block;
-        margin: 0 8px;
-        font-weight: bold;
-        color: ${token.colorText};
-        font-size: 16px;
-      }
-    `,
+            span {
+                display: inline-block;
+                margin: 0 8px;
+                font-weight: bold;
+                color: ${token.colorText};
+                font-size: 16px;
+            }
+        `,
         addBtn: css`
-      background: #1677ff0f;
-      border: 1px solid #1677ff34;
-      width: calc(100% - 24px);
-      margin: 0 12px 24px 12px;
-    `,
+            background: #1677ff0f;
+            border: 1px solid #1677ff34;
+            width: calc(100% - 24px);
+            margin: 0 12px 24px 12px;
+        `,
     };
 });
 
 const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     {
         key: '1',
-        label: renderTitle(<FireOutlined style={{ color: '#FF4D4F' }} />, '标题'),
+        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
         description: '描述',
         children: [
             {
@@ -163,29 +175,29 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     },
     {
         key: '2',
-        label: renderTitle(<ReadOutlined style={{ color: '#1890FF' }} />, '评估供应链韧性'),
+        label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '评估供应链韧性'),
         description: '我可以帮助你评估供应链韧性，你可以尝试这样问：',
         children: [
             {
                 key: '2-1',
-                icon: <HeartOutlined />,
+                icon: <HeartOutlined/>,
                 description: `生成供应链网络结构图`,
             },
             {
                 key: '2-2',
-                icon: <SmileOutlined />,
+                icon: <SmileOutlined/>,
                 description: `我要对供应链结构进行仿真`,
             },
             {
                 key: '2-3',
-                icon: <CommentOutlined />,
+                icon: <CommentOutlined/>,
                 description: `666`,
             },
         ],
     },
     {
         key: '3',
-        label: renderTitle(<FireOutlined style={{ color: '#FF4D4F' }} />, '标题'),
+        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
         description: '描述',
         children: [
             {
@@ -208,26 +220,84 @@ const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     {
         key: '1',
         description: '热门信息',
-        icon: <FireOutlined style={{ color: '#FF4D4F' }} />,
+        icon: <FireOutlined style={{color: '#FF4D4F'}}/>,
     },
     {
         key: '2',
         description: '使用指导',
-        icon: <ReadOutlined style={{ color: '#1890FF' }} />,
+        icon: <ReadOutlined style={{color: '#1890FF'}}/>,
     },
 ];
 
+const mdComponentMyButton:React.FC<{
+    children: string;
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}> = ({children, onClick}) => {
+    return <Button onClick={onClick}> {children} </Button>
+}
 
-const mdComponents = {};
+let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
+let exampleSideChangeFn: (() => void) | undefined;
+let windowChatSize: number[] = [1,0];
+
+function checkRightSize():void{
+    if (windowChatSize[1]>20){
+        return
+    }
+    const opts = {
+        duration: 3,
+        position: 'bottomRight',
+        content: '请将鼠标移到窗口右侧，出现调整光标后将右侧隐藏页面拉开。',
+        title: '右侧边栏未展开',
+    };
+    Notification.warning({ ...opts, position: 'bottomRight' })
+}
+
+const mdComponentIFrameButton:React.FC<{
+    children: string;
+    src: string
+}> = ({ children, src }) => {
+    return <Button onClick={()=> {
+        checkRightSize()
+        if (setRightNodeFn === undefined){
+            return
+        }
+        setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
+    }}> {children} </Button>
+}
+
+const mdComponentExampleSideSheetShow:React.FC<{
+    children: string
+}> = ({ children }) => {
+    return <Button onClick={()=> {
+        if (exampleSideChangeFn === undefined){
+            return
+        }
+        exampleSideChangeFn()
+    }}>{children}</Button>
+}
+
+// const mdComponents = {};
+const mdxComponents = {
+    'MyButton':mdComponentMyButton,
+    'IFrameButton':mdComponentIFrameButton,
+    'ExampleSideSheetShow':mdComponentExampleSideSheetShow
+};
+
+
 
 const semiMarkdownRender = (content?: string) => {
-    return <MarkdownRender raw={content} format="md" components={mdComponents} />
+    return <MarkdownRender raw={content} components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
 };
+
+// const semiPureMarkdownRender = (content?: string) => {
+//     return <MarkdownRender raw={content} format="md" components={mdComponents}/>
+// }
 
 const roles: GetProp<typeof Bubble.List, 'roles'> = {
     ai: {
         placement: 'start',
-        typing: { step: 5, interval: 20 },
+        // typing: { step: 300, interval: 1 },
         styles: {
             content: {
                 borderRadius: 16,
@@ -238,11 +308,13 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
     local: {
         placement: 'end',
         variant: 'shadow',
-        messageRender: semiMarkdownRender,
+        // messageRender: semiPureMarkdownRender,
     },
 };
 
-const FullChatApp = React.forwardRef((props, ref) => {
+function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSize: number[] }){
+    setRightNodeFn = rightNodeFn;
+    windowChatSize = chatSize;
     // ==================== Style ====================
     const { styles } = useStyle();
 
@@ -265,6 +337,14 @@ const FullChatApp = React.forwardRef((props, ref) => {
     const layoutRef = React.useRef<HTMLDivElement>(null);
 
 
+    const [exampleSideVisible, setEexampleSideVisible] = React.useState(false);
+    const exampleSideChange = () => {
+        setEexampleSideVisible(!exampleSideVisible);
+    };
+
+    exampleSideChangeFn = exampleSideChange;
+
+
 
     // ==================== Runtime ====================
     const [agent] = useXAgent({
@@ -273,11 +353,12 @@ const FullChatApp = React.forwardRef((props, ref) => {
                 onSuccess('Hello! How can I help you?');
                 // return;
             }
-            if (message ==="card"){
-                onSuccess("123")
+            if (message ==="help" || message ==="帮助" || message==="使用指导"){
+                onSuccess(`## 支持Markdown和JSX混写 \n\n参考[SemiDesignMarkdown渲染器说明](https://semi.design/zh-CN/plus/markdownrender)\n\n注意： \\{\\} \\<\\> 等JSX符号需要转译，即实际传入的需要为 \\\\\\{ \\\\\\} \\\\\\< \\\\\\> \n\n图片示例：\\!\\[test picture\\](https://semi.design/dsm_manual/content/introduction/start/start-intro.png)\n\n点击图片可以放大\n\n![test picture](https://semi.design/dsm_manual/content/introduction/start/start-intro.png)\n\n直接在 Markdown 中书写 JSX ，例如写一个按钮：\n\n<MyButton onClick={()=>alert("一个弹窗")}>JS默认弹窗</MyButton>   <ExampleSideSheetShow>弹出侧边栏，查看示例语句</ExampleSideSheetShow>   点击按钮可以弹窗\n\n<IFrameButton src="https://mail.bit.edu.cn/">显示BIT邮箱</IFrameButton>   <IFrameButton src="https://www.bytelan.cn/">显示主页</IFrameButton>   点按钮可以在右侧显示网页\n\n你可以在下方输入框尝试输入Markdown格式和JSX内容，注意不要让 \\{\\} \\<\\> 等JSX符号单独出现，否则会崩溃`);
             }
 
-            onSuccess(`# Mock success return.\n\n 1. hello \n 2. nihao \n\n **123** \n You said: ${message}`);
+            // onSuccess(`### Mock success return.\n\n对话框输入help可查看帮助\n\n## You said: \n\n${message.replace(`\\`,`\\\\`).replace(`<`,`\\<`).replace(`>`,`\\>`).replace(`{`,`\\{`).replace(`}`,`\\}`)}`)
+            onSuccess(`### Mock success return.\n\n对话框输入help可查看帮助\n\n## You said: \n\n${message}`)
 
         },
     });
@@ -311,7 +392,7 @@ const FullChatApp = React.forwardRef((props, ref) => {
 
 
 
-    React.useImperativeHandle(ref, () => ({
+    React.useImperativeHandle(innerRef, () => ({
         handleResize
     }))
 
@@ -444,6 +525,7 @@ const FullChatApp = React.forwardRef((props, ref) => {
     );
 
     // ==================== Render =================
+    const example_side_text:string = "<IFrameButton src=\"https://www.bytelan.cn/\">显示主页</IFrameButton>";
     return (
         <div className={styles.layout} ref={layoutRef}>
             <div className={styles.menu} style={{ width: menuWidth, visibility: menuVisible }}>
@@ -487,8 +569,12 @@ const FullChatApp = React.forwardRef((props, ref) => {
                     className={styles.sender}
                 />
             </div>
+            <SideSheet title="滑动侧边栏示例" visible={exampleSideVisible} onCancel={exampleSideChange}>
+                <p>你可以在对话框输入以下内容，尝试渲染Markdown和JSX，这些内容都是AI返回到会话的。</p>
+                <p>{example_side_text}</p>
+            </SideSheet>
         </div>
     );
-});
+}
 
 export default FullChatApp
