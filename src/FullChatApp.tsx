@@ -454,6 +454,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             // http请求
             fetch(hostAddr+'auth/api/ckidCheck',{
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
                     "ckid": userIdValue
                 })
@@ -463,7 +466,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             .then(data => {
                 if (data.responseStatus === 'ckidCheckSuccess') {
                     Cookies.set('ckid',data.newCkid);
-                    setTempCkid(data.setCookies);
+                    setTempCkid(data.newCkid);
                     setUserName(data.userName);
                     setLoginState(true);
                     onLoginOption();
