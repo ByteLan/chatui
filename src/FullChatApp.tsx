@@ -23,9 +23,12 @@ import {
     SmileOutlined,
 } from '@ant-design/icons';
 import { Badge, type GetProp, Space, Button} from 'antd';
-import { MarkdownRender, SideSheet, Notification } from '@douyinfe/semi-ui';
+import {MarkdownRender, SideSheet, Notification, Empty, Toast} from '@douyinfe/semi-ui';
+import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
-
+import UserBar from "./components/UserBar.tsx";
+import Cookies from 'js-cookie';
+import {hostAddr} from "./serverConfig.tsx";
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -34,16 +37,16 @@ const renderTitle = (icon: React.ReactElement, title: string) => (
     </Space>
 );
 
-const defaultConversationsItems = [
-    {
-        key: '1122',
-        label: 'Conversations 1',
-    },
-    {
-        key: '1011',
-        label: 'Conversations 2',
-    }
-];
+// const defaultConversationsItems = [
+//     {
+//         key: '1122',
+//         label: 'Conversations 1',
+//     },
+//     {
+//         key: '1011',
+//         label: 'Conversations 2',
+//     }
+// ];
 
 // 隐藏菜单的媒体宽度
 const hideMenuMediaWidth = 850;
@@ -54,7 +57,7 @@ const useStyle = createStyles(({token, css}) => {
         layout: css`
             width: 100%;
             min-width: 300px;
-            height: 97vh;
+            height: 100%;
             min-height: 400px;
             border-radius: ${token.borderRadius}px;
             display: flex;
@@ -250,18 +253,38 @@ const mdComponentMyButton:React.FC<{
 let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
 let exampleSideChangeFn: (() => void) | undefined;
 let windowChatSize: number[] = [1,0];
+let setChatSizeString: (size: string) => void | undefined;
+// let handleResizePublic: () => void | undefined;
 
 function checkRightSize():void{
+    // console.log(windowChatSize);
     if (windowChatSize[1]>20){
         return
     }
+    // const opts = {
+    //     duration: 3,
+    //     position: 'bottomRight',
+    //     content: '请将鼠标移到窗口右侧，出现调整光标后将右侧隐藏页面拉开。',
+    //     title: '右侧边栏未展开',
+    // };
+    // Notification.warning({ ...opts, position: 'bottomRight' })
     const opts = {
-        duration: 3,
+        duration: 5,
         position: 'bottomRight',
-        content: '请将鼠标移到窗口右侧，出现调整光标后将右侧隐藏页面拉开。',
-        title: '右侧边栏未展开',
+        content: '您可以通过拖动中间的分隔条来改变大小或关闭。',
+        title: '已展开右侧边栏',
     };
     Notification.warning({ ...opts, position: 'bottomRight' })
+    if(setChatSizeString !== undefined){
+        // console.log("setChatSizeString 45%");
+        setChatSizeString('45%');
+        windowChatSize[1] = 21;
+        // console.warn("handrsz: "+handleResizePublic);
+        // if(handleResizePublic !== undefined) {
+        //     console.warn("in handlersz")
+        //     handleResizePublic();
+        // }
+    }
 }
 
 const mdComponentIFrameButton:React.FC<{
@@ -321,11 +344,28 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
         variant: 'shadow',
         // messageRender: semiPureMarkdownRender,
     },
+    aiMdx: {
+        placement: 'end',
+        // typing: { step: 300, interval: 1 },
+        styles: {
+            content: {
+                borderRadius: 16,
+            },
+        },
+        messageRender: semiMarkdownRender,
+    }
 };
 
-function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSize: number[] }){
+function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSizeConst: number[], setChatSize: any, chatSize: any }) {
     setRightNodeFn = rightNodeFn;
-    windowChatSize = chatSize;
+    windowChatSize = chatSizeConst;
+    setChatSizeString = setChatSize;
+    const [tempCkid, setTempCkid] = React.useState('');
+    const [userName, setUserName] = React.useState('');
+    const [loginState, setLoginState] = React.useState(false);
+    const [messageItems, setMessageItems] = React.useState<{key:string,loading:boolean,role:string,content:string}[]>([]);
+    const [conversationItems, setConversationItems] = React.useState<{key:string,label:string}[]>([]);
+
     // ==================== Style ====================
     const { styles } = useStyle();
 
@@ -334,9 +374,10 @@ function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: J
 
     const [inputContent, setInputInputContent] = React.useState('');
 
-    const [conversationsItems, setConversationsItems] = React.useState(defaultConversationsItems);
+    // const [conversationsItems, setConversationsItems] = React.useState(defaultConversationsItems);
 
-    const [activeKey, setActiveKey] = React.useState(defaultConversationsItems[0].key);
+    const [activeKey, setActiveKey] = React.useState("");
+    const [messageContentReplacementTitle, setMessageContentReplacementTitle] = React.useState("请先登录");
 
     const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
         [],
@@ -355,38 +396,129 @@ function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: J
 
     exampleSideChangeFn = exampleSideChange;
 
-
+    function onLoginOption(){
+        setMessageItems([]);
+        setConversationItems([]);
+        setMessageContentReplacementTitle("请先选择一个会话或新建一个会话");
+        fetch(hostAddr+'ai_chat/api/query_conversation_list',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: '{}'
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            if (data.responseStatus === 'success') {
+                setConversationItems(data.conversationList.map((item) => {
+                    return {
+                        key: item.conversationId,
+                        label: item.conversationName
+                    }
+                }));
+            }else{
+                setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+data);
+            }
+        }).catch((error) => {
+            console.error('Error:', error);
+            setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+error);
+        });
+    }
 
     // ==================== Runtime ====================
-    const [agent] = useXAgent({
-        request: async ({ message }, { onSuccess }) => {
-            if (message === 'hello') {
-                onSuccess('Hello! How can I help you?');
-                // return;
-            }
-            if (message ==="help" || message ==="帮助" || message==="使用指导"){
-                onSuccess(`## 支持Markdown和JSX混写 \n\n参考[SemiDesignMarkdown渲染器说明](https://semi.design/zh-CN/plus/markdownrender)\n\n注意： \\{\\} \\<\\> 等JSX符号需要转译，即实际传入的需要为 \\\\\\{ \\\\\\} \\\\\\< \\\\\\> \n\n图片示例：\\!\\[test picture\\](https://semi.design/dsm_manual/content/introduction/start/start-intro.png)\n\n点击图片可以放大\n\n![test picture](https://semi.design/dsm_manual/content/introduction/start/start-intro.png)\n\n直接在 Markdown 中书写 JSX ，例如写一个按钮：\n\n<MyButton onClick={()=>alert("一个弹窗")}>JS默认弹窗</MyButton>   <ExampleSideSheetShow>弹出侧边栏，查看示例语句</ExampleSideSheetShow>   点击按钮可以弹窗\n\n<IFrameButton src="https://mail.bit.edu.cn/">显示BIT邮箱</IFrameButton>   <IFrameButton src="https://www.bytelan.cn/">显示主页</IFrameButton>   点按钮可以在右侧显示网页\n\n你可以在下方输入框尝试输入Markdown格式和JSX内容，注意不要让 \\{\\} \\<\\> 等JSX符号单独出现，否则会崩溃`);
-            }
+    // const [agent] = useXAgent({
+    //     request: async ({ message }, { onSuccess }) => {
+    //         if (message === 'hello') {
+    //             onSuccess('Hello! How can I help you?');
+    //             // return;
+    //         }
+    //         if (message ==="help" || message ==="帮助" || message==="使用指导"){
+    //             onSuccess(`## 支持Markdown和JSX混写 \n\n参考[SemiDesignMarkdown渲染器说明](https://semi.design/zh-CN/plus/markdownrender)\n\n注意： \\{\\} \\<\\> 等JSX符号需要转译，即实际传入的需要为 \\\\\\{ \\\\\\} \\\\\\< \\\\\\> \n\n图片示例：\\!\\[test picture\\](https://semi.design/dsm_manual/content/introduction/start/start-intro.png)\n\n点击图片可以放大\n\n![test picture](https://semi.design/dsm_manual/content/introduction/start/start-intro.png)\n\n直接在 Markdown 中书写 JSX ，例如写一个按钮：\n\n<MyButton onClick={()=>alert("一个弹窗")}>JS默认弹窗</MyButton>   <ExampleSideSheetShow>弹出侧边栏，查看示例语句</ExampleSideSheetShow>   点击按钮可以弹窗\n\n<IFrameButton src="https://mail.bit.edu.cn/">显示BIT邮箱</IFrameButton>   <IFrameButton src="https://www.bytelan.cn/">显示主页</IFrameButton>   点按钮可以在右侧显示网页\n\n你可以在下方输入框尝试输入Markdown格式和JSX内容，注意不要让 \\{\\} \\<\\> 等JSX符号单独出现，否则会崩溃`);
+    //         }
+    //
+    //         // onSuccess(`### Mock success return.\n\n对话框输入help可查看帮助\n\n## You said: \n\n${message.replace(`\\`,`\\\\`).replace(`<`,`\\<`).replace(`>`,`\\>`).replace(`{`,`\\{`).replace(`}`,`\\}`)}`)
+    //         onSuccess(`### Mock success return.\n\n对话框输入help可查看帮助\n\n## You said: \n\n${message}`)
+    //
+    //     },
+    // });
 
-            // onSuccess(`### Mock success return.\n\n对话框输入help可查看帮助\n\n## You said: \n\n${message.replace(`\\`,`\\\\`).replace(`<`,`\\<`).replace(`>`,`\\>`).replace(`{`,`\\{`).replace(`}`,`\\}`)}`)
-            onSuccess(`### Mock success return.\n\n对话框输入help可查看帮助\n\n## You said: \n\n${message}`)
-
-        },
-    });
-
-    const { onRequest, messages, setMessages } = useXChat({
-        agent,
-    });
+    // const { onRequest, messages, setMessages } = useXChat({
+    //     agent,
+    // });
 
     useEffect(() => {
-        if (activeKey !== undefined) {
+        // 读取cookies中的userid
+        const userIdValue = Cookies.get('ckid');
+        if(userIdValue !== undefined){
+            // http请求
+            fetch(hostAddr+'auth/api/ckidCheck',{
+                method: 'POST',
+                body: JSON.stringify({
+                    "ckid": userIdValue
+                })
+            }).then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.responseStatus === 'ckidCheckSuccess') {
+                    Cookies.set('ckid',data.newCkid);
+                    setTempCkid(data.setCookies);
+                    setUserName(data.userName);
+                    setLoginState(true);
+                    onLoginOption();
+                }
+            }).catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    }, []);
+
+
+    useEffect(() => {
+        if (activeKey !== undefined && activeKey !== ""){
+            setMessageContentReplacementTitle("");
             // 这里应该要取历史消息，或者放入一个开场欢迎语
-            setMessages([]);
+            // setMessages([]);
+            fetch(hostAddr+'ai_chat/api/query_conversation_messages',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    conversationId: activeKey
+                })
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data.responseStatus === 'success') {
+                    setMessageItems(data.messageList.map((item) => {
+                        return {
+                            key: item.messageId,
+                            loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                            role: item.uid.startsWith("-")?'ai':'local',
+                            content: item.messageContent,
+                        }
+                    }));
+                }else{
+                    setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+data);
+                }
+            }).catch((error) => {
+                console.error('Error:', error);
+                setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+error);
+            })
+        }else{
+            if(messageContentReplacementTitle === ""){
+                setMessageContentReplacementTitle("请选择一个会话或新建一个会话");
+            }
         }
     }, [activeKey]);
 
     const handleResize = () => {
+        console.warn(layoutRef.current);
         if (layoutRef.current) {
+            console.warn(layoutRef.current.offsetWidth);
             const layoutWidth = layoutRef.current.offsetWidth;
             // 根据.layout的宽度设置menu的宽度逻辑
             if (layoutWidth > hideMenuMediaWidth) {
@@ -401,7 +533,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: J
         }
     };
 
-
+    // handleResizePublic = handleResize;
 
     React.useImperativeHandle(innerRef, () => ({
         handleResize
@@ -418,8 +550,80 @@ function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: J
         };
     }, []);
 
+    useEffect(() => {
+        handleResize();
+    }, [chatSizeConst]);
+
+    useEffect(() => {
+        handleResize();
+    }, [chatSize]);
 
     // ==================== Event ====================
+    function onRequest(nextContent: string) {
+        fetch(hostAddr+'ai_chat/api/send_message',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                conversationId: activeKey,
+                messageContent: nextContent
+            })
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            if (data.responseStatus === 'success') {
+                // data.appendMessages.map((item) => {
+                //     setMessageItems([
+                //         ...messageItems,
+                //         {
+                //             key: item.messageId,
+                //             loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                //             role: item.uid.startsWith("-")?'ai':'local',
+                //             content: item.messageContent,
+                //         },
+                //         {
+                //
+                //         }
+                //     ]);
+                // })
+                setMessageItems([
+                    ...messageItems,
+                    ...data.appendMessages.map((item) => {
+                        return {
+                            key: item.messageId,
+                            loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                            role: item.uid.startsWith("-")?'ai':'local',
+                            content: item.messageContent,
+                        }
+                    }),
+                ]);
+            }else{
+                const opts = {
+                    content: "发送消息失败！"+data,
+                    duration: 0,
+                    stack: true,
+                    theme: 'light',
+                };
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                Toast.error(opts);
+            }
+        }).catch((error) => {
+            console.error('Error:', error);
+            const opts = {
+                content: "发送消息异常！"+error,
+                duration: 0,
+                stack: true,
+                theme: 'light',
+            };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            Toast.error(opts);
+        })
+    }
+
     const onSubmit = (nextContent: string) => {
         if (!nextContent) return;
         onRequest(nextContent);
@@ -430,16 +634,61 @@ function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: J
         onRequest(info.data.description as string);
     };
 
-    const onAddConversation = () => {
-        setConversationsItems([
-            ...conversationsItems,
-            {
-                key: `${conversationsItems.length}`,
-                label: `New Conversation ${conversationsItems.length}`,
+    // const onAddConversation = () => {
+    //     setConversationsItems([
+    //         ...conversationsItems,
+    //         {
+    //             key: `${conversationsItems.length}`,
+    //             label: `New Conversation ${conversationsItems.length}`,
+    //         },
+    //     ]);
+    //     setActiveKey(`${conversationsItems.length}`);
+    // };
+    function onAddConversation(){
+        fetch(hostAddr+'ai_chat/api/create_conversation',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
-        ]);
-        setActiveKey(`${conversationsItems.length}`);
-    };
+            credentials: 'include',
+            body: '{}'
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            if (data.responseStatus === 'success') {
+                setConversationItems([
+                    {
+                        key: data.conversationId,
+                        label: data.conversationName,
+                    },
+                    ...conversationItems,
+                ]);
+                setActiveKey(data.conversationId);
+            }else{
+                const opts = {
+                    content: "新建会话失败！"+data,
+                    duration: 0,
+                    stack: true,
+                    theme: 'light',
+                };
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                Toast.error(opts);
+            }
+        }).catch((error) => {
+            console.error('Error:', error);
+            const opts = {
+                content: "新建会话异常！"+error,
+                duration: 0,
+                stack: true,
+                theme: 'light',
+            };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            Toast.error(opts);
+        });
+
+    }
 
     const onConversationClick: GetProp<typeof Conversations, 'onActiveChange'> = (key) => {
         setActiveKey(key);
@@ -483,12 +732,12 @@ function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: J
         </Space>
     );
 
-    const items: GetProp<typeof Bubble.List, 'items'> = messages.map(({ id, message, status }) => ({
-        key: id,
-        loading: status === 'loading',
-        role: status === 'local' ? 'local' : 'ai',
-        content: message,
-    }));
+    // const items: GetProp<typeof Bubble.List, 'items'> = messages.map(({ id, message, status }) => ({
+    //     key: id,
+    //     loading: status === 'loading',
+    //     role: status === 'local' ? 'local' : 'ai',
+    //     content: message,
+    // }));
 
     const attachmentsNode = (
         <Badge dot={attachedFiles.length > 0 && !headerOpen}>
@@ -553,32 +802,46 @@ function FullChatApp ({rightNodeFn, innerRef, chatSize}: { rightNodeFn: (node: J
                 </Button>
                 {/* 🌟 会话管理 */}
                 <Conversations
-                    items={conversationsItems}
+                    // items={conversationsItems}
+                    items={conversationItems}
                     className={styles.conversations}
                     activeKey={activeKey}
                     onActiveChange={onConversationClick}
                 />
+                <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
             </div>
             <div className={styles.chat} style={{ width: chatWidth}}>
-                {/* 🌟 消息列表 */}
-                <Bubble.List
-                    items={items.length > 0 ? items : [{ content: placeholderNode, variant: 'borderless' }]}
-                    roles={roles}
-                    className={styles.messages}
-                />
+                {
+                    (messageContentReplacementTitle === "")?(
+                        <>
+                            <Bubble.List
+                                items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
+                                roles={roles}
+                                className={styles.messages}
+                            />
+                            <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
+                            <Sender
+                                value={inputContent}
+                                header={senderHeader}
+                                onSubmit={onSubmit}
+                                onChange={setInputInputContent}
+                                prefix={attachmentsNode}
+                                loading={false}
+                                className={styles.sender}
+                            />
+                        </>
+                        ):(
+                            <>
+                                <Empty
+                                    image={<IllustrationConstruction style={{ width: 150, height: 150 }} />}
+                                    darkModeImage={<IllustrationConstructionDark style={{ width: 150, height: 150 }} />}
+                                    title={messageContentReplacementTitle}
+                                    style={{height: '100%', width: '100%'}}
+                                />
+                            </>
+                        )
+                }
 
-                {/* 🌟 提示词 */}
-                <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
-                {/* 🌟 输入框 */}
-                <Sender
-                    value={inputContent}
-                    header={senderHeader}
-                    onSubmit={onSubmit}
-                    onChange={setInputInputContent}
-                    prefix={attachmentsNode}
-                    loading={agent.isRequesting()}
-                    className={styles.sender}
-                />
             </div>
             <SideSheet title="滑动侧边栏示例" visible={exampleSideVisible} onCancel={exampleSideChange}>
                 <p>你可以在对话框输入以下内容，尝试渲染Markdown和JSX，这些内容都是AI返回到会话的。</p>
