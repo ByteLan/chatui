@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
     Attachments,
     Bubble,
@@ -28,7 +28,7 @@ import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinf
 import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
 import Cookies from 'js-cookie';
-import {hostAddr} from "./serverConfig.tsx";
+import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -277,7 +277,7 @@ function checkRightSize():void{
     Notification.warning({ ...opts, position: 'bottomRight' })
     if(setChatSizeString !== undefined){
         // console.log("setChatSizeString 45%");
-        setChatSizeString('45%');
+        setChatSizeString('30%');
         windowChatSize[1] = 21;
         // console.warn("handrsz: "+handleResizePublic);
         // if(handleResizePublic !== undefined) {
@@ -377,7 +377,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // const [conversationsItems, setConversationsItems] = React.useState(defaultConversationsItems);
 
     const [activeKey, setActiveKey] = React.useState("");
+    const activeKeyRef = useRef(activeKey);
     const [messageContentReplacementTitle, setMessageContentReplacementTitle] = React.useState("请先登录");
+    const messageContentReplacementTitleRef = useRef(messageContentReplacementTitle);
 
     const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
         [],
@@ -395,6 +397,96 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     };
 
     exampleSideChangeFn = exampleSideChange;
+
+    useEffect(() => {
+        activeKeyRef.current = activeKey;
+    }, [activeKey]);
+
+    useEffect(() => {
+        messageContentReplacementTitleRef.current = messageContentReplacementTitle;
+    }, [messageContentReplacementTitle]);
+
+    // 使用 useRef 存储 socket 对象
+    const socketRef = useRef<WebSocket | null>(null);
+    useEffect(() => {
+        function updateMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string){
+            console.log("updateMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
+            if(activeKeyRef.current != null && activeKeyRef.current !== '' && activeKeyRef.current === conversationId){
+                // const newMessageItems = messageItems.map((item) => {
+                //     if(item.key === messageId){
+                //         return {
+                //             key: item.key,
+                //             loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
+                //             role: messageUid.startsWith("-")?'ai':'local',
+                //             content: messageContent,
+                //         }
+                //     }else{
+                //         return item;
+                //     }
+                // });
+                setMessageItems(prevMessageItems => {
+                    const newMessageItems = prevMessageItems.map((item) => {
+                        if(item.key === messageId){
+                            return {
+                                key: item.key,
+                                loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
+                                role: messageUid.startsWith("-")?'ai':'local',
+                                content: messageContent,
+                            }
+                        }else{
+                            return item;
+                        }
+                    });
+                    console.info("update newMessageItems: "+newMessageItems);
+                    return newMessageItems;
+                });
+            }
+        }
+        if(loginState===false||tempCkid === ''){
+            socketRef.current?.close();
+            socketRef.current = null;
+        }else{
+            if(socketRef.current != null){
+                socketRef.current.close();
+                socketRef.current = null;
+            }
+            socketRef.current = new WebSocket(hostWsAddr+'ai_chat/ws');
+            socketRef.current.onopen = () => {
+                console.log('ws opened');
+                socketRef.current?.send(JSON.stringify({
+                    requestType: 'setActiveCkid',
+                    activeCkid: tempCkid,
+                }));
+            }
+            socketRef.current.onmessage = (event) => {
+                console.info("onMessage: "+event.data);
+                try{
+                    if (event.data != null){
+                        const jd = JSON.parse(event.data);
+                        if(jd.responseType !=null && jd.responseType === 'updateMessageWithMessageIdAndConversationId') {
+                            updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid);
+                        }
+                    }
+                }catch (e) {
+                    console.error("onMessageError: "+e);
+                }
+
+
+            }
+            socketRef.current.onclose = () => {
+
+            }
+            socketRef.current.onerror = () => {
+
+            }
+
+        }
+        return () => {
+            console.log('close socket, tempCkid changed:'+tempCkid);
+            socketRef.current?.close();
+            socketRef.current = null;
+        }
+    }, [tempCkid, loginState]);
 
     function onLoginOption(){
         setMessageItems([]);
@@ -512,7 +604,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+error);
             })
         }else{
-            if(messageContentReplacementTitle === ""){
+            if(messageContentReplacementTitleRef.current === ""){
                 setMessageContentReplacementTitle("请选择一个会话或新建一个会话");
             }
         }
@@ -631,6 +723,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         if (!nextContent) return;
         onRequest(nextContent);
         setInputInputContent('');
+        console.info("onSubmit, activeKey: "+activeKey);
     };
 
     const onPromptsItemClick: GetProp<typeof Prompts, 'onItemClick'> = (info) => {
@@ -666,7 +759,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     },
                     ...conversationItems,
                 ]);
+
                 setActiveKey(data.conversationId);
+                console.warn("setActiveKey: "+data.conversationId+"    activeKey: "+activeKey);
             }else{
                 const opts = {
                     content: "新建会话失败！"+data,
@@ -695,6 +790,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     const onConversationClick: GetProp<typeof Conversations, 'onActiveChange'> = (key) => {
         setActiveKey(key);
+        console.log('onConversationClick', key, "activeKey: ", activeKey);
     };
 
     const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
@@ -811,6 +907,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     activeKey={activeKey}
                     onActiveChange={onConversationClick}
                 />
+                {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
+                {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
+                {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
                 <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
             </div>
             <div className={styles.chat} style={{ width: chatWidth}}>
