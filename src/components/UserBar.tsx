@@ -43,6 +43,7 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({
                 userName: userName,
                 password: password,
@@ -53,7 +54,7 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
             if(data.responseStatus === 'loginSuccess'){
                 setLoginModalOpen(false);
                 setLoginUserName(data.userName);
-                Cookies.set('ckid', data.setCkid);
+                Cookies.set('localckid', data.setCkid);
                 setLoginState(true);
                 setTempCkid(data.setCkid);
                 onLogin();
