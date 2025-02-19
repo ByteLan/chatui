@@ -29,6 +29,7 @@ import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
 import Cookies from 'js-cookie';
 import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
+import bit_logo from './assets/logo_01.svg';
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -324,9 +325,9 @@ const semiMarkdownRender = (content?: string) => {
     return <MarkdownRender raw={content} components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
 };
 
-// const semiPureMarkdownRender = (content?: string) => {
-//     return <MarkdownRender raw={content} format="md" components={mdComponents}/>
-// }
+const semiPureMarkdownRender = (content?: string) => {
+    return <MarkdownRender raw={content} format="md" />
+}
 
 const roles: GetProp<typeof Bubble.List, 'roles'> = {
     ai: {
@@ -337,7 +338,7 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
                 borderRadius: 16,
             },
         },
-        messageRender: semiMarkdownRender,
+        messageRender: semiPureMarkdownRender,
     },
     local: {
         placement: 'end',
@@ -410,7 +411,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // 使用 useRef 存储 socket 对象
     const socketRef = useRef<WebSocket | null>(null);
     useEffect(() => {
-        function updateMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string){
+        function updateMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
             console.log("updateMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
             if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId){
                 // const newMessageItems = messageItems.map((item) => {
@@ -431,7 +432,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             return {
                                 key: item.key,
                                 loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
-                                role: messageUid.startsWith("-")?'ai':'local',
+                                role: messageUid.startsWith("-")?(messageType==='ai_mdx'?'ai_mdx':'ai'):'local',
                                 content: messageContent,
                             }
                         }else{
@@ -465,7 +466,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     if (event.data != null){
                         const jd = JSON.parse(event.data);
                         if(jd.responseType !=null && jd.responseType == 'updateMessageWithMessageIdAndConversationId') {
-                            updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid);
+                            updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType);
                         }
                     }
                 }catch (e) {
@@ -542,7 +543,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     useEffect(() => {
         // 读取cookies中的userid
-        const userIdValue = Cookies.get('ckid');
+        const userIdValue = Cookies.get('localckid');
         if(userIdValue !== undefined){
             // http请求
             fetch(hostAddr+'auth/api/ckidCheck',{
@@ -558,7 +559,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             })
             .then(data => {
                 if (data.responseStatus == 'ckidCheckSuccess') {
-                    Cookies.set('ckid',data.newCkid);
+                    Cookies.set('localckid',data.newCkid);
                     setTempCkid(data.newCkid);
                     setUserName(data.userName);
                     setLoginState(true);
@@ -593,7 +594,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         return {
                             key: item.messageId,
                             loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
-                            role: item.uid.startsWith("-")?'ai':'local',
+                            role: item.uid.startsWith("-")?(item.messageType==='ai_mdx'?'ai_mdx':'ai'):'local',
                             content: item.messageContent,
                         }
                     }));
@@ -656,6 +657,30 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     // ==================== Event ====================
     function onRequest(nextContent: string) {
+        if(activeKey == null || activeKey == ''){
+            const opts = {
+                content: "请先选择一个会话或新建一个会话（控件异常）",
+                duration: 3,
+                stack: true,
+                theme: 'light',
+            };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            Toast.error(opts);
+            return
+        }
+        if (loginState == false || tempCkid == '' ) {
+            const opts = {
+                content: "请先登录！（控件异常）",
+                duration: 3,
+                stack: true,
+                theme: 'light',
+            };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            Toast.error(opts);
+            return
+        }
         fetch(hostAddr+'ai_chat/api/send_message',{
             method: 'POST',
             headers: {
@@ -690,7 +715,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         return {
                             key: item.messageId,
                             loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
-                            role: item.uid.startsWith("-")?'ai':'local',
+                            role: item.uid.startsWith("-")?(item.messageType==='ai_mdx'?'ai_mdx':'ai'):'local',
+                            // role: item.uid.startsWith("-")?'ai':'local',
                             content: item.messageContent,
                         }
                     }),
@@ -742,6 +768,18 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     setActiveKey(`${conversationsItems.length}`);
     // };
     function onAddConversation(){
+        if(loginState == false || tempCkid == ''){
+            const opts = {
+                content: "请先登录！",
+                duration: 3,
+                stack: true,
+                theme: 'light',
+            };
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            Toast.error(opts);
+            return
+        }
         setIsCreatingConversation(true);
         fetch(hostAddr+'ai_chat/api/create_conversation',{
             method: 'POST',
@@ -880,7 +918,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const logoNode = (
         <div className={styles.logo}>
             <img
-                src="/react.svg"
+                src={bit_logo}
                 draggable={false}
                 alt="logo"
             />
