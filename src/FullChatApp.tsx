@@ -365,6 +365,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [loginState, setLoginState] = React.useState(false);
     const [messageItems, setMessageItems] = React.useState<{key:string,loading:boolean,role:string,content:string}[]>([]);
     const [conversationItems, setConversationItems] = React.useState<{key:string,label:string}[]>([]);
+    const [isCreatingConversation, setIsCreatingConversation] = React.useState(false);
 
     // ==================== Style ====================
     const { styles } = useStyle();
@@ -411,7 +412,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     useEffect(() => {
         function updateMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string){
             console.log("updateMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
-            if(activeKeyRef.current != null && activeKeyRef.current !== '' && activeKeyRef.current === conversationId){
+            if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId){
                 // const newMessageItems = messageItems.map((item) => {
                 //     if(item.key === messageId){
                 //         return {
@@ -426,7 +427,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 // });
                 setMessageItems(prevMessageItems => {
                     const newMessageItems = prevMessageItems.map((item) => {
-                        if(item.key === messageId){
+                        if(item.key == messageId){
                             return {
                                 key: item.key,
                                 loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
@@ -442,7 +443,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 });
             }
         }
-        if(loginState===false||tempCkid === ''){
+        if(loginState==false||tempCkid == ''){
             socketRef.current?.close();
             socketRef.current = null;
         }else{
@@ -463,7 +464,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 try{
                     if (event.data != null){
                         const jd = JSON.parse(event.data);
-                        if(jd.responseType !=null && jd.responseType === 'updateMessageWithMessageIdAndConversationId') {
+                        if(jd.responseType !=null && jd.responseType == 'updateMessageWithMessageIdAndConversationId') {
                             updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid);
                         }
                     }
@@ -502,7 +503,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         }).then(response => {
             return response.json();
         }).then(data => {
-            if (data.responseStatus === 'success') {
+            if (data.responseStatus == 'success') {
                 setConversationItems(data.conversationList.map((item) => {
                     return {
                         key: item.conversationId,
@@ -556,7 +557,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 return response.json();
             })
             .then(data => {
-                if (data.responseStatus === 'ckidCheckSuccess') {
+                if (data.responseStatus == 'ckidCheckSuccess') {
                     Cookies.set('ckid',data.newCkid);
                     setTempCkid(data.newCkid);
                     setUserName(data.userName);
@@ -587,7 +588,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }).then(response => {
                 return response.json();
             }).then(data => {
-                if (data.responseStatus === 'success') {
+                if (data.responseStatus == 'success') {
                     setMessageItems(data.messageList.map((item) => {
                         return {
                             key: item.messageId,
@@ -604,7 +605,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+error);
             })
         }else{
-            if(messageContentReplacementTitleRef.current === ""){
+            if(messageContentReplacementTitleRef.current == ""){
                 setMessageContentReplacementTitle("请选择一个会话或新建一个会话");
             }
         }
@@ -668,7 +669,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         }).then(response => {
             return response.json();
         }).then(data => {
-            if (data.responseStatus === 'success') {
+            if (data.responseStatus == 'success') {
                 // data.appendMessages.map((item) => {
                 //     setMessageItems([
                 //         ...messageItems,
@@ -741,6 +742,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     setActiveKey(`${conversationsItems.length}`);
     // };
     function onAddConversation(){
+        setIsCreatingConversation(true);
         fetch(hostAddr+'ai_chat/api/create_conversation',{
             method: 'POST',
             headers: {
@@ -751,7 +753,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         }).then(response => {
             return response.json();
         }).then(data => {
-            if (data.responseStatus === 'success') {
+            if (data.responseStatus == 'success') {
                 setConversationItems([
                     {
                         key: data.conversationId,
@@ -773,6 +775,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 // @ts-expect-error
                 Toast.error(opts);
             }
+            setIsCreatingConversation(false);
         }).catch((error) => {
             console.error('Error:', error);
             const opts = {
@@ -784,7 +787,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             Toast.error(opts);
+            setIsCreatingConversation(false);
         });
+        // setIsCreatingConversation(false);
 
     }
 
@@ -860,7 +865,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 items={attachedFiles}
                 onChange={handleFileChange}
                 placeholder={(type) =>
-                    type === 'drop'
+                    type == 'drop'
                         ? { title: 'Drop file here' }
                         : {
                             icon: <CloudUploadOutlined />,
@@ -896,6 +901,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     type="link"
                     className={styles.addBtn}
                     icon={<PlusOutlined />}
+                    loading={isCreatingConversation}
                 >
                     New Conversation
                 </Button>
@@ -914,7 +920,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             </div>
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {
-                    (messageContentReplacementTitle === "")?(
+                    (messageContentReplacementTitle == "")?(
                         <>
                             <Bubble.List
                                 items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
