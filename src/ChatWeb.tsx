@@ -6,7 +6,7 @@ import { Splitter } from "antd";
 
 export default function ChatWeb() {
     const [chatSizeConst, setChatSizeConst] = useState([1,0]);
-    const [chatSize, setChatSize] = useState('100%');
+    const [chatSize, setChatSize] = useState<number|string>('100%');
     //使用useRef，类似于创造一个全局变量
     const chatRef = useRef();
     const [rightNode, setRightNode] = useState(<iframe src = "https://www.bytelan.cn" width="100%" height="100%"></iframe>);
@@ -14,7 +14,7 @@ export default function ChatWeb() {
     const onSplitterSizeChange = (sizes: number[]) => {
         console.warn("onSplitterSizeChange: "+sizes);
         setChatSizeConst(sizes);
-        setChatSize(""+sizes[0]);
+        setChatSize(sizes[0]);
         chatRef.current?.handleResize();
     }
 
