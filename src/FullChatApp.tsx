@@ -444,6 +444,10 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 });
             }
         }
+
+        let heartbeatInterval: NodeJS.Timeout;
+
+
         if(loginState==false||tempCkid == ''){
             socketRef.current?.close();
             socketRef.current = null;
@@ -459,6 +463,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     requestType: 'setActiveCkid',
                     activeCkid: tempCkid,
                 }));
+
+                heartbeatInterval = setInterval(() => {
+                    socketRef.current?.send('{}');
+                }, 25000);
+
             }
             socketRef.current.onmessage = (event) => {
                 console.info("onMessage: "+event.data);
@@ -476,15 +485,16 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
             }
             socketRef.current.onclose = () => {
-
+                clearInterval(heartbeatInterval);
             }
             socketRef.current.onerror = () => {
-
+                clearInterval(heartbeatInterval);
             }
 
         }
         return () => {
             console.log('close socket, tempCkid changed:'+tempCkid);
+            clearInterval(heartbeatInterval);
             socketRef.current?.close();
             socketRef.current = null;
         }
