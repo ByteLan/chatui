@@ -7,7 +7,7 @@ import {
     Sender,
     Welcome,
     useXAgent,
-    useXChat,
+    useXChat, ConversationsProps,
 } from '@ant-design/x';
 import { createStyles } from 'antd-style';
 import {
@@ -22,7 +22,7 @@ import {
     // ShareAltOutlined,
     SmileOutlined,
 } from '@ant-design/icons';
-import { Badge, type GetProp, Space, Button} from 'antd';
+import {Badge, type GetProp, Space, Button, Modal, Row, Col, Input, Flex} from 'antd';
 import {MarkdownRender, SideSheet, Notification, Empty, Toast} from '@douyinfe/semi-ui';
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
@@ -30,6 +30,7 @@ import UserBar from "./components/UserBar.tsx";
 import Cookies from 'js-cookie';
 import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
+import { DeleteOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -244,12 +245,6 @@ const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     },
 ];
 
-const mdComponentMyButton:React.FC<{
-    children: string;
-    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}> = ({children, onClick}) => {
-    return <Button onClick={onClick}> {children} </Button>
-}
 
 let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
 let exampleSideChangeFn: (() => void) | undefined;
@@ -288,10 +283,36 @@ function checkRightSize():void{
     }
 }
 
-const mdComponentIFrameButton:React.FC<{
-    children: string;
-    src: string
-}> = ({ children, src }) => {
+// const mdComponentMyButton:React.FC<{
+//     children: string;
+//     onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+// }> = ({children, onClick}) => {
+//     return <Button onClick={onClick}> {children} </Button>
+// }
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentMyButton({children, onClick}){
+    return <Button onClick={onClick}> {children} </Button>
+}
+
+// const mdComponentIFrameButton:React.FC<{
+//     children: string;
+//     src: string
+// }> = ({ children, src }) => {
+//     return <Button onClick={()=> {
+//         checkRightSize()
+//         if (setRightNodeFn === undefined){
+//             return
+//         }
+//         setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
+//     }}> {children} </Button>
+// }
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentIFrameButton({children, src}){
+    console.warn("in mdComponentIFrameButton");
     return <Button onClick={()=> {
         checkRightSize()
         if (setRightNodeFn === undefined){
@@ -301,9 +322,20 @@ const mdComponentIFrameButton:React.FC<{
     }}> {children} </Button>
 }
 
-const mdComponentExampleSideSheetShow:React.FC<{
-    children: string
-}> = ({ children }) => {
+// const mdComponentExampleSideSheetShow:React.FC<{
+//     children: string
+// }> = ({ children }) => {
+//     return <Button onClick={()=> {
+//         if (exampleSideChangeFn === undefined){
+//             return
+//         }
+//         exampleSideChangeFn()
+//     }}>{children}</Button>
+// }
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentExampleSideSheetShow({children}){
     return <Button onClick={()=> {
         if (exampleSideChangeFn === undefined){
             return
@@ -312,22 +344,41 @@ const mdComponentExampleSideSheetShow:React.FC<{
     }}>{children}</Button>
 }
 
-// const mdComponents = {};
+// // const mdComponents = {};
+// const mdxComponents = {};
+//
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// // @ts-expect-error
+// mdxComponents['MyButton']=mdComponentMyButton;
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// // @ts-expect-error
+// mdxComponents['IFrameButton']=mdComponentIFrameButton;
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// // @ts-expect-error
+// mdxComponents['ExampleSideSheetShow']=mdComponentExampleSideSheetShow;
+
+// console.warn(mdxComponents);
+//
+// console.warn(...MarkdownRender.defaultComponents,...mdxComponents);
+
 const mdxComponents = {
     'MyButton':mdComponentMyButton,
     'IFrameButton':mdComponentIFrameButton,
     'ExampleSideSheetShow':mdComponentExampleSideSheetShow
 };
 
+// console.warn(mdxComponents);
 
 
 const semiMarkdownRender = (content?: string) => {
-    return <MarkdownRender raw={content} components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
+    return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
+    // return <div>123</div>
 };
+
 
 const semiPureMarkdownRender = (content?: string) => {
     return <MarkdownRender raw={content} format="md" />
-}
+};
 
 const roles: GetProp<typeof Bubble.List, 'roles'> = {
     ai: {
@@ -346,7 +397,7 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
         // messageRender: semiPureMarkdownRender,
     },
     aiMdx: {
-        placement: 'end',
+        placement: 'start',
         // typing: { step: 300, interval: 1 },
         styles: {
             content: {
@@ -354,8 +405,10 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
             },
         },
         messageRender: semiMarkdownRender,
-    }
+    },
 };
+
+
 
 function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSizeConst: number[], setChatSize: any, chatSize: any }) {
     setRightNodeFn = rightNodeFn;
@@ -366,6 +419,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [loginState, setLoginState] = React.useState(false);
     const [messageItems, setMessageItems] = React.useState<{key:string,loading:boolean,role:string,content:string}[]>([]);
     const [conversationItems, setConversationItems] = React.useState<{key:string,label:string}[]>([]);
+    const conversationItemsRef = useRef(conversationItems);
     const [isCreatingConversation, setIsCreatingConversation] = React.useState(false);
 
     // ==================== Style ====================
@@ -392,13 +446,10 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [menuVisible, setMenuVisible] = React.useState('visible');
     const layoutRef = React.useRef<HTMLDivElement>(null);
 
-
-    const [exampleSideVisible, setEexampleSideVisible] = React.useState(false);
-    const exampleSideChange = () => {
-        setEexampleSideVisible(!exampleSideVisible);
-    };
-
-    exampleSideChangeFn = exampleSideChange;
+    // Modal rename
+    const renameName = useRef('');
+    // const [renameName, setRenameName] = React.useState('');
+    // const [renameConversationKey, setRenameConversationKey] = React.useState('');
 
     useEffect(() => {
         activeKeyRef.current = activeKey;
@@ -407,6 +458,209 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     useEffect(() => {
         messageContentReplacementTitleRef.current = messageContentReplacementTitle;
     }, [messageContentReplacementTitle]);
+
+    useEffect(() => {
+        conversationItemsRef.current = conversationItems;
+    }, [conversationItems]);
+
+
+    const menuConfig: ConversationsProps['menu'] = (conversation) => ({
+        items: [
+            {
+                label: '重命名会话',
+                key: 'editName',
+                icon: <EditOutlined />,
+            },
+            {
+                label: '删除会话',
+                key: 'deleteConversation',
+                icon: <DeleteOutlined />,
+                danger: true,
+            },
+        ],
+        onClick: (menuInfo) => {
+            if(menuInfo.key === 'editName'){
+                Modal.confirm({
+                    title: '重命名会话',
+                    maskClosable: true,
+                    content: (
+                        <Flex vertical={true}>
+                            <p>重命名会话：{conversation.label}</p>
+                            <Row>
+                                <Col flex='80px'>新名称：</Col>
+                                <Col flex='auto'><Input onChange={(e) => renameName.current = e.target.value}/></Col>
+                            </Row>
+                        </Flex>
+                    ),
+                    onOk() {
+                        return new Promise((resolve, reject) => {
+                            fetch(hostAddr+'ai_chat/api/rename_conversation',{
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                credentials: 'include',
+                                body: JSON.stringify({
+                                    conversationId: conversation.key,
+                                    newConversationName: renameName.current
+                                })
+                            }).then(response => {
+                                return response.json();
+                            }).then(data => {
+                                if (data.responseStatus == 'success') {
+                                    const newConversationItems = conversationItems.map((item) => {
+                                        if(item.key == conversation.key){
+                                            return {
+                                                key: item.key,
+                                                label: renameName.current
+                                            }
+                                        }else{
+                                            return item;
+                                        }
+                                    });
+                                    const index = newConversationItems.findIndex((item) => item.key == conversation.key);
+                                    if(index == -1){
+                                        console.error('重命名会话失败！本地列表错误！ '+conversation.key+' '+conversation.label+' '+renameName.current+' '+data);
+                                        reject();
+                                    }else{
+                                        const thisItem = newConversationItems[index];
+                                        newConversationItems.splice(index, 1);
+                                        setConversationItems([thisItem, ...newConversationItems]);
+                                        const opts = {
+                                            content: "["+renameName.current+"] 重命名成功！",
+                                            duration: 3,
+                                            stack: true,
+                                            theme: 'light',
+                                        }
+                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                        // @ts-expect-error
+                                        Toast.success(opts);
+                                        resolve();
+                                    }
+                                }else{
+                                    console.error('重命名会话失败！返回错误 '+conversation.key+' '+conversation.label+' '+renameName.current+' '+data);
+                                    reject();
+                                }
+                            }).catch(() => {
+                                reject();
+                            })
+                        }).catch(() => {
+                            console.error('重命名会话失败！ '+conversation.key+' '+conversation.label+' '+renameName.current);
+                            const opts = {
+                                content: "[重命名会话] 失败！ "+conversation.key+" "+conversation.label+" "+renameName.current,
+                                duration: 3,
+                                stack: true,
+                                theme: 'light',
+                            }
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-expect-error
+                            Toast.error(opts);
+                            // Promise.reject();
+                        })
+                    },
+                });
+            }else if(menuInfo.key === 'deleteConversation'){
+                Modal.confirm({
+                    title: '确认删除？',
+                    maskClosable: true,
+                    content: '确认删除会话：'+conversation.label,
+                    onOk() {
+                        return new Promise((resolve, reject) => {
+                            fetch(hostAddr+'ai_chat/api/delete_conversation',{
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                credentials: 'include',
+                                body: JSON.stringify({
+                                    conversationId: conversation.key
+                                })
+                            }).then(response => {
+                                return response.json();
+                            }).then(data => {
+                                if (data.responseStatus == 'success') {
+                                    // const newConversationItems = conversationItems.map((item) => {
+                                    //     if(item.key != conversation.key){
+                                    //         return item;
+                                    //     }else{
+                                    //         return null;
+                                    //     }
+                                    // });
+                                    // console.warn("deleteConversation");
+                                    // console.warn(newConversationItems);
+                                    const indexToDelete = conversationItemsRef.current.findIndex((item) => item.key == conversation.key);
+                                    if(indexToDelete == -1){
+                                        console.error('删除会话失败！本地列表错误！ '+conversation.key+' '+conversation.label+' '+data);
+                                        reject();
+                                    }
+                                    conversationItemsRef.current.splice(indexToDelete, 1);
+                                    setConversationItems(conversationItemsRef.current);
+                                    setActiveKey('');
+                                    const opts = {
+                                        content: "["+conversation.label+"] 删除成功！",
+                                        duration: 3,
+                                        stack: true,
+                                        theme: 'light',
+                                    }
+                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // @ts-expect-error
+                                    Toast.success(opts);
+                                    resolve();
+                                }else{
+                                    // console.error('删除会话失败！ '+conversation.key+' '+conversation.label+' '+data);
+                                    // const opts = {
+                                    //     content: "[删除会话] 请求异常！ "+conversation.key+" "+conversation.label+" "+data,
+                                    //     duration: 3,
+                                    //     stack: true,
+                                    //     theme: 'light',
+                                    // }
+                                    // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // // @ts-expect-error
+                                    // Toast.error(opts);
+                                    reject();
+                                }
+                            }).catch(() => {
+                                reject();
+                            });
+                            // throw new Error('删除会话失败！ '+conversation.key+' '+conversation.label);等效于reject();
+                        }).catch(() => {
+                            console.log('删除会话失败！ '+conversation.key+' '+conversation.label);
+                            const opts = {
+                                content: "[删除会话] 失败！ "+conversation.key+" "+conversation.label,
+                                duration: 3,
+                                stack: true,
+                                theme: 'light',
+                            }
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-expect-error
+                            Toast.error(opts);
+                        });
+                    },
+                });
+
+
+            }else{
+                const opts = {
+                    content: "[menu] 未知操作",
+                    duration: 3,
+                    stack: true,
+                    theme: 'light',
+                }
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                Toast.warning(opts);
+            }
+            console.info(`Click ${conversation.key} - ${menuInfo.key}`);
+        },
+    });
+
+
+    const [exampleSideVisible, setEexampleSideVisible] = React.useState(false);
+    const exampleSideChange = () => {
+        setEexampleSideVisible(!exampleSideVisible);
+    };
+
+    exampleSideChangeFn = exampleSideChange;
 
     // 使用 useRef 存储 socket 对象
     const socketRef = useRef<WebSocket | null>(null);
@@ -432,21 +686,35 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             return {
                                 key: item.key,
                                 loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
-                                role: messageUid.startsWith("-")?(messageType==='ai_mdx'?'ai_mdx':'ai'):'local',
+                                role: messageUid.startsWith("-")?(messageType=='ai_mdx'?'aiMdx':'ai'):'local',
                                 content: messageContent,
                             }
                         }else{
                             return item;
                         }
                     });
-                    console.info("update newMessageItems: "+newMessageItems);
+                    console.info(newMessageItems);
                     return newMessageItems;
                 });
             }
         }
 
-        let heartbeatInterval: NodeJS.Timeout;
+        function updateConversationName(conversationId:string, newConversationName:string){
+            console.log("fun updateConversationName: "+conversationId+" "+newConversationName);
+            const newConversationItems = conversationItemsRef.current.map((item) => {
+                if(item.key == conversationId){
+                    return {
+                        key: item.key,
+                        label: newConversationName
+                    }
+                }else{
+                    return item;
+                }
+            });
+            setConversationItems(newConversationItems);
+        }
 
+        let heartbeatInterval: NodeJS.Timeout;
 
         if(loginState==false||tempCkid == ''){
             socketRef.current?.close();
@@ -457,40 +725,43 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 socketRef.current = null;
             }
             socketRef.current = new WebSocket(hostWsAddr+'ai_chat/ws');
+
             socketRef.current.onopen = () => {
                 console.log('ws opened');
                 socketRef.current?.send(JSON.stringify({
                     requestType: 'setActiveCkid',
                     activeCkid: tempCkid,
                 }));
-
                 heartbeatInterval = setInterval(() => {
                     socketRef.current?.send('{}');
                 }, 25000);
-
             }
+
             socketRef.current.onmessage = (event) => {
                 console.info("onMessage: "+event.data);
                 try{
                     if (event.data != null){
                         const jd = JSON.parse(event.data);
-                        if(jd.responseType !=null && jd.responseType == 'updateMessageWithMessageIdAndConversationId') {
-                            updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType);
+                        if(jd.responseType !=null) {
+                            if(jd.responseType == 'updateMessageWithMessageIdAndConversationId'){
+                                updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType);
+                            }else if(jd.responseType == 'updateConversationName'){
+                                updateConversationName(jd.conversationId, jd.updateNewConversationName);
+                            }
                         }
                     }
                 }catch (e) {
                     console.error("onMessageError: "+e);
                 }
-
-
             }
+
             socketRef.current.onclose = () => {
                 clearInterval(heartbeatInterval);
             }
+
             socketRef.current.onerror = () => {
                 clearInterval(heartbeatInterval);
             }
-
         }
         return () => {
             console.log('close socket, tempCkid changed:'+tempCkid);
@@ -601,10 +872,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }).then(data => {
                 if (data.responseStatus == 'success') {
                     setMessageItems(data.messageList.map((item) => {
+                        // console.log("role  ",item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local');
                         return {
                             key: item.messageId,
                             loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
-                            role: item.uid.startsWith("-")?(item.messageType==='ai_mdx'?'ai_mdx':'ai'):'local',
+                            role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
                             content: item.messageContent,
                         }
                     }));
@@ -725,12 +997,22 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         return {
                             key: item.messageId,
                             loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
-                            role: item.uid.startsWith("-")?(item.messageType==='ai_mdx'?'ai_mdx':'ai'):'local',
+                            role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
                             // role: item.uid.startsWith("-")?'ai':'local',
                             content: item.messageContent,
                         }
                     }),
                 ]);
+                // 将当前Conversation更新到最上面
+                const index = conversationItems.findIndex((item) => item.key == activeKey);
+                if(index != -1){
+                    const upConversationItem = conversationItems[index];
+                    conversationItems.splice(index, 1);
+                    setConversationItems([
+                        upConversationItem,
+                        ...conversationItems
+                    ]);
+                }
             }else{
                 const opts = {
                     content: "发送消息失败！"+data,
@@ -960,6 +1242,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     className={styles.conversations}
                     activeKey={activeKey}
                     onActiveChange={onConversationClick}
+                    menu={menuConfig}
                 />
                 {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
                 {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
