@@ -27,10 +27,11 @@ import {MarkdownRender, SideSheet, Notification, Empty, Toast} from '@douyinfe/s
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
+import AnylogicSimulationDemoPage from "./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -312,7 +313,7 @@ function mdComponentMyButton({children, onClick}){
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 function mdComponentIFrameButton({children, src}){
-    console.warn("in mdComponentIFrameButton");
+    // console.warn("in mdComponentIFrameButton");
     return <Button onClick={()=> {
         checkRightSize()
         if (setRightNodeFn === undefined){
@@ -344,6 +345,26 @@ function mdComponentExampleSideSheetShow({children}){
     }}>{children}</Button>
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentAnylogicSimulationDemoButton({children, src}){
+    return <Button onClick={()=> {
+        checkRightSize()
+        if (setRightNodeFn === undefined){
+            return
+        }
+        if(src == null){
+            setRightNodeFn(
+                <AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/>
+            )
+        }else{
+            setRightNodeFn(
+                <AnylogicSimulationDemoPage simAddr={src}/>
+            )
+        }
+    }}> {children} </Button>
+}
+
 // // const mdComponents = {};
 // const mdxComponents = {};
 //
@@ -361,9 +382,17 @@ function mdComponentExampleSideSheetShow({children}){
 //
 // console.warn(...MarkdownRender.defaultComponents,...mdxComponents);
 
+// const mdxComponents = {
+//     'MyButton':mdComponentMyButton,
+//     'IFrameButton':mdComponentIFrameButton,
+//     'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
+//     'ExampleSideSheetShow':mdComponentExampleSideSheetShow
+// };
+
 const mdxComponents = {
     'MyButton':mdComponentMyButton,
     'IFrameButton':mdComponentIFrameButton,
+    'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
     'ExampleSideSheetShow':mdComponentExampleSideSheetShow
 };
 
@@ -761,6 +790,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
             socketRef.current.onerror = () => {
                 clearInterval(heartbeatInterval);
+                console.error('ws on error');
             }
         }
         return () => {
@@ -822,34 +852,58 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     agent,
     // });
 
+    // useEffect(() => {
+    //     // 读取cookies中的userid
+    //     const userIdValue = Cookies.get('localckid');
+    //     if(userIdValue !== undefined){
+    //         // http请求
+    //         fetch(hostAddr+'auth/api/ckidCheck',{
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             credentials: 'include',
+    //             body: JSON.stringify({
+    //                 "ckid": userIdValue
+    //             })
+    //         }).then(response => {
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             if (data.responseStatus == 'ckidCheckSuccess') {
+    //                 Cookies.set('localckid',data.newCkid, { expires: 3 });
+    //                 setTempCkid(data.newCkid);
+    //                 setUserName(data.userName);
+    //                 setLoginState(true);
+    //                 onLoginOption();
+    //             }
+    //         }).catch((error) => {
+    //             console.error('Error:', error);
+    //         });
+    //     }
+    // }, []);
+
     useEffect(() => {
-        // 读取cookies中的userid
-        const userIdValue = Cookies.get('localckid');
-        if(userIdValue !== undefined){
-            // http请求
-            fetch(hostAddr+'auth/api/ckidCheck',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    "ckid": userIdValue
-                })
-            }).then(response => {
-                return response.json();
-            })
+        // http请求
+        fetch(hostAddr+'auth/api/ckidCheck',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: "{}"
+        }).then(response => {
+            return response.json();
+        })
             .then(data => {
                 if (data.responseStatus == 'ckidCheckSuccess') {
-                    Cookies.set('localckid',data.newCkid);
+                    // Cookies.set('localckid',data.newCkid, { expires: 3 });
                     setTempCkid(data.newCkid);
                     setUserName(data.userName);
                     setLoginState(true);
                     onLoginOption();
                 }
-            }).catch((error) => {
-                console.error('Error:', error);
-            });
-        }
+            }).catch((error) => {console.error('Error:', error);});
     }, []);
 
 
@@ -1247,6 +1301,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
                 {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
                 {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
+                {mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}
                 <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
             </div>
             <div className={styles.chat} style={{ width: chatWidth}}>
