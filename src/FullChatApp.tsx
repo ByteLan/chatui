@@ -251,6 +251,7 @@ let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
 let exampleSideChangeFn: (() => void) | undefined;
 let windowChatSize: number[] = [1,0];
 let setChatSizeString: (size: string) => void | undefined;
+let setSubPageSizeFn: (size: string) => void | undefined;
 // let handleResizePublic: () => void | undefined;
 
 function checkRightSize():void{
@@ -272,9 +273,10 @@ function checkRightSize():void{
         title: '已展开右侧边栏',
     };
     Notification.warning({ ...opts, position: 'bottomRight' })
-    if(setChatSizeString !== undefined){
+    if(setChatSizeString !== undefined && setSubPageSizeFn !== undefined){
         // console.log("setChatSizeString 45%");
-        setChatSizeString('30%');
+        setChatSizeString('40%');
+        setSubPageSizeFn('60%');
         windowChatSize[1] = 21;
         // console.warn("handrsz: "+handleResizePublic);
         // if(handleResizePublic !== undefined) {
@@ -439,10 +441,11 @@ const roles: GetProp<typeof Bubble.List, 'roles'> = {
 
 
 
-function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSizeConst: number[], setChatSize: any, chatSize: any }) {
+function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
     setRightNodeFn = rightNodeFn;
     windowChatSize = chatSizeConst;
     setChatSizeString = setChatSize;
+    setSubPageSizeFn = setSubPageSize;
     const [tempCkid, setTempCkid] = React.useState('');
     const [userName, setUserName] = React.useState('');
     const [loginState, setLoginState] = React.useState(false);
@@ -1268,7 +1271,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 draggable={false}
                 alt="logo"
             />
-            <span>BIT</span>
+            <span>丝路大模型</span>
         </div>
     );
 

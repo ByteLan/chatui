@@ -9,6 +9,7 @@ import {Empty} from "@douyinfe/semi-ui";
 export default function ChatWeb() {
     const [chatSizeConst, setChatSizeConst] = useState([1,0]);
     const [chatSize, setChatSize] = useState<number|string>('100%');
+    const [subPageSize, setSubPageSize] = useState<number|string>('0%');
     //使用useRef，类似于创造一个全局变量
     const chatRef = useRef();
     const [rightNode, setRightNode] = useState(
@@ -30,6 +31,7 @@ export default function ChatWeb() {
         console.warn("onSplitterSizeChange: "+sizes);
         setChatSizeConst(sizes);
         setChatSize(sizes[0]);
+        setSubPageSize(sizes[1]);
         chatRef.current?.handleResize();
     }
 
@@ -45,9 +47,9 @@ export default function ChatWeb() {
                 onResize={onSplitterSizeChange}
             >
                 <Splitter.Panel collapsible size={chatSize} defaultSize="100%" min="20%">
-                    <FullChatApp rightNodeFn={setRightNode} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize}></FullChatApp>
+                    <FullChatApp rightNodeFn={setRightNode} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
                 </Splitter.Panel>
-                <Splitter.Panel collapsible defaultSize='0%' style={{overflow: 'auto', height: '100%', width: '100%'}}>
+                <Splitter.Panel collapsible defaultSize='0%' size={subPageSize} style={{overflow: 'auto', height: '100%', width: '100%'}}>
                     {rightNode}
                 </Splitter.Panel>
             </Splitter>
