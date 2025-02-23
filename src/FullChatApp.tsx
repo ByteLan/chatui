@@ -1,14 +1,18 @@
 import React, {useEffect, useRef, lazy, Suspense} from 'react';
 import {
     Attachments,
-    Bubble,
-    Conversations,
     Prompts,
+    Bubble,
     Sender,
     Welcome,
-    useXAgent,
-    useXChat, ConversationsProps,
+    // useXAgent,
+    // useXChat,
+    ConversationsProps,
 } from '@ant-design/x';
+
+const Conversations = lazy(() => import('@ant-design/x').then(module => ({ default: module.Conversations })));
+// const Bubble = lazy(() => import('@ant-design/x').then(module => ({ default: module.Bubble })));
+
 import { createStyles } from 'antd-style';
 import {
     CloudUploadOutlined,
@@ -23,7 +27,7 @@ import {
     SmileOutlined,
 } from '@ant-design/icons';
 import {Badge, type GetProp, Space, Button, Modal, Row, Col, Input, Flex} from 'antd';
-import {MarkdownRender, SideSheet, Notification, Empty, Toast} from '@douyinfe/semi-ui';
+import {MarkdownRender, SideSheet, Notification, Empty, Toast, List} from '@douyinfe/semi-ui';
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
@@ -1294,14 +1298,17 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     New Conversation
                 </Button>
                 {/* 🌟 会话管理 */}
-                <Conversations
-                    // items={conversationsItems}
-                    items={conversationItems}
-                    className={styles.conversations}
-                    activeKey={activeKey}
-                    onActiveChange={onConversationClick}
-                    menu={menuConfig}
-                />
+                <LazyImportSuspense style={{ width: '100%', flex: 1}}>
+                    <Conversations
+                        // items={conversationsItems}
+                        items={conversationItems}
+                        className={styles.conversations}
+                        activeKey={activeKey}
+                        onActiveChange={onConversationClick}
+                        menu={menuConfig}
+                    />
+                </LazyImportSuspense>
+
                 {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
                 {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
                 {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
