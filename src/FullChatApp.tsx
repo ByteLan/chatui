@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, lazy, Suspense} from 'react';
 import {
     Attachments,
     Bubble,
@@ -31,7 +31,7 @@ import UserBar from "./components/UserBar.tsx";
 import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
-import AnylogicSimulationDemoPage from "./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"
+const AnylogicSimulationDemoPage = lazy(() => import("./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -357,11 +357,16 @@ function mdComponentAnylogicSimulationDemoButton({children, src}){
         }
         if(src == null){
             setRightNodeFn(
-                <AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/>
+                </Suspense>
             )
         }else{
             setRightNodeFn(
-                <AnylogicSimulationDemoPage simAddr={src}/>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <AnylogicSimulationDemoPage simAddr={src}/>
+                </Suspense>
+
             )
         }
     }}> {children} </Button>

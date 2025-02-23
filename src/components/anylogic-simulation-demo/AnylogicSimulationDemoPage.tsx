@@ -21,7 +21,6 @@ import {Toast, Typography} from '@douyinfe/semi-ui';
 import SimDataShowContent from './components/SimDataShowContent.tsx';
 import {demoDataShowMenuItems, demoSimDataShowItems, demoSimsData} from './assets/demoData.tsx';
 
-
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -30,7 +29,7 @@ import {
     VideoCameraOutlined,
 } from '@ant-design/icons';
 
-import test_sim from "./assets/test_sim.png";
+// import test_sim from "./assets/test_sim.png";
 
 const {Header, Sider, Content} = Layout;
 
