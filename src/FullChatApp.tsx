@@ -31,6 +31,7 @@ import UserBar from "./components/UserBar.tsx";
 import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
+import LazyImportSuspense from "../../../silkroad-platform/src/LazyImportSuspense.tsx";
 const AnylogicSimulationDemoPage = lazy(() => import("./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
@@ -357,16 +358,11 @@ function mdComponentAnylogicSimulationDemoButton({children, src}){
         }
         if(src == null){
             setRightNodeFn(
-                <Suspense fallback={<div>Loading...</div>}>
-                    <AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/>
-                </Suspense>
+                <LazyImportSuspense><AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/></LazyImportSuspense>
             )
         }else{
             setRightNodeFn(
-                <Suspense fallback={<div>Loading...</div>}>
-                    <AnylogicSimulationDemoPage simAddr={src}/>
-                </Suspense>
-
+                <LazyImportSuspense><AnylogicSimulationDemoPage simAddr={src}/></LazyImportSuspense>
             )
         }
     }}> {children} </Button>
