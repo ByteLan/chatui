@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, lazy, Suspense} from 'react';
+import React, {useEffect, useRef, lazy} from 'react';
 import {
-    Attachments,
-    Prompts,
-    Bubble,
-    Sender,
-    Welcome,
+    // Attachments,
+    // Prompts,
+    // Bubble,
+    // Sender,
+    // Welcome,
     // useXAgent,
     // useXChat,
     ConversationsProps,
@@ -15,19 +15,19 @@ const Conversations = lazy(() => import('@ant-design/x').then(module => ({ defau
 
 import { createStyles } from 'antd-style';
 import {
-    CloudUploadOutlined,
-    CommentOutlined,
-    EllipsisOutlined,
-    FireOutlined,
-    HeartOutlined,
-    PaperClipOutlined,
+    // CloudUploadOutlined,
+    // CommentOutlined,
+    // EllipsisOutlined,
+    // FireOutlined,
+    // HeartOutlined,
+    // PaperClipOutlined,
     PlusOutlined,
-    ReadOutlined,
+    // ReadOutlined,
     // ShareAltOutlined,
-    SmileOutlined,
+    // SmileOutlined,
 } from '@ant-design/icons';
 import {Badge, type GetProp, Space, Button, Modal, Row, Col, Input, Flex} from 'antd';
-import {MarkdownRender, SideSheet, Notification, Empty, Toast, List} from '@douyinfe/semi-ui';
+import {SideSheet, Notification, Empty, Toast, List} from '@douyinfe/semi-ui';
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
@@ -35,15 +35,18 @@ import UserBar from "./components/UserBar.tsx";
 import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
-import LazyImportSuspense from "../../../silkroad-platform/src/LazyImportSuspense.tsx";
-const AnylogicSimulationDemoPage = lazy(() => import("./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
+import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
+// import ImChat from "./components/ImChat.tsx";
+const ImChat = lazy(() => import('./components/ImChat.tsx'));
 
-const renderTitle = (icon: React.ReactElement, title: string) => (
-    <Space align="start">
-        {icon}
-        <span>{title}</span>
-    </Space>
-);
+// const AnylogicSimulationDemoPage = lazy(() => import("./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
+
+// const renderTitle = (icon: React.ReactElement, title: string) => (
+//     <Space align="start">
+//         {icon}
+//         <span>{title}</span>
+//     </Space>
+// );
 
 // const defaultConversationsItems = [
 //     {
@@ -175,85 +178,85 @@ const useStyle = createStyles(({token, css}) => {
     };
 });
 
-const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
-    {
-        key: '1',
-        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
-        description: '描述',
-        children: [
-            {
-                key: '1-1',
-                description: `引导问题1`,
-            },
-            {
-                key: '1-2',
-                description: `引导问题2`,
-            },
-            {
-                key: '1-3',
-                description: `引导问题3`,
-            },
-        ],
-    },
-    {
-        key: '2',
-        label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '评估供应链韧性'),
-        description: '我可以帮助你评估供应链韧性，你可以尝试这样问：',
-        children: [
-            {
-                key: '2-1',
-                icon: <HeartOutlined/>,
-                description: `生成供应链网络结构图`,
-            },
-            {
-                key: '2-2',
-                icon: <SmileOutlined/>,
-                description: `我要对供应链结构进行仿真`,
-            },
-            {
-                key: '2-3',
-                icon: <CommentOutlined/>,
-                description: `666`,
-            },
-        ],
-    },
-    {
-        key: '3',
-        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '看这里'),
-        description: '点下面按钮',
-        children: [
-            {
-                key: '3-1',
-                description: `帮助`,
-            },
-            {
-                key: '3-2',
-                description: `使用指导`,
-            },
-            {
-                key: '3-3',
-                description: `help`,
-            },
-        ],
-    },
-];
+// const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
+//     {
+//         key: '1',
+//         label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
+//         description: '描述',
+//         children: [
+//             {
+//                 key: '1-1',
+//                 description: `引导问题1`,
+//             },
+//             {
+//                 key: '1-2',
+//                 description: `引导问题2`,
+//             },
+//             {
+//                 key: '1-3',
+//                 description: `引导问题3`,
+//             },
+//         ],
+//     },
+//     {
+//         key: '2',
+//         label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '评估供应链韧性'),
+//         description: '我可以帮助你评估供应链韧性，你可以尝试这样问：',
+//         children: [
+//             {
+//                 key: '2-1',
+//                 icon: <HeartOutlined/>,
+//                 description: `生成供应链网络结构图`,
+//             },
+//             {
+//                 key: '2-2',
+//                 icon: <SmileOutlined/>,
+//                 description: `我要对供应链结构进行仿真`,
+//             },
+//             {
+//                 key: '2-3',
+//                 icon: <CommentOutlined/>,
+//                 description: `666`,
+//             },
+//         ],
+//     },
+//     {
+//         key: '3',
+//         label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '看这里'),
+//         description: '点下面按钮',
+//         children: [
+//             {
+//                 key: '3-1',
+//                 description: `帮助`,
+//             },
+//             {
+//                 key: '3-2',
+//                 description: `使用指导`,
+//             },
+//             {
+//                 key: '3-3',
+//                 description: `help`,
+//             },
+//         ],
+//     },
+// ];
+//
+// const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
+//     {
+//         key: '1',
+//         description: 'help',
+//         icon: <FireOutlined style={{color: '#FF4D4F'}}/>,
+//     },
+//     {
+//         key: '2',
+//         description: '使用指导',
+//         icon: <ReadOutlined style={{color: '#1890FF'}}/>,
+//     },
+// ];
 
-const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
-    {
-        key: '1',
-        description: 'help',
-        icon: <FireOutlined style={{color: '#FF4D4F'}}/>,
-    },
-    {
-        key: '2',
-        description: '使用指导',
-        icon: <ReadOutlined style={{color: '#1890FF'}}/>,
-    },
-];
 
-
-let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
-let exampleSideChangeFn: (() => void) | undefined;
+// let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
+// let exampleSideChangeFn: (() => void) | undefined;
 let windowChatSize: number[] = [1,0];
 let setChatSizeString: (size: string) => void | undefined;
 let setSubPageSizeFn: (size: string) => void | undefined;
@@ -298,11 +301,11 @@ function checkRightSize():void{
 //     return <Button onClick={onClick}> {children} </Button>
 // }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-function mdComponentMyButton({children, onClick}){
-    return <Button onClick={onClick}> {children} </Button>
-}
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// // @ts-expect-error
+// function mdComponentMyButton({children, onClick}){
+//     return <Button onClick={onClick}> {children} </Button>
+// }
 
 // const mdComponentIFrameButton:React.FC<{
 //     children: string;
@@ -317,18 +320,18 @@ function mdComponentMyButton({children, onClick}){
 //     }}> {children} </Button>
 // }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-function mdComponentIFrameButton({children, src}){
-    // console.warn("in mdComponentIFrameButton");
-    return <Button onClick={()=> {
-        checkRightSize()
-        if (setRightNodeFn === undefined){
-            return
-        }
-        setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
-    }}> {children} </Button>
-}
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// // @ts-expect-error
+// function mdComponentIFrameButton({children, src}){
+//     // console.warn("in mdComponentIFrameButton");
+//     return <Button onClick={()=> {
+//         checkRightSize()
+//         if (setRightNodeFn === undefined){
+//             return
+//         }
+//         setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
+//     }}> {children} </Button>
+// }
 
 // const mdComponentExampleSideSheetShow:React.FC<{
 //     children: string
@@ -341,36 +344,36 @@ function mdComponentIFrameButton({children, src}){
 //     }}>{children}</Button>
 // }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-function mdComponentExampleSideSheetShow({children}){
-    return <Button onClick={()=> {
-        if (exampleSideChangeFn === undefined){
-            return
-        }
-        exampleSideChangeFn()
-    }}>{children}</Button>
-}
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-function mdComponentAnylogicSimulationDemoButton({children, src}){
-    return <Button onClick={()=> {
-        checkRightSize()
-        if (setRightNodeFn === undefined){
-            return
-        }
-        if(src == null){
-            setRightNodeFn(
-                <LazyImportSuspense><AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/></LazyImportSuspense>
-            )
-        }else{
-            setRightNodeFn(
-                <LazyImportSuspense><AnylogicSimulationDemoPage simAddr={src}/></LazyImportSuspense>
-            )
-        }
-    }}> {children} </Button>
-}
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// // @ts-expect-error
+// function mdComponentExampleSideSheetShow({children}){
+//     return <Button onClick={()=> {
+//         if (exampleSideChangeFn === undefined){
+//             return
+//         }
+//         exampleSideChangeFn()
+//     }}>{children}</Button>
+// }
+//
+// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// // @ts-expect-error
+// function mdComponentAnylogicSimulationDemoButton({children, src}){
+//     return <Button onClick={()=> {
+//         checkRightSize()
+//         if (setRightNodeFn === undefined){
+//             return
+//         }
+//         if(src == null){
+//             setRightNodeFn(
+//                 <LazyImportSuspense><AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/></LazyImportSuspense>
+//             )
+//         }else{
+//             setRightNodeFn(
+//                 <LazyImportSuspense><AnylogicSimulationDemoPage simAddr={src}/></LazyImportSuspense>
+//             )
+//         }
+//     }}> {children} </Button>
+// }
 
 // // const mdComponents = {};
 // const mdxComponents = {};
@@ -396,58 +399,58 @@ function mdComponentAnylogicSimulationDemoButton({children, src}){
 //     'ExampleSideSheetShow':mdComponentExampleSideSheetShow
 // };
 
-const mdxComponents = {
-    'MyButton':mdComponentMyButton,
-    'IFrameButton':mdComponentIFrameButton,
-    'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
-    'ExampleSideSheetShow':mdComponentExampleSideSheetShow
-};
+// const mdxComponents = {
+//     'MyButton':mdComponentMyButton,
+//     'IFrameButton':mdComponentIFrameButton,
+//     'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
+//     'ExampleSideSheetShow':mdComponentExampleSideSheetShow
+// };
 
 // console.warn(mdxComponents);
 
 
-const semiMarkdownRender = (content?: string) => {
-    return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
-    // return <div>123</div>
-};
+// const semiMarkdownRender = (content?: string) => {
+//     return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
+//     // return <div>123</div>
+// };
+//
+//
+// const semiPureMarkdownRender = (content?: string) => {
+//     return <MarkdownRender raw={content} format="md" />
+// };
 
-
-const semiPureMarkdownRender = (content?: string) => {
-    return <MarkdownRender raw={content} format="md" />
-};
-
-const roles: GetProp<typeof Bubble.List, 'roles'> = {
-    ai: {
-        placement: 'start',
-        // typing: { step: 300, interval: 1 },
-        styles: {
-            content: {
-                borderRadius: 16,
-            },
-        },
-        messageRender: semiPureMarkdownRender,
-    },
-    local: {
-        placement: 'end',
-        variant: 'shadow',
-        // messageRender: semiPureMarkdownRender,
-    },
-    aiMdx: {
-        placement: 'start',
-        // typing: { step: 300, interval: 1 },
-        styles: {
-            content: {
-                borderRadius: 16,
-            },
-        },
-        messageRender: semiMarkdownRender,
-    },
-};
+// const roles: GetProp<typeof Bubble.List, 'roles'> = {
+//     ai: {
+//         placement: 'start',
+//         // typing: { step: 300, interval: 1 },
+//         styles: {
+//             content: {
+//                 borderRadius: 16,
+//             },
+//         },
+//         messageRender: semiPureMarkdownRender,
+//     },
+//     local: {
+//         placement: 'end',
+//         variant: 'shadow',
+//         // messageRender: semiPureMarkdownRender,
+//     },
+//     aiMdx: {
+//         placement: 'start',
+//         // typing: { step: 300, interval: 1 },
+//         styles: {
+//             content: {
+//                 borderRadius: 16,
+//             },
+//         },
+//         messageRender: semiMarkdownRender,
+//     },
+// };
 
 
 
 function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
-    setRightNodeFn = rightNodeFn;
+    // setRightNodeFn = rightNodeFn;
     windowChatSize = chatSizeConst;
     setChatSizeString = setChatSize;
     setSubPageSizeFn = setSubPageSize;
@@ -463,9 +466,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const { styles } = useStyle();
 
     // ==================== State ====================
-    const [headerOpen, setHeaderOpen] = React.useState(false);
-
-    const [inputContent, setInputInputContent] = React.useState('');
+    // const [headerOpen, setHeaderOpen] = React.useState(false);
+    //
+    // const [inputContent, setInputInputContent] = React.useState('');
 
     // const [conversationsItems, setConversationsItems] = React.useState(defaultConversationsItems);
 
@@ -474,9 +477,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [messageContentReplacementTitle, setMessageContentReplacementTitle] = React.useState("请先登录");
     const messageContentReplacementTitleRef = useRef(messageContentReplacementTitle);
 
-    const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
-        [],
-    );
+    // const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
+    //     [],
+    // );
 
     const [menuWidth, setMenuWidth] = React.useState('20%');// 初始宽度
     const [chatWidth, setChatWidth] = React.useState('80%');// 初始宽度
@@ -697,7 +700,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         setEexampleSideVisible(!exampleSideVisible);
     };
 
-    exampleSideChangeFn = exampleSideChange;
+    // exampleSideChangeFn = exampleSideChange;
 
     // 使用 useRef 存储 socket 对象
     const socketRef = useRef<WebSocket | null>(null);
@@ -718,8 +721,10 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 //     }
                 // });
                 setMessageItems(prevMessageItems => {
-                    const newMessageItems = prevMessageItems.map((item) => {
+                    let hasItem = false;
+                    let newMessageItems = prevMessageItems.map((item) => {
                         if(item.key == messageId){
+                            hasItem = true;
                             return {
                                 key: item.key,
                                 loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
@@ -730,6 +735,14 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             return item;
                         }
                     });
+                    if(!hasItem){
+                        newMessageItems = [...prevMessageItems, {
+                            key: messageId,
+                            loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
+                            role: messageUid.startsWith("-")?(messageType=='ai_mdx'?'aiMdx':'ai'):'local',
+                            content: messageContent,
+                        }]
+                    }
                     console.info(newMessageItems);
                     return newMessageItems;
                 });
@@ -1100,16 +1113,16 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         })
     }
 
-    const onSubmit = (nextContent: string) => {
-        if (!nextContent) return;
-        onRequest(nextContent);
-        setInputInputContent('');
-        console.info("onSubmit, activeKey: "+activeKey);
-    };
+    // const onSubmit = (nextContent: string) => {
+    //     if (!nextContent) return;
+    //     onRequest(nextContent);
+    //     setInputInputContent('');
+    //     console.info("onSubmit, activeKey: "+activeKey);
+    // };
 
-    const onPromptsItemClick: GetProp<typeof Prompts, 'onItemClick'> = (info) => {
-        onRequest(info.data.description as string);
-    };
+    // const onPromptsItemClick: GetProp<typeof Prompts, 'onItemClick'> = (info) => {
+    //     onRequest(info.data.description as string);
+    // };
 
     // const onAddConversation = () => {
     //     setConversationsItems([
@@ -1190,43 +1203,43 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         console.log('onConversationClick', key, "activeKey: ", activeKey);
     };
 
-    const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
-        setAttachedFiles(info.fileList);
+    // const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
+    //     setAttachedFiles(info.fileList);
 
-    const openLinkInNewTab = (url:string) => {
-        window.open(url, '_blank');
-    }
+    // const openLinkInNewTab = (url:string) => {
+    //     window.open(url, '_blank');
+    // }
 
     // ==================== Nodes ====================
-    const placeholderNode = (
-        <Space direction="vertical" size={16} className={styles.placeholder}>
-            <Welcome
-                variant="borderless"
-                icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-                title="你好，这是一个Chat Demo"
-                description="Base on Ant Design, Semi Design."
-                extra={
-                    <Space>
-                        {/*<Button icon={<ShareAltOutlined />} />*/}
-                        <Button icon={<EllipsisOutlined />} onClick={()=>openLinkInNewTab("https://www.bytelan.cn/")}/>
-                    </Space>
-                }
-            />
-            <Prompts
-                title="这是一个默认的提示词面板，发送消息后会自动消失。"
-                items={placeholderPromptsItems}
-                styles={{
-                    list: {
-                        width: '100%',
-                    },
-                    item: {
-                        flex: 1,
-                    },
-                }}
-                onItemClick={onPromptsItemClick}
-            />
-        </Space>
-    );
+    // const placeholderNode = (
+    //     <Space direction="vertical" size={16} className={styles.placeholder}>
+    //         <Welcome
+    //             variant="borderless"
+    //             icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+    //             title="你好，这是一个Chat Demo"
+    //             description="Base on Ant Design, Semi Design."
+    //             extra={
+    //                 <Space>
+    //                     {/*<Button icon={<ShareAltOutlined />} />*/}
+    //                     <Button icon={<EllipsisOutlined />} onClick={()=>openLinkInNewTab("https://www.bytelan.cn/")}/>
+    //                 </Space>
+    //             }
+    //         />
+    //         <Prompts
+    //             title="这是一个默认的提示词面板，发送消息后会自动消失。"
+    //             items={placeholderPromptsItems}
+    //             styles={{
+    //                 list: {
+    //                     width: '100%',
+    //                 },
+    //                 item: {
+    //                     flex: 1,
+    //                 },
+    //             }}
+    //             onItemClick={onPromptsItemClick}
+    //         />
+    //     </Space>
+    // );
 
     // const items: GetProp<typeof Bubble.List, 'items'> = messages.map(({ id, message, status }) => ({
     //     key: id,
@@ -1235,39 +1248,39 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     content: message,
     // }));
 
-    const attachmentsNode = (
-        <Badge dot={attachedFiles.length > 0 && !headerOpen}>
-            <Button type="text" icon={<PaperClipOutlined />} onClick={() => setHeaderOpen(!headerOpen)} />
-        </Badge>
-    );
+    // const attachmentsNode = (
+    //     <Badge dot={attachedFiles.length > 0 && !headerOpen}>
+    //         <Button type="text" icon={<PaperClipOutlined />} onClick={() => setHeaderOpen(!headerOpen)} />
+    //     </Badge>
+    // );
 
-    const senderHeader = (
-        <Sender.Header
-            title="Attachments"
-            open={headerOpen}
-            onOpenChange={setHeaderOpen}
-            styles={{
-                content: {
-                    padding: 0,
-                },
-            }}
-        >
-            <Attachments
-                beforeUpload={() => false}
-                items={attachedFiles}
-                onChange={handleFileChange}
-                placeholder={(type) =>
-                    type == 'drop'
-                        ? { title: 'Drop file here' }
-                        : {
-                            icon: <CloudUploadOutlined />,
-                            title: 'Upload files',
-                            description: 'Click or drag files to this area to upload',
-                        }
-                }
-            />
-        </Sender.Header>
-    );
+    // const senderHeader = (
+    //     <Sender.Header
+    //         title="Attachments"
+    //         open={headerOpen}
+    //         onOpenChange={setHeaderOpen}
+    //         styles={{
+    //             content: {
+    //                 padding: 0,
+    //             },
+    //         }}
+    //     >
+    //         <Attachments
+    //             beforeUpload={() => false}
+    //             items={attachedFiles}
+    //             onChange={handleFileChange}
+    //             placeholder={(type) =>
+    //                 type == 'drop'
+    //                     ? { title: 'Drop file here' }
+    //                     : {
+    //                         icon: <CloudUploadOutlined />,
+    //                         title: 'Upload files',
+    //                         description: 'Click or drag files to this area to upload',
+    //                     }
+    //             }
+    //         />
+    //     </Sender.Header>
+    // );
 
     const logoNode = (
         <div className={styles.logo}>
@@ -1309,31 +1322,42 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     />
                 </LazyImportSuspense>
 
-                {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
-                {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
-                {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
-                {mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}
+                {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
+                {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
+                {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
+                {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
                 <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
             </div>
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {
                     (messageContentReplacementTitle == "")?(
                         <>
-                            <Bubble.List
-                                items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
-                                roles={roles}
-                                className={styles.messages}
-                            />
-                            <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
-                            <Sender
-                                value={inputContent}
-                                header={senderHeader}
-                                onSubmit={onSubmit}
-                                onChange={setInputInputContent}
-                                prefix={attachmentsNode}
-                                loading={false}
-                                className={styles.sender}
-                            />
+                            {/*<Bubble.List*/}
+                            {/*    items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}*/}
+                            {/*    roles={roles}*/}
+                            {/*    className={styles.messages}*/}
+                            {/*/>*/}
+                            {/*<Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />*/}
+                            {/*<Sender*/}
+                            {/*    value={inputContent}*/}
+                            {/*    header={senderHeader}*/}
+                            {/*    onSubmit={onSubmit}*/}
+                            {/*    onChange={setInputInputContent}*/}
+                            {/*    prefix={attachmentsNode}*/}
+                            {/*    loading={false}*/}
+                            {/*    className={styles.sender}*/}
+                            {/*/>*/}
+                            <LazyImportSuspense>
+                                <ImChat
+                                    styles={styles}
+                                    checkRightSize={checkRightSize}
+                                    exampleSideChangeFn={exampleSideChange}
+                                    onRequest={onRequest}
+                                    activeKey={activeKey}
+                                    setRightNodeFn={rightNodeFn}
+                                    messageItems={messageItems}>
+                                </ImChat>
+                            </LazyImportSuspense>
                         </>
                         ):(
                             <>

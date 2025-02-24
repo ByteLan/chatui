@@ -1,8 +1,11 @@
-import FullChatApp from './FullChatApp.tsx'
-import {useRef, useState} from "react";
+// import FullChatApp from './FullChatApp.tsx'
+import {useRef, useState, lazy} from "react";
 import { Splitter } from "antd";
 import {IllustrationNoContent, IllustrationNoContentDark} from "@douyinfe/semi-illustrations";
 import {Empty} from "@douyinfe/semi-ui";
+import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
+
+const FullChatApp = lazy(() => import('./FullChatApp.tsx'));
 
 
 
@@ -47,7 +50,9 @@ export default function ChatWeb() {
                 onResize={onSplitterSizeChange}
             >
                 <Splitter.Panel collapsible size={chatSize} defaultSize="100%" min="20%">
-                    <FullChatApp rightNodeFn={setRightNode} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
+                    <LazyImportSuspense>
+                        <FullChatApp rightNodeFn={setRightNode} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
+                    </LazyImportSuspense>
                 </Splitter.Panel>
                 <Splitter.Panel collapsible defaultSize='0%' size={subPageSize} style={{overflow: 'auto', height: '100%', width: '100%'}}>
                     {rightNode}
