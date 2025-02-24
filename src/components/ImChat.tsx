@@ -111,7 +111,7 @@ const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
 
 
 
-export default function ImChat({styles, messageItems, activeKey, checkRightSize, setRightNodeFn, onRequest, exampleSideChangeFn}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSize: (() => void) | undefined, setRightNodeFn: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeFn: (() => void) | undefined}) {
+export default function ImChat({styles, messageItems, activeKey, checkRightSize, setRightNodeFn, onRequest, exampleSideChangeFn, setDemoButtonNode}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSize: (() => void) | undefined, setRightNodeFn: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeFn: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined}) {
     const [inputContent, setInputInputContent] = React.useState('');
     const [headerOpen, setHeaderOpen] = React.useState(false);
     const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
@@ -294,6 +294,29 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
         </Sender.Header>
     );
 
+    // setDemoButtonNode?.(
+    //     <>
+    //         {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
+    //         {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
+    //         {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
+    //         {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
+    //     </>
+    // )
+    React.useEffect(() => {
+        setDemoButtonNode?.(
+            <>
+                {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
+                {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
+                {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
+                {mdComponentAnylogicSimulationDemoButton({children: "SimulationDemo", src: null})}
+            </>
+        );
+
+        return () => {
+            // 清理副作用
+            setDemoButtonNode?.(null);
+        };
+    }, [setDemoButtonNode]);
 
     return (
         <>

@@ -461,6 +461,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [conversationItems, setConversationItems] = React.useState<{key:string,label:string}[]>([]);
     const conversationItemsRef = useRef(conversationItems);
     const [isCreatingConversation, setIsCreatingConversation] = React.useState(false);
+    const [demoButtonNode, setDemoButtonNode] = React.useState<JSX.Element|null>(<></>);
 
     // ==================== Style ====================
     const { styles } = useStyle();
@@ -1321,7 +1322,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         menu={menuConfig}
                     />
                 </LazyImportSuspense>
-
+                {demoButtonNode==null?(<></>):(demoButtonNode)}
                 {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
                 {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
                 {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
@@ -1355,7 +1356,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                     onRequest={onRequest}
                                     activeKey={activeKey}
                                     setRightNodeFn={rightNodeFn}
-                                    messageItems={messageItems}>
+                                    messageItems={messageItems}
+                                    setDemoButtonNode={setDemoButtonNode}
+                                >
                                 </ImChat>
                             </LazyImportSuspense>
                         </>
