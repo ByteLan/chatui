@@ -14,6 +14,7 @@ import {
 } from "@ant-design/icons";
 
 const AnylogicSimulationDemoPage = lazy(() => import("../components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
+const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/simulation-pages/SimulationStarter.tsx"));
 
 // let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
 // let exampleSideChangeFn: (() => void) | undefined;
@@ -177,6 +178,27 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
         }}> {children} </Button>
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    function mdComponentSimulationStarter({children, src}:{children:any, src:string}){
+        return <Button onClick={()=> {
+            checkRightSize?.()
+            if (setRightNodeFn === undefined){
+                return
+            }
+            if(src == null || src =="") {
+                setRightNodeFn(
+                    <LazyImportSuspense><SimulationStarter src="demo2"/></LazyImportSuspense>
+                )
+            }else{
+                setRightNodeFn(
+                    <LazyImportSuspense><SimulationStarter src={src}/></LazyImportSuspense>
+                )
+            }
+        }
+        }>{children}</Button>
+    }
+
     const mdxComponents = {
         'MyButton':mdComponentMyButton,
         'IFrameButton':mdComponentIFrameButton,
@@ -309,12 +331,13 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
                 {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
                 {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
                 {mdComponentAnylogicSimulationDemoButton({children: "SimulationDemo", src: null})}
+                {mdComponentSimulationStarter({children: "SimulationDemo2", src: ""})}
             </>
         );
 
         return () => {
             // 清理副作用
-            setDemoButtonNode?.(null);
+            setDemoButtonNode?.(<> </>);
         };
     }, [setDemoButtonNode]);
 
