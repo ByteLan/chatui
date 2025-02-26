@@ -96,7 +96,7 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
 
     return (
 
-        <div>
+        <div style={{margin:12}}>
             <Flex align='center' style={{height: 64}}>
                 <Avatar color="light-blue" style={{ margin: 4 }} alt='Taylor Joy' onClick={onAvatarClick}>
                     {loginState?loginUserName:'未登录'}
