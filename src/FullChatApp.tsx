@@ -22,11 +22,12 @@ import {
     // HeartOutlined,
     // PaperClipOutlined,
     PlusOutlined,
+    RightOutlined,
     // ReadOutlined,
     // ShareAltOutlined,
     // SmileOutlined,
 } from '@ant-design/icons';
-import {Badge, type GetProp, Space, Button, Modal, Row, Col, Input, Flex} from 'antd';
+import {Badge, type GetProp, Space, Button, Modal, Row, Col, Input, Flex, FloatButton, Drawer} from 'antd';
 import {SideSheet, Notification, Empty, Toast, List} from '@douyinfe/semi-ui';
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
@@ -462,6 +463,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const conversationItemsRef = useRef(conversationItems);
     const [isCreatingConversation, setIsCreatingConversation] = React.useState(false);
     const [demoButtonNode, setDemoButtonNode] = React.useState<JSX.Element|null>(<></>);
+    // const [menuPlacement, setMenuPlacement] = React.useState<'Default'|'Drawer'>('Default');
+    const [menuDrawerOpen, setMenuDrawerOpen] = React.useState(false);
 
     // ==================== Style ====================
     const { styles } = useStyle();
@@ -484,7 +487,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     const [menuWidth, setMenuWidth] = React.useState('20%');// 初始宽度
     const [chatWidth, setChatWidth] = React.useState('80%');// 初始宽度
-    const [menuVisible, setMenuVisible] = React.useState('visible');
+    const [menuVisible, setMenuVisible] = React.useState<'visible'|'hidden'>('visible');
     const layoutRef = React.useRef<HTMLDivElement>(null);
 
     // Modal rename
@@ -970,6 +973,12 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         }
     }, [activeKey]);
 
+    // const menuPlacementRef = React.useRef(menuPlacement);
+    // useEffect(() => {
+    //     menuPlacementRef.current = menuPlacement;
+    // }, [menuPlacement]);
+
+
     const handleResize = () => {
         console.warn(layoutRef.current);
         if (layoutRef.current) {
@@ -979,14 +988,37 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             if (layoutWidth > hideMenuMediaWidth) {
                 setMenuWidth('20%');
                 setChatWidth('80%');
+                // if(menuVisible!='visible'){
+                //     setMenuVisible('visible');
+                // }
                 setMenuVisible('visible');
+                // setMenuPlacement('Default');
+                // menuPlacementRef.current = 'Default';
+                setMenuDrawerOpen(false);
             } else {
+                // if(menuPlacementRef.current == 'Drawer'){
+                //     return;
+                // }
                 setMenuWidth('0');
                 setChatWidth('98%');
                 setMenuVisible('hidden');
             }
         }
     };
+
+    function onClickOpenMenu(){
+        // setMenuPlacement('Drawer');
+        // menuPlacementRef.current = 'Drawer';
+        // setMenuWidth('100%');
+        setMenuDrawerOpen(true);
+        // setMenuVisible('visible');
+    }
+    function onClickCloseMenu(){
+        // setMenuPlacement('Default');
+        // menuPlacementRef.current = 'Default';
+        setMenuDrawerOpen(false);
+        handleResize();
+    }
 
     // handleResizePublic = handleResize;
 
@@ -1005,9 +1037,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         };
     }, []);
 
-    useEffect(() => {
-        handleResize();
-    }, [chatSizeConst]);
+    // useEffect(() => {
+    //     handleResize();
+    // }, [chatSizeConst]);
 
     useEffect(() => {
         handleResize();
@@ -1296,9 +1328,48 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     // ==================== Render =================
     const example_side_text:string = "<IFrameButton src=\"https://www.bytelan.cn/\">显示主页</IFrameButton>";
+
+    // 用这个方式渲染菜单，会导致窗口大小变化时反复渲染
+    // function MenuRender(){
+    //     return (
+    //         <div className={styles.menu} style={{ width: menuWidth, visibility: menuVisible }} >
+    //             {/* 🌟 Logo */}
+    //             {logoNode}
+    //             {/* 🌟 添加会话 */}
+    //             <Button
+    //                 onClick={onAddConversation}
+    //                 type="link"
+    //                 className={styles.addBtn}
+    //                 icon={<PlusOutlined />}
+    //                 loading={isCreatingConversation}
+    //             >
+    //                 创建新会话
+    //             </Button>
+    //             {/* 🌟 会话管理 */}
+    //             <LazyImportSuspense style={{ width: '100%', flex: 1}}>
+    //                 <Conversations
+    //                     // items={conversationsItems}
+    //                     items={conversationItems}
+    //                     className={styles.conversations}
+    //                     activeKey={activeKey}
+    //                     onActiveChange={onConversationClick}
+    //                     menu={menuConfig}
+    //                 />
+    //             </LazyImportSuspense>
+    //             {demoButtonNode==null?(<></>):(demoButtonNode)}
+    //             {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
+    //             {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
+    //             {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
+    //             {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
+    //             <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
+    //         </div>
+    //     )
+    // }
+
     return (
         <div className={styles.layout} ref={layoutRef}>
-            <div className={styles.menu} style={{ width: menuWidth, visibility: menuVisible }}>
+            {/*<MenuRender />*/}
+            <div className={styles.menu} style={{ width: menuWidth, visibility: menuVisible }} >
                 {/* 🌟 Logo */}
                 {logoNode}
                 {/* 🌟 添加会话 */}
@@ -1309,7 +1380,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     icon={<PlusOutlined />}
                     loading={isCreatingConversation}
                 >
-                    New Conversation
+                    创建新会话
                 </Button>
                 {/* 🌟 会话管理 */}
                 <LazyImportSuspense style={{ width: '100%', flex: 1}}>
@@ -1329,6 +1400,55 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
                 <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
             </div>
+            <Drawer
+                title="会话列表"
+                placement="left"
+                closable={true}
+                onClose={onClickCloseMenu}
+                width={348}
+                open={menuDrawerOpen}
+                getContainer={false}
+            >
+                <div className={styles.menu} style={{ width: 300 }} >
+                    {/* 🌟 Logo */}
+                    {logoNode}
+                    {/* 🌟 添加会话 */}
+                    <Button
+                        onClick={onAddConversation}
+                        type="link"
+                        className={styles.addBtn}
+                        icon={<PlusOutlined />}
+                        loading={isCreatingConversation}
+                    >
+                        创建新会话
+                    </Button>
+                    {/* 🌟 会话管理 */}
+                    <LazyImportSuspense style={{ width: '100%', flex: 1}}>
+                        <Conversations
+                            // items={conversationsItems}
+                            items={conversationItems}
+                            className={styles.conversations}
+                            activeKey={activeKey}
+                            onActiveChange={onConversationClick}
+                            menu={menuConfig}
+                        />
+                    </LazyImportSuspense>
+                    {demoButtonNode==null?(<></>):(demoButtonNode)}
+                    {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
+                    {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
+                    {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
+                    {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
+                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
+                </div>
+            </Drawer>
+
+            {(menuVisible==='hidden' && !menuDrawerOpen)?(<FloatButton
+                shape="circle"
+                type="primary"
+                style={{ top:20, left:20 }}
+                tooltip={<div>展开列表</div>}
+                onClick={onClickOpenMenu}
+                icon={<RightOutlined />} />):(<></>)}
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {
                     (messageContentReplacementTitle == "")?(
