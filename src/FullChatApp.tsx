@@ -456,6 +456,10 @@ function convertRole(messageUid:string, messageType:string){
     }
 }
 
+function convertLoading(messageUid:string, messageStatus:string){
+    return messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete');
+}
+
 
 function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
     // setRightNodeFn = rightNodeFn;
@@ -739,7 +743,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             //role: messageUid.startsWith("-")?(messageType=='ai_mdx'?'aiMdx':'ai'):'local',
                             return {
                                 key: item.key,
-                                loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
+                                loading: convertLoading(messageUid, messageStatus),
+                                // loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
                                 role: convertRole(messageUid, messageType),
                                 content: messageContent,
                             }
@@ -750,7 +755,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     if(!hasItem){
                         newMessageItems = [...prevMessageItems, {
                             key: messageId,
-                            loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
+                            loading: convertLoading(messageUid, messageStatus),
                             role: convertRole(messageUid, messageType),
                             content: messageContent,
                         }]
@@ -758,6 +763,21 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     console.info(newMessageItems);
                     return newMessageItems;
                 });
+            }
+        }
+
+        function createNewMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
+            console.log("createMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
+            if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId) {
+                setMessageItems(
+                    [...messageItems, {
+                        key: messageId,
+                        loading: convertLoading(messageUid, messageStatus),
+                        // loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
+                        role: convertRole(messageUid, messageType),
+                        content: messageContent,
+                    }]
+                )
             }
         }
 
@@ -809,6 +829,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                 updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType);
                             }else if(jd.responseType == 'updateConversationName'){
                                 updateConversationName(jd.conversationId, jd.updateNewConversationName);
+                            }else if(jd.responseType == 'createNewMessage'){
+                                createNewMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType)
                             }
                         }
                     }
@@ -963,7 +985,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         // role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
                         return {
                             key: item.messageId,
-                            loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                            loading: convertLoading(item.uid, item.messageStatus),
+                            // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
                             role: convertRole(item.uid, item.messageType),
                             content: item.messageContent,
                         }
@@ -1113,7 +1136,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     ...data.appendMessages.map((item) => {
                         return {
                             key: item.messageId,
-                            loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                            loading: convertLoading(item.uid, item.messageStatus),
+                            // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
                             role: convertRole(item.uid, item.messageType),
                             // role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
                             // role: item.uid.startsWith("-")?'ai':'local',
