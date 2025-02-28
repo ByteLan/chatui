@@ -769,15 +769,14 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         function createNewMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
             console.log("createMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
             if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId) {
-                setMessageItems(
-                    [...messageItems, {
+                setMessageItems(prevMessageItems => {
+                    return [...prevMessageItems, {
                         key: messageId,
                         loading: convertLoading(messageUid, messageStatus),
-                        // loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
                         role: convertRole(messageUid, messageType),
                         content: messageContent,
                     }]
-                )
+                });
             }
         }
 
