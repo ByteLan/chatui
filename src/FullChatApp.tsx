@@ -477,6 +477,13 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // const [menuPlacement, setMenuPlacement] = React.useState<'Default'|'Drawer'>('Default');
     const [menuDrawerOpen, setMenuDrawerOpen] = React.useState(false);
 
+    const [socketReconnecting, setSocketReconnecting] = React.useState(false);
+    const socketReconnectingRef = useRef(socketReconnecting);
+    useEffect(() => {
+        socketReconnectingRef.current = socketReconnecting;
+    }, [socketReconnecting]);
+    const socketReconnectCountRef = useRef(0);
+
     // ==================== Style ====================
     const { styles } = useStyle();
 
@@ -723,18 +730,6 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         function updateMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
             console.log("updateMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
             if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId){
-                // const newMessageItems = messageItems.map((item) => {
-                //     if(item.key === messageId){
-                //         return {
-                //             key: item.key,
-                //             loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
-                //             role: messageUid.startsWith("-")?'ai':'local',
-                //             content: messageContent,
-                //         }
-                //     }else{
-                //         return item;
-                //     }
-                // });
                 setMessageItems(prevMessageItems => {
                     let hasItem = false;
                     let newMessageItems = prevMessageItems.map((item) => {
@@ -797,56 +792,87 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
         let heartbeatInterval: NodeJS.Timeout;
 
-        if(loginState==false||tempCkid == ''){
-            socketRef.current?.close();
-            socketRef.current = null;
-        }else{
-            if(socketRef.current != null){
-                socketRef.current.close();
+        function connectSocket(){
+            socketReconnectingRef.current = false;
+
+            function setReconnect(){
+                if(socketReconnectingRef.current==true){
+                    return;
+                }
+                socketReconnectCountRef.current += 1;
+                if(socketReconnectCountRef.current > 10){
+                    socketReconnectCountRef.current = 10;
+                }
+                socketReconnectingRef.current = true;
+                // socketReconnectCountRef.current = 0;
+                setSocketReconnecting(true);
+                setTimeout(() => {
+                    connectSocket();
+                }, 5000+socketReconnectCountRef.current*6000);
+                console.log('ws REconnecting');
+            }
+
+            if(loginState==false||tempCkid == ''){
+                socketRef.current?.close();
                 socketRef.current = null;
-            }
-            socketRef.current = new WebSocket(hostWsAddr+'ai_chat/ws');
+            }else{
+                if(socketRef.current != null){
+                    socketRef.current.close();
+                    socketRef.current = null;
+                }
+                socketRef.current = new WebSocket(hostWsAddr+'ai_chat/ws');
 
-            socketRef.current.onopen = () => {
-                console.log('ws opened');
-                socketRef.current?.send(JSON.stringify({
-                    requestType: 'setActiveCkid',
-                    activeCkid: tempCkid,
-                }));
-                heartbeatInterval = setInterval(() => {
-                    socketRef.current?.send('{}');
-                }, 25000);
-            }
+                socketRef.current.onopen = () => {
+                    socketReconnectCountRef.current = 0;
+                    setSocketReconnecting(false);
+                    socketReconnectingRef.current = false;
+                    console.log('ws opened');
+                    socketRef.current?.send(JSON.stringify({
+                        requestType: 'setActiveCkid',
+                        activeCkid: tempCkid,
+                    }));
+                    heartbeatInterval = setInterval(() => {
+                        socketRef.current?.send('{}');
+                    }, 20000);
+                }
 
-            socketRef.current.onmessage = (event) => {
-                console.info("onMessage: "+event.data);
-                try{
-                    if (event.data != null){
-                        const jd = JSON.parse(event.data);
-                        if(jd.responseType !=null) {
-                            if(jd.responseType == 'updateMessageWithMessageIdAndConversationId'){
-                                updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType);
-                            }else if(jd.responseType == 'updateConversationName'){
-                                updateConversationName(jd.conversationId, jd.updateNewConversationName);
-                            }else if(jd.responseType == 'createNewMessage'){
-                                createNewMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType)
+                socketRef.current.onmessage = (event) => {
+                    console.info("onMessage: "+event.data);
+                    try{
+                        if (event.data != null){
+                            const jd = JSON.parse(event.data);
+                            if(jd.responseType !=null) {
+                                if(jd.responseType == 'updateMessageWithMessageIdAndConversationId'){
+                                    updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType);
+                                }else if(jd.responseType == 'updateConversationName'){
+                                    updateConversationName(jd.conversationId, jd.updateNewConversationName);
+                                }else if(jd.responseType == 'createNewMessage'){
+                                    createNewMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType)
+                                }
                             }
                         }
+                    }catch (e) {
+                        console.error("onMessageError: "+e);
                     }
-                }catch (e) {
-                    console.error("onMessageError: "+e);
+                }
+
+                socketRef.current.onclose = () => {
+                    clearInterval(heartbeatInterval);
+                    console.error('ws on close');
+                    setReconnect();
+                }
+
+                socketRef.current.onerror = () => {
+                    clearInterval(heartbeatInterval);
+                    console.error('ws on error');
+                    setReconnect();
                 }
             }
-
-            socketRef.current.onclose = () => {
-                clearInterval(heartbeatInterval);
-            }
-
-            socketRef.current.onerror = () => {
-                clearInterval(heartbeatInterval);
-                console.error('ws on error');
-            }
         }
+
+        connectSocket();
+
+
         return () => {
             console.log('close socket, tempCkid changed:'+tempCkid);
             clearInterval(heartbeatInterval);
@@ -1483,6 +1509,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 onClick={onClickOpenMenu}
                 icon={<RightOutlined />} />):(<></>)}
             <div className={styles.chat} style={{ width: chatWidth}}>
+                {socketReconnecting?(<div style={{ backgroundColor: 'rgba(var(--semi-pink-1), 1)' , width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(var(--semi-red-7), 1)' , borderRadius: '6px'  }}><p style={{margin: 0}}>长连接断开，正在重连中......您也可以尝试刷新页面......</p></div>):(<></>)}
                 {
                     (messageContentReplacementTitle == "")?(
                         <>
