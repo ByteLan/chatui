@@ -188,11 +188,11 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
             }
             if(src == null || src =="") {
                 setRightNodeFn(
-                    <LazyImportSuspense><SimulationStarter src="demo2"/></LazyImportSuspense>
+                    <LazyImportSuspense><SimulationStarter src="demo2" activeConversationKey={activeKey}/></LazyImportSuspense>
                 )
             }else{
                 setRightNodeFn(
-                    <LazyImportSuspense><SimulationStarter src={src}/></LazyImportSuspense>
+                    <LazyImportSuspense><SimulationStarter src={src} activeConversationKey={activeKey}/></LazyImportSuspense>
                 )
             }
         }
