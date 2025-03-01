@@ -37,6 +37,8 @@ import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
+// import ImChatTitle from "./components/ImChatTitle.tsx";
+const ImChatTitle = lazy(() => import('./components/ImChatTitle.tsx'));
 // import ImChat from "./components/ImChat.tsx";
 const ImChat = lazy(() => import('./components/ImChat.tsx'));
 
@@ -496,8 +498,12 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     const [activeKey, setActiveKey] = React.useState("");
     const activeKeyRef = useRef(activeKey);
+    const [chatTitle, setChatTitle] = React.useState<string>("");
     const [messageContentReplacementTitle, setMessageContentReplacementTitle] = React.useState("请先登录");
     const messageContentReplacementTitleRef = useRef(messageContentReplacementTitle);
+
+    const [modelName, setModelName] = React.useState<string>("default");
+    const [historyRound, setHistoryRound] = React.useState<number>(10);
 
     // const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
     //     [],
@@ -761,6 +767,36 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }
         }
 
+        function updateStreamMessage(messageId:string, messageContent:string, conversationId:string){
+            if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId){
+                setMessageItems(prevMessageItems => {
+                    let hasItem = false;
+                    let newMessageItem = prevMessageItems.map((item) => {
+                        if(item.key == messageId){
+                            hasItem = true;
+                            return {
+                                key: item.key,
+                                loading: false,
+                                role: 'ai',
+                                content: item.content+messageContent,
+                            }
+                        }else{
+                            return item;
+                        }
+                    })
+                    if (!hasItem){
+                        newMessageItem = [...prevMessageItems, {
+                            key: messageId,
+                            loading: false,
+                            role: 'ai',
+                            content: messageContent,
+                        }]
+                    }
+                    return newMessageItem;
+                });
+            }
+        }
+
         function createNewMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
             console.log("createMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
             if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId) {
@@ -848,6 +884,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                     updateConversationName(jd.conversationId, jd.updateNewConversationName);
                                 }else if(jd.responseType == 'createNewMessage'){
                                     createNewMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType)
+                                }else if(jd.responseType == 'updateStreamMessage') {
+                                    updateStreamMessage(jd.messageId, jd.updateStreamMessageContent, jd.conversationId);
                                 }
                             }
                         }
@@ -1016,6 +1054,19 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             content: item.messageContent,
                         }
                     }));
+                    // 找到当前activeKey在ConversationItemsRef.current中对应的label
+                    const index = conversationItemsRef.current.findIndex((item) => {
+                        if(item.key == activeKey){
+                            if(item.label == null){
+                                setChatTitle("");
+                            }else{
+                                setChatTitle(item.label);
+                            }
+                            return true;
+                        }
+                    });
+                    setModelName("default");
+                    setHistoryRound(10);
                 }else{
                     setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+data);
                 }
@@ -1136,7 +1187,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             credentials: 'include',
             body: JSON.stringify({
                 conversationId: activeKey,
-                messageContent: nextContent
+                messageContent: nextContent,
+                modelName: modelName,
+                historyRound: historyRound
             })
         }).then(response => {
             return response.json();
@@ -1292,6 +1345,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     const onConversationClick: GetProp<typeof Conversations, 'onActiveChange'> = (key) => {
         setActiveKey(key);
+        setMenuDrawerOpen(false);
         console.log('onConversationClick', key, "activeKey: ", activeKey);
     };
 
@@ -1425,6 +1479,14 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     )
     // }
 
+    useEffect(() => {
+        console.warn("modelName changed: "+modelName);
+    }, [modelName]);
+
+    useEffect(() => {
+        console.warn("historyRound changed: "+historyRound);
+    }, [historyRound]);
+
     return (
         <div className={styles.layout} ref={layoutRef}>
             {/*<MenuRender />*/}
@@ -1504,12 +1566,17 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             {(menuVisible==='hidden' && !menuDrawerOpen)?(<FloatButton
                 shape="circle"
                 type="primary"
-                style={{ top:20, left:20 }}
+                style={{ top:12, left:12 , height: 35, width: 35 }}
                 tooltip={<div>展开列表</div>}
                 onClick={onClickOpenMenu}
                 icon={<RightOutlined />} />):(<></>)}
             <div className={styles.chat} style={{ width: chatWidth}}>
-                {socketReconnecting?(<div style={{ backgroundColor: 'rgba(var(--semi-pink-1), 1)' , width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(var(--semi-red-7), 1)' , borderRadius: '6px'  }}><p style={{margin: 0}}>长连接断开，正在重连中......您也可以尝试刷新页面......</p></div>):(<></>)}
+                {messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>
+                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={[{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"}]} modelName={modelName} historyRound={historyRound}></ImChatTitle>
+                </LazyImportSuspense>):(<></>)}
+
+
+                {socketReconnecting?(<div style={{ marginLeft:20, backgroundColor: 'rgba(var(--semi-pink-1), 1)' , width: 'calc(100% - 40px)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(var(--semi-red-7), 1)' , borderRadius: '6px'  }}><p style={{margin: 0}}>长连接断开，消息接收可能异常，重连中...您也可以尝试刷新页面...</p></div>):(<></>)}
                 {
                     (messageContentReplacementTitle == "")?(
                         <>
