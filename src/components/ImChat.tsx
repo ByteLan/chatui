@@ -34,25 +34,25 @@ const openLinkInNewTab = (url:string) => {
 }
 
 const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
-    {
-        key: '1',
-        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
-        description: '描述',
-        children: [
-            {
-                key: '1-1',
-                description: `引导问题1`,
-            },
-            {
-                key: '1-2',
-                description: `引导问题2`,
-            },
-            {
-                key: '1-3',
-                description: `引导问题3`,
-            },
-        ],
-    },
+    // {
+    //     key: '1',
+    //     label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
+    //     description: '描述',
+    //     children: [
+    //         {
+    //             key: '1-1',
+    //             description: `引导问题1`,
+    //         },
+    //         {
+    //             key: '1-2',
+    //             description: `引导问题2`,
+    //         },
+    //         {
+    //             key: '1-3',
+    //             description: `引导问题3`,
+    //         },
+    //     ],
+    // },
     {
         key: '2',
         label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '评估供应链韧性'),
@@ -203,7 +203,8 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
         'MyButton':mdComponentMyButton,
         'IFrameButton':mdComponentIFrameButton,
         'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
-        'ExampleSideSheetShow':mdComponentExampleSideSheetShow
+        'ExampleSideSheetShow':mdComponentExampleSideSheetShow,
+        'AnylogicSimulationDemo2Button':mdComponentSimulationStarter
     };
 
     const semiMarkdownRender = (content?: string) => {
@@ -348,7 +349,7 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
                 roles={roles}
                 className={styles.messages}
             />
-            <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
+            <Prompts styles={{item:{paddingTop:2, paddingBottom:2}}} items={senderPromptsItems} onItemClick={onPromptsItemClick} />
             <Sender
                 value={inputContent}
                 header={senderHeader}

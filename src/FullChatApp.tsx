@@ -116,9 +116,10 @@ const useStyle = createStyles(({token, css}) => {
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            padding: ${token.paddingLG}px;
-            gap: 16px;
-
+            padding: 16px;
+            padding-top: 6px;
+            padding-bottom: 8px;
+            gap: 6px;
         `,
         messages: css`
             flex: 1;
@@ -531,6 +532,20 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         conversationItemsRef.current = conversationItems;
     }, [conversationItems]);
 
+    useEffect(() => {
+        // 找到当前activeKey在ConversationItemsRef.current中对应的label
+        conversationItems.findIndex((item) => {
+            if(item.key == activeKey){
+                if(item.label == null){
+                    setChatTitle("");
+                }else{
+                    setChatTitle(item.label);
+                }
+                return true;
+            }
+        });
+    }, [activeKey,conversationItems]);
+
 
     const menuConfig: ConversationsProps['menu'] = (conversation) => ({
         items: [
@@ -578,6 +593,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                 if (data.responseStatus == 'success') {
                                     const newConversationItems = conversationItems.map((item) => {
                                         if(item.key == conversation.key){
+                                            // if(activeKey==conversation.key){
+                                            //     setChatTitle(renameName.current);
+                                            // }
                                             return {
                                                 key: item.key,
                                                 label: renameName.current
@@ -1054,17 +1072,17 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             content: item.messageContent,
                         }
                     }));
-                    // 找到当前activeKey在ConversationItemsRef.current中对应的label
-                    const index = conversationItemsRef.current.findIndex((item) => {
-                        if(item.key == activeKey){
-                            if(item.label == null){
-                                setChatTitle("");
-                            }else{
-                                setChatTitle(item.label);
-                            }
-                            return true;
-                        }
-                    });
+                    // // 找到当前activeKey在ConversationItemsRef.current中对应的label
+                    // const index = conversationItemsRef.current.findIndex((item) => {
+                    //     if(item.key == activeKey){
+                    //         if(item.label == null){
+                    //             setChatTitle("");
+                    //         }else{
+                    //             setChatTitle(item.label);
+                    //         }
+                    //         return true;
+                    //     }
+                    // });
                     setModelName("default");
                     setHistoryRound(10);
                 }else{
@@ -1572,7 +1590,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 icon={<RightOutlined />} />):(<></>)}
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>
-                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={[{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"}]} modelName={modelName} historyRound={historyRound}></ImChatTitle>
+                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={[{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "Qianwen", name: "千问 - 阿里云"},{key: "Doubao", name: "豆包 - 火山引擎"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]} modelName={modelName} historyRound={historyRound}></ImChatTitle>
                 </LazyImportSuspense>):(<></>)}
 
 
