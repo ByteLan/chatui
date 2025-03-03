@@ -27,15 +27,15 @@ import {
     // ShareAltOutlined,
     // SmileOutlined,
 } from '@ant-design/icons';
-import {Badge, type GetProp, Space, Button, Modal, Row, Col, Input, Flex, FloatButton, Drawer} from 'antd';
-import {SideSheet, Notification, Empty, Toast, List} from '@douyinfe/semi-ui';
+import {type GetProp, Button, Modal, Row, Col, Input, Flex, FloatButton, Drawer} from 'antd';
+import {SideSheet, Notification, Empty, Toast} from '@douyinfe/semi-ui';
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
 // import Cookies from 'js-cookie';
 import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
-import { DeleteOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 // import ImChatTitle from "./components/ImChatTitle.tsx";
 const ImChatTitle = lazy(() => import('./components/ImChatTitle.tsx'));
@@ -1580,14 +1580,13 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
                 </div>
             </Drawer>
-
-            {(menuVisible==='hidden' && !menuDrawerOpen)?(<FloatButton
+            <FloatButton
                 shape="circle"
                 type="primary"
-                style={{ top:12, left:12 , height: 35, width: 35 }}
+                style={{ top:12, left:12 , height: 35, width: 35, visibility: (menuVisible==='hidden' && !menuDrawerOpen)?'visible':'hidden'}}
                 tooltip={<div>展开列表</div>}
                 onClick={onClickOpenMenu}
-                icon={<RightOutlined />} />):(<></>)}
+                icon={<RightOutlined />} />
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>
                     <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={[{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]} modelName={modelName} historyRound={historyRound}></ImChatTitle>
