@@ -1590,7 +1590,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 icon={<RightOutlined />} />):(<></>)}
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>
-                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={[{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "Qianwen", name: "千问 - 阿里云"},{key: "Doubao", name: "豆包 - 火山引擎"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]} modelName={modelName} historyRound={historyRound}></ImChatTitle>
+                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={[{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]} modelName={modelName} historyRound={historyRound}></ImChatTitle>
                 </LazyImportSuspense>):(<></>)}
 
 
