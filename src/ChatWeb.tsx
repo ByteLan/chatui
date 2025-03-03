@@ -40,7 +40,7 @@ export default function ChatWeb() {
 
     // return <FullChatApp />
     return (
-        <div style={{height: '100%', width: 'calc(100% - 6px)',}}>
+        <div style={{height: '100%', width: 'calc(100% - 6px)',}} className={`semi-light-scrollbar`}>
             <Splitter
                 style={{
                     // boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
