@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import { Avatar } from '@douyinfe/semi-ui';
 import {Toast} from "@douyinfe/semi-ui";
 import {Flex, Modal, Row, Col, Input} from "antd";
