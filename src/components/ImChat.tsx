@@ -1,7 +1,7 @@
 import {Attachments, Bubble, Prompts, Sender, Welcome} from "@ant-design/x";
-import React, {lazy} from "react";
+import React, {lazy, useEffect, useRef} from "react";
 import {Badge, Button, type GetProp, Space} from "antd";
-import {MarkdownRender} from "@douyinfe/semi-ui";
+import {Collapse, MarkdownRender} from "@douyinfe/semi-ui";
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 import {
     CloudUploadOutlined,
@@ -199,12 +199,38 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
         }>{children}</Button>
     }
 
-    const mdxComponents = {
+    const mdxComponentsNoThink = {
         'MyButton':mdComponentMyButton,
         'IFrameButton':mdComponentIFrameButton,
         'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
         'ExampleSideSheetShow':mdComponentExampleSideSheetShow,
         'AnylogicSimulationDemo2Button':mdComponentSimulationStarter
+    }
+
+    function mdThink({children}){
+        return (
+            <Collapse style={{padding:6}}>
+                <Collapse.Panel header="思考过程" itemKey="1">
+                    <MarkdownRender raw={children} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponentsNoThink}} />
+                </Collapse.Panel>
+            </Collapse>
+        );
+    }
+
+    function mdThinking({children}){
+        return (
+            <Collapse defaultActiveKey="1" style={{padding:6}}>
+                <Collapse.Panel header="思考过程" itemKey="1">
+                    <MarkdownRender raw={children} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponentsNoThink}} />
+                </Collapse.Panel>
+            </Collapse>
+        );
+    }
+
+    const mdxComponents = {
+        ...mdxComponentsNoThink,
+        'Think':mdThink,
+        'Thinking':mdThinking
     };
 
     const semiMarkdownRender = (content?: string) => {
@@ -341,6 +367,36 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
             setDemoButtonNode?.(<> </>);
         };
     }, [setDemoButtonNode]);
+    // const MemoizedBubbleList = React.memo(Bubble.List);
+
+    // const scrollRef = useRef<HTMLDivElement>(null);
+    //
+    // useEffect(() => {
+    //     const scrollElement = scrollRef.current;
+    //     if (scrollElement) {
+    //         const scrollPosition = scrollElement.scrollTop;
+    //         return () => {
+    //             scrollElement.scrollTop = scrollPosition;
+    //         };
+    //     }
+    // }, [messageItems]);
+
+    function SenderBar() {
+        return (
+            <>
+                <Prompts styles={{item:{paddingTop:2, paddingBottom:2}}} items={senderPromptsItems} onItemClick={onPromptsItemClick} />
+                <Sender
+                    value={inputContent}
+                    header={senderHeader}
+                    onSubmit={onSubmit}
+                    onChange={setInputInputContent}
+                    prefix={attachmentsNode}
+                    loading={false}
+                    className={styles.sender}
+                />
+            </>
+        )
+    }
 
     return (
         <>
@@ -349,16 +405,17 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
                 roles={roles}
                 className={styles.messages}
             />
-            <Prompts styles={{item:{paddingTop:2, paddingBottom:2}}} items={senderPromptsItems} onItemClick={onPromptsItemClick} />
-            <Sender
-                value={inputContent}
-                header={senderHeader}
-                onSubmit={onSubmit}
-                onChange={setInputInputContent}
-                prefix={attachmentsNode}
-                loading={false}
-                className={styles.sender}
-            />
+            <SenderBar></SenderBar>
+            {/*<Prompts styles={{item:{paddingTop:2, paddingBottom:2}}} items={senderPromptsItems} onItemClick={onPromptsItemClick} />*/}
+            {/*<Sender*/}
+            {/*    value={inputContent}*/}
+            {/*    header={senderHeader}*/}
+            {/*    onSubmit={onSubmit}*/}
+            {/*    onChange={setInputInputContent}*/}
+            {/*    prefix={attachmentsNode}*/}
+            {/*    loading={false}*/}
+            {/*    className={styles.sender}*/}
+            {/*/>*/}
         </>
     )
 }

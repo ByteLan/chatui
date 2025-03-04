@@ -785,18 +785,35 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }
         }
 
-        function updateStreamMessage(messageId:string, messageContent:string, conversationId:string){
+        function addReasoningContent(oldContent:string, reasoningContent?:string){
+            if(reasoningContent == null|| reasoningContent.length==0){
+                return oldContent;
+            }
+            // console.warn(oldContent)
+            //在oldContent中最后一个>字符前面加上reasoningContent
+            const lastIndex = oldContent.lastIndexOf("\" />");
+            if(lastIndex === -1){
+                return '<Thinking children="'+reasoningContent+'" />\n\n'+oldContent;
+            }
+            return oldContent.slice(0,lastIndex) + reasoningContent + oldContent.slice(lastIndex);
+        }
+
+        function updateStreamMessage(messageId:string, messageContent:string, messageReasoningContent:string, conversationId:string){
             if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId){
                 setMessageItems(prevMessageItems => {
                     let hasItem = false;
                     let newMessageItem = prevMessageItems.map((item) => {
+
                         if(item.key == messageId){
+                            console.warn(item.content)
+                            console.warn(messageContent)
+                            console.warn(messageReasoningContent)
                             hasItem = true;
                             return {
                                 key: item.key,
                                 loading: false,
-                                role: 'ai',
-                                content: item.content+messageContent,
+                                role: 'aiMdx',
+                                content: addReasoningContent(item.content,messageReasoningContent)+(messageContent?messageContent:""),
                             }
                         }else{
                             return item;
@@ -806,8 +823,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         newMessageItem = [...prevMessageItems, {
                             key: messageId,
                             loading: false,
-                            role: 'ai',
-                            content: messageContent,
+                            role: 'aiMdx',
+                            content: (messageReasoningContent?('<Thinking children="'+messageReasoningContent+'" />\n\n'):"")+(messageContent?messageContent:""),
                         }]
                     }
                     return newMessageItem;
@@ -903,7 +920,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                 }else if(jd.responseType == 'createNewMessage'){
                                     createNewMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType)
                                 }else if(jd.responseType == 'updateStreamMessage') {
-                                    updateStreamMessage(jd.messageId, jd.updateStreamMessageContent, jd.conversationId);
+                                    updateStreamMessage(jd.messageId, jd.updateStreamMessageContent, jd.updateStreamMessageReasoningContent, jd.conversationId);
                                 }
                             }
                         }
