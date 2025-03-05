@@ -298,158 +298,7 @@ function checkRightSize():void{
     }
 }
 
-// const mdComponentMyButton:React.FC<{
-//     children: string;
-//     onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-// }> = ({children, onClick}) => {
-//     return <Button onClick={onClick}> {children} </Button>
-// }
 
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-expect-error
-// function mdComponentMyButton({children, onClick}){
-//     return <Button onClick={onClick}> {children} </Button>
-// }
-
-// const mdComponentIFrameButton:React.FC<{
-//     children: string;
-//     src: string
-// }> = ({ children, src }) => {
-//     return <Button onClick={()=> {
-//         checkRightSize()
-//         if (setRightNodeFn === undefined){
-//             return
-//         }
-//         setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
-//     }}> {children} </Button>
-// }
-
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-expect-error
-// function mdComponentIFrameButton({children, src}){
-//     // console.warn("in mdComponentIFrameButton");
-//     return <Button onClick={()=> {
-//         checkRightSize()
-//         if (setRightNodeFn === undefined){
-//             return
-//         }
-//         setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
-//     }}> {children} </Button>
-// }
-
-// const mdComponentExampleSideSheetShow:React.FC<{
-//     children: string
-// }> = ({ children }) => {
-//     return <Button onClick={()=> {
-//         if (exampleSideChangeFn === undefined){
-//             return
-//         }
-//         exampleSideChangeFn()
-//     }}>{children}</Button>
-// }
-
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-expect-error
-// function mdComponentExampleSideSheetShow({children}){
-//     return <Button onClick={()=> {
-//         if (exampleSideChangeFn === undefined){
-//             return
-//         }
-//         exampleSideChangeFn()
-//     }}>{children}</Button>
-// }
-//
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-expect-error
-// function mdComponentAnylogicSimulationDemoButton({children, src}){
-//     return <Button onClick={()=> {
-//         checkRightSize()
-//         if (setRightNodeFn === undefined){
-//             return
-//         }
-//         if(src == null){
-//             setRightNodeFn(
-//                 <LazyImportSuspense><AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/></LazyImportSuspense>
-//             )
-//         }else{
-//             setRightNodeFn(
-//                 <LazyImportSuspense><AnylogicSimulationDemoPage simAddr={src}/></LazyImportSuspense>
-//             )
-//         }
-//     }}> {children} </Button>
-// }
-
-// // const mdComponents = {};
-// const mdxComponents = {};
-//
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-expect-error
-// mdxComponents['MyButton']=mdComponentMyButton;
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-expect-error
-// mdxComponents['IFrameButton']=mdComponentIFrameButton;
-// // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// // @ts-expect-error
-// mdxComponents['ExampleSideSheetShow']=mdComponentExampleSideSheetShow;
-
-// console.warn(mdxComponents);
-//
-// console.warn(...MarkdownRender.defaultComponents,...mdxComponents);
-
-// const mdxComponents = {
-//     'MyButton':mdComponentMyButton,
-//     'IFrameButton':mdComponentIFrameButton,
-//     'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
-//     'ExampleSideSheetShow':mdComponentExampleSideSheetShow
-// };
-
-// const mdxComponents = {
-//     'MyButton':mdComponentMyButton,
-//     'IFrameButton':mdComponentIFrameButton,
-//     'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
-//     'ExampleSideSheetShow':mdComponentExampleSideSheetShow
-// };
-
-// console.warn(mdxComponents);
-
-
-// const semiMarkdownRender = (content?: string) => {
-//     return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
-//     // return <div>123</div>
-// };
-//
-//
-// const semiPureMarkdownRender = (content?: string) => {
-//     return <MarkdownRender raw={content} format="md" />
-// };
-
-// const roles: GetProp<typeof Bubble.List, 'roles'> = {
-//     ai: {
-//         placement: 'start',
-//         // typing: { step: 300, interval: 1 },
-//         styles: {
-//             content: {
-//                 borderRadius: 16,
-//             },
-//         },
-//         messageRender: semiPureMarkdownRender,
-//     },
-//     local: {
-//         placement: 'end',
-//         variant: 'shadow',
-//         // messageRender: semiPureMarkdownRender,
-//     },
-//     aiMdx: {
-//         placement: 'start',
-//         // typing: { step: 300, interval: 1 },
-//         styles: {
-//             content: {
-//                 borderRadius: 16,
-//             },
-//         },
-//         messageRender: semiMarkdownRender,
-//     },
-// };
 
 function convertRole(messageUid:string, messageType:string){
     if(messageUid.startsWith("-")){
@@ -988,36 +837,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     agent,
     // });
 
-    // useEffect(() => {
-    //     // 读取cookies中的userid
-    //     const userIdValue = Cookies.get('localckid');
-    //     if(userIdValue !== undefined){
-    //         // http请求
-    //         fetch(hostAddr+'auth/api/ckidCheck',{
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             credentials: 'include',
-    //             body: JSON.stringify({
-    //                 "ckid": userIdValue
-    //             })
-    //         }).then(response => {
-    //             return response.json();
-    //         })
-    //         .then(data => {
-    //             if (data.responseStatus == 'ckidCheckSuccess') {
-    //                 Cookies.set('localckid',data.newCkid, { expires: 3 });
-    //                 setTempCkid(data.newCkid);
-    //                 setUserName(data.userName);
-    //                 setLoginState(true);
-    //                 onLoginOption();
-    //             }
-    //         }).catch((error) => {
-    //             console.error('Error:', error);
-    //         });
-    //     }
-    // }, []);
+
 
     useEffect(() => {
         // http请求
@@ -1615,11 +1435,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             <LazyImportSuspense>
                                 <ImChat
                                     styles={styles}
-                                    checkRightSize={checkRightSize}
-                                    exampleSideChangeFn={exampleSideChange}
+                                    checkRightSizeF={checkRightSize}
+                                    exampleSideChangeF={exampleSideChange}
                                     onRequest={onRequest}
                                     activeKey={activeKey}
-                                    setRightNodeFn={rightNodeFn}
+                                    setRightNodeF={rightNodeFn}
                                     messageItems={messageItems}
                                     setDemoButtonNode={setDemoButtonNode}
                                 >
