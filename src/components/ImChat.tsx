@@ -1,26 +1,31 @@
-import {Attachments, Bubble, Prompts, Sender, Welcome} from "@ant-design/x";
+import { Prompts, Welcome} from "@ant-design/x";
 import React, {lazy} from "react";
-import {Badge, Button, type GetProp, Space} from "antd";
+import { Button, type GetProp, Space} from "antd";
 import {MarkdownRender} from "@douyinfe/semi-ui";
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 import {
-    CloudUploadOutlined,
+    // CloudUploadOutlined,
     CommentOutlined,
     EllipsisOutlined,
     FireOutlined,
-    HeartOutlined, PaperClipOutlined,
+    HeartOutlined,
+    // PaperClipOutlined,
     ReadOutlined,
     SmileOutlined
 } from "@ant-design/icons";
-
+// import ImChatTitle from "./ImChatTitle.tsx";
+// import ImChatSender from "./ImChatSender.tsx";
+import Bubble from "@ant-design-local/x/components/bubble/index.tsx";
+const ImChatSender = lazy(() => import("./ImChatSender.tsx"));
 const AnylogicSimulationDemoPage = lazy(() => import("../components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/simulation-pages/SimulationStarter.tsx"));
 
-// let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
-// let exampleSideChangeFn: (() => void) | undefined;
-//
-// let checkRightSize: (() => void) | undefined;
+import { isEqual } from 'lodash';
 
+let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
+let exampleSideChangeFn: (() => void) | undefined;
+let checkRightSize: (() => void) | undefined;
+let activeKeyPublic:string|undefined;
 
 const renderTitle = (icon: React.ReactElement, title: string) => (
     <Space align="start">
@@ -96,126 +101,137 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     },
 ];
 
-const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
-    {
-        key: '1',
-        description: 'help',
-        icon: <FireOutlined style={{color: '#FF4D4F'}}/>,
-    },
-    {
-        key: '2',
-        description: '使用指导',
-        icon: <ReadOutlined style={{color: '#1890FF'}}/>,
-    },
-];
 
+// 解决重复渲染BubbleList
+const BubbleListMemo = React.memo(({messageItems, styles, roles, placeholderNode}:{messageItems:{
+        key: string
+        loading: boolean
+        role: string
+        content: string
+    }[], styles:any, roles:any, placeholderNode:any}) => (
+    <Bubble.List
+        items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
+        roles={roles}
+        className={styles.messages}
+    />
+), (prevProps, nextProps) => {
+    // 只在消息变化时重新渲染
+    return isEqual(prevProps.messageItems , nextProps.messageItems);
+});
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentMyButton({children, onClick}){
+    return <Button onClick={onClick}> {children} </Button>
+}
 
-
-
-export default function ImChat({styles, messageItems, activeKey, checkRightSize, setRightNodeFn, onRequest, exampleSideChangeFn, setDemoButtonNode}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSize: (() => void) | undefined, setRightNodeFn: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeFn: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined}) {
-    const [inputContent, setInputInputContent] = React.useState('');
-    const [headerOpen, setHeaderOpen] = React.useState(false);
-    const [attachedFiles, setAttachedFiles] = React.useState<GetProp<typeof Attachments, 'items'>>(
-        [],
-    );
-
-    const onSubmit = (nextContent: string) => {
-        if (!nextContent) return;
-        onRequest(nextContent);
-        setInputInputContent('');
-        console.info("onSubmit, activeKey: "+activeKey);
-    };
-
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    function mdComponentMyButton({children, onClick}){
-        return <Button onClick={onClick}> {children} </Button>
-    }
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    function mdComponentIFrameButton({children, src}){
-        // console.warn("in mdComponentIFrameButton");
-        return <Button onClick={()=> {
-            checkRightSize?.()
-            if (setRightNodeFn === undefined){
-                return
-            }
-            setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
-        }}> {children} </Button>
-    }
-
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    function mdComponentExampleSideSheetShow({children}){
-        return <Button onClick={()=> {
-            if (exampleSideChangeFn === undefined){
-                return
-            }
-            exampleSideChangeFn()
-        }}>{children}</Button>
-    }
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-     function mdComponentAnylogicSimulationDemoButton({children, src}){
-        return <Button onClick={()=> {
-            checkRightSize?.()
-            if (setRightNodeFn === undefined){
-                return
-            }
-            if(src == null){
-                setRightNodeFn(
-                    <LazyImportSuspense><AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/></LazyImportSuspense>
-                )
-            }else{
-                setRightNodeFn(
-                    <LazyImportSuspense><AnylogicSimulationDemoPage simAddr={src}/></LazyImportSuspense>
-                )
-            }
-        }}> {children} </Button>
-    }
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    function mdComponentSimulationStarter({children, src}:{children:any, src:string}){
-        return <Button onClick={()=> {
-            checkRightSize?.()
-            if (setRightNodeFn === undefined){
-                return
-            }
-            if(src == null || src =="") {
-                setRightNodeFn(
-                    <LazyImportSuspense><SimulationStarter src="demo2" activeConversationKey={activeKey}/></LazyImportSuspense>
-                )
-            }else{
-                setRightNodeFn(
-                    <LazyImportSuspense><SimulationStarter src={src} activeConversationKey={activeKey}/></LazyImportSuspense>
-                )
-            }
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentIFrameButton({children, src}){
+    // console.warn("in mdComponentIFrameButton");
+    // console.warn(setRightNodeFn)
+    return <Button onClick={()=> {
+        checkRightSize?.()
+        if (setRightNodeFn === undefined){
+            return
         }
-        }>{children}</Button>
+        setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
+    }}> {children} </Button>
+}
+
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentExampleSideSheetShow({children}){
+    return <Button onClick={()=> {
+        if (exampleSideChangeFn === undefined){
+            return
+        }
+        exampleSideChangeFn()
+    }}>{children}</Button>
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentAnylogicSimulationDemoButton({children, src}){
+    return <Button onClick={()=> {
+        checkRightSize?.()
+        if (setRightNodeFn === undefined){
+            return
+        }
+        if(src == null){
+            setRightNodeFn(
+                <LazyImportSuspense><AnylogicSimulationDemoPage simAddr="https://bytelan.cn/"/></LazyImportSuspense>
+            )
+        }else{
+            setRightNodeFn(
+                <LazyImportSuspense><AnylogicSimulationDemoPage simAddr={src}/></LazyImportSuspense>
+            )
+        }
+    }}> {children} </Button>
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+function mdComponentSimulationStarter({children, src}:{children:any, src:string}){
+    return <Button onClick={()=> {
+        checkRightSize?.()
+        if (setRightNodeFn === undefined){
+            return
+        }
+        if(src == null || src =="") {
+            setRightNodeFn(
+                <LazyImportSuspense><SimulationStarter src="demo2" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+            )
+        }else{
+            setRightNodeFn(
+                <LazyImportSuspense><SimulationStarter src={src} activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+            )
+        }
     }
+    }>{children}</Button>
+}
 
-    const mdxComponents = {
-        'MyButton':mdComponentMyButton,
-        'IFrameButton':mdComponentIFrameButton,
-        'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
-        'ExampleSideSheetShow':mdComponentExampleSideSheetShow,
-        'AnylogicSimulationDemo2Button':mdComponentSimulationStarter
-    };
+const mdxComponents = {
+    'MyButton':mdComponentMyButton,
+    'IFrameButton':mdComponentIFrameButton,
+    'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
+    'ExampleSideSheetShow':mdComponentExampleSideSheetShow,
+    'AnylogicSimulationDemo2Button':mdComponentSimulationStarter
+};
 
-    const semiMarkdownRender = (content?: string) => {
-        return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
-        // return <div>123</div>
-    };
+const MemoSemiMarkdownRenderMemo = React.memo(({content}:{content?:string}) => (
+    <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
+), (prevProps, nextProps) => {
+    return isEqual(prevProps, nextProps);
+});
 
 
-    const semiPureMarkdownRender = (content?: string) => {
-        return <MarkdownRender raw={content} format="md" />
-    };
+const semiMarkdownRender = (content?: string) => {
+    return <MemoSemiMarkdownRenderMemo content={content} />;
+    // return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
+    // return <div>123</div>
+};
+
+const MemoSemiPureMarkdownRender = React.memo(({content}:{content?:string}) => (
+    <MarkdownRender raw={content} format="md" />
+), (prevProps, nextProps) => {
+    return isEqual(prevProps, nextProps);
+});
+
+
+const semiPureMarkdownRender = (content?: string) => {
+    return <MemoSemiPureMarkdownRender content={content} />;
+    // return <MarkdownRender raw={content} format="md" />
+};
+
+
+const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, checkRightSizeF, setRightNodeF, onRequest, exampleSideChangeF, setDemoButtonNode}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSizeF: (() => void) | undefined, setRightNodeF: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeF: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined}) {
+    checkRightSize = checkRightSizeF;
+    setRightNodeFn = setRightNodeF;
+    exampleSideChangeFn = exampleSideChangeF;
+    activeKeyPublic = activeKey;
+    // console.warn(checkRightSizeF,setRightNodeF,exampleSideChangeF);
+    // console.warn(checkRightSize,setRightNodeFn,exampleSideChangeFn);
 
     const roles: GetProp<typeof Bubble.List, 'roles'> = {
         ai: {
@@ -280,42 +296,42 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
         </Space>
     );
 
-    const attachmentsNode = (
-        <Badge dot={attachedFiles.length > 0 && !headerOpen}>
-            <Button type="text" icon={<PaperClipOutlined />} onClick={() => setHeaderOpen(!headerOpen)} />
-        </Badge>
-    );
+    // const attachmentsNode = (
+    //     <Badge dot={attachedFiles.length > 0 && !headerOpen}>
+    //         <Button type="text" icon={<PaperClipOutlined />} onClick={() => setHeaderOpen(!headerOpen)} />
+    //     </Badge>
+    // );
 
-    const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
-        setAttachedFiles(info.fileList);
-
-    const senderHeader = (
-        <Sender.Header
-            title="Attachments"
-            open={headerOpen}
-            onOpenChange={setHeaderOpen}
-            styles={{
-                content: {
-                    padding: 0,
-                },
-            }}
-        >
-            <Attachments
-                beforeUpload={() => false}
-                items={attachedFiles}
-                onChange={handleFileChange}
-                placeholder={(type) =>
-                    type == 'drop'
-                        ? { title: 'Drop file here' }
-                        : {
-                            icon: <CloudUploadOutlined />,
-                            title: 'Upload files',
-                            description: 'Click or drag files to this area to upload',
-                        }
-                }
-            />
-        </Sender.Header>
-    );
+    // const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
+    //     setAttachedFiles(info.fileList);
+    //
+    // const senderHeader = (
+    //     <Sender.Header
+    //         title="Attachments"
+    //         open={headerOpen}
+    //         onOpenChange={setHeaderOpen}
+    //         styles={{
+    //             content: {
+    //                 padding: 0,
+    //             },
+    //         }}
+    //     >
+    //         <Attachments
+    //             beforeUpload={() => false}
+    //             items={attachedFiles}
+    //             onChange={handleFileChange}
+    //             placeholder={(type) =>
+    //                 type == 'drop'
+    //                     ? { title: 'Drop file here' }
+    //                     : {
+    //                         icon: <CloudUploadOutlined />,
+    //                         title: 'Upload files',
+    //                         description: 'Click or drag files to this area to upload',
+    //                     }
+    //             }
+    //         />
+    //     </Sender.Header>
+    // );
 
     // setDemoButtonNode?.(
     //     <>
@@ -342,23 +358,32 @@ export default function ImChat({styles, messageItems, activeKey, checkRightSize,
         };
     }, [setDemoButtonNode]);
 
+
+
+
     return (
         <>
-            <Bubble.List
-                items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
-                roles={roles}
-                className={styles.messages}
-            />
-            <Prompts styles={{item:{paddingTop:2, paddingBottom:2}}} items={senderPromptsItems} onItemClick={onPromptsItemClick} />
-            <Sender
-                value={inputContent}
-                header={senderHeader}
-                onSubmit={onSubmit}
-                onChange={setInputInputContent}
-                prefix={attachmentsNode}
-                loading={false}
-                className={styles.sender}
-            />
+            <BubbleListMemo messageItems={messageItems} roles={roles} styles={styles} placeholderNode={placeholderNode}/>
+            {/*<Bubble.List*/}
+            {/*    items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}*/}
+            {/*    roles={roles}*/}
+            {/*    className={styles.messages}*/}
+            {/*/>*/}
+            <LazyImportSuspense>
+                <ImChatSender onRequest={onRequest} activeKey={activeKey} styles={styles} />
+            </LazyImportSuspense>
+            {/*<Prompts styles={{item:{paddingTop:2, paddingBottom:2}}} items={senderPromptsItems} onItemClick={onPromptsItemClick} />*/}
+            {/*<Sender*/}
+            {/*    value={inputContent}*/}
+            {/*    header={senderHeader}*/}
+            {/*    onSubmit={onSubmit}*/}
+            {/*    onChange={setInputInputContent}*/}
+            {/*    prefix={attachmentsNode}*/}
+            {/*    loading={false}*/}
+            {/*    className={styles.sender}*/}
+            {/*/>*/}
         </>
     )
-}
+});
+
+export default ImChat;
