@@ -5,7 +5,7 @@ import {Table} from '@douyinfe/semi-ui';
 import { omit } from 'lodash';
 import {TableProps} from "@douyinfe/semi-ui/lib/es/table";
 
-const table = (props: PropsWithChildren<TableProps>) => {
+const table: React.FC<PropsWithChildren<TableProps>> = (props: PropsWithChildren<TableProps>) => {
 
     const { children } = props;
     const toArray = value => Array.isArray(value) ? value : [value];
