@@ -22,7 +22,7 @@ const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/plat
 
 import { isEqual } from 'lodash';
 
-import table from "./table.tsx";
+import MyTable from "./table.tsx";
 
 let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
 let exampleSideChangeFn: (() => void) | undefined;
@@ -193,17 +193,21 @@ function mdComponentSimulationStarter({children, src}:{children:any, src:string}
     }>{children}</Button>
 }
 
+function mdTable({children}:{children:any}){
+    return <MyTable>{children}</MyTable>
+}
+
 const mdxComponents = {
     'MyButton':mdComponentMyButton,
     'IFrameButton':mdComponentIFrameButton,
     'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
     'ExampleSideSheetShow':mdComponentExampleSideSheetShow,
     'AnylogicSimulationDemo2Button':mdComponentSimulationStarter,
-    'table': ({children})=> table({children}),
+    'table': mdTable
 };
 
 const mdComponents = {
-    'table': ({children})=> table({children}),
+    'table': mdTable
 }
 
 const MemoSemiMarkdownRenderMemo = React.memo(({content}:{content?:string}) => (
