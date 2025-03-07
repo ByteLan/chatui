@@ -1,7 +1,7 @@
 import { Prompts, Welcome} from "@ant-design/x";
 import React, {lazy} from "react";
 import { Button, type GetProp, Space} from "antd";
-import {MarkdownRender} from "@douyinfe/semi-ui";
+import {Collapse, MarkdownRender} from "@douyinfe/semi-ui";
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 import {
     // CloudUploadOutlined,
@@ -223,9 +223,41 @@ const semiMarkdownRender = (content?: string) => {
     // return <div>123</div>
 };
 
-const MemoSemiPureMarkdownRender = React.memo(({content}:{content?:string}) => (
-    <MarkdownRender raw={content} format="md" components={{...MarkdownRender.defaultComponents,...mdComponents}}/>
-), (prevProps, nextProps) => {
+const MemoSemiPureMarkdownRender = React.memo(({content, openReasoning}:{content?:string, openReasoning?:boolean}) => {
+    // 将content中>开头的行提取出来
+    if(content!=null && content.length>0){
+        const contentArr = content.split("\n");
+        let contentReasoning = "";
+        let contentOthers = "";
+        let i=0;
+        for(i=0; i<contentArr.length; i++){
+            if(contentArr[i].startsWith(">")){
+                contentReasoning += contentArr[i] + "\n";
+            }else{
+                break;
+            }
+        }
+        if(i>0){
+            for(let j=i; j<contentArr.length; j++){
+                contentOthers += contentArr[j] + "\n";
+            }
+            return (
+                <>
+                    <Collapse defaultActiveKey={openReasoning?"1":undefined}>
+                        <Collapse.Panel header="思考过程" itemKey="1">
+                            <MarkdownRender raw={contentReasoning} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+                        </Collapse.Panel>
+                    </Collapse>
+                    <MarkdownRender raw={contentOthers} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+                </>
+            )
+        }else{
+            return <MarkdownRender raw={content} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+        }
+
+    }
+    return <MarkdownRender raw={content} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+}, (prevProps, nextProps) => {
     return isEqual(prevProps, nextProps);
 });
 
@@ -234,6 +266,10 @@ const semiPureMarkdownRender = (content?: string) => {
     return <MemoSemiPureMarkdownRender content={content} />;
     // return <MarkdownRender raw={content} format="md" />
 };
+
+const semiPureMarkdownRenderProcessing = (content?: string) => {
+    return <MemoSemiPureMarkdownRender content={content} openReasoning={true} />;
+}
 
 
 const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, checkRightSizeF, setRightNodeF, onRequest, exampleSideChangeF, setDemoButtonNode}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSizeF: (() => void) | undefined, setRightNodeF: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeF: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined}) {
@@ -254,6 +290,16 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 },
             },
             messageRender: semiPureMarkdownRender,
+        },
+        aiProcessing: {
+            placement: 'start',
+            // typing: { step: 300, interval: 1 },
+            styles: {
+                content: {
+                    borderRadius: 16,
+                },
+            },
+            messageRender: semiPureMarkdownRenderProcessing,
         },
         local: {
             placement: 'end',
