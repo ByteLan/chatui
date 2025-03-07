@@ -356,7 +356,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
         setDemoButtonNode?.(
             <>
                 {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
-                {mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}
+                {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
                 {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
                 {mdComponentAnylogicSimulationDemoButton({children: "SimulationDemo", src: null})}
                 {mdComponentSimulationStarter({children: "SimulationDemo2", src: ""})}

@@ -4,7 +4,7 @@ import {Flex} from "antd";
 
 const {Option} = Form.Select;
 
-export default function ImChatTitle({chatTitle, modelList, onModelChange, onHistoryRoundChange, style, modelName: modelKey, historyRound }:{chatTitle?:string, modelList?:{key:string, name:string, property?: string[]}[], onModelChange?:(key:string)=>void, onHistoryRoundChange?:(round:number)=>void, style?:React.CSSProperties, modelName?:string, historyRound?:number}) {
+export default function ImChatTitle({chatTitle, modelList, onModelChange, onHistoryRoundChange, style, modelKey, historyRound }:{chatTitle?:string, modelList?:{key:string, name:string, property?: string[]}[], onModelChange?:(key:string)=>void, onHistoryRoundChange?:(round:number)=>void, style?:React.CSSProperties, modelKey?:string, historyRound?:number}) {
     const newStyle = {
         width: '100%',
         ...style,
@@ -16,9 +16,7 @@ export default function ImChatTitle({chatTitle, modelList, onModelChange, onHist
 
     function onModelValueChange(newValue:any) {
         if(newValue!=null&&newValue.modelName!=null&&typeof newValue.modelName=="string"){
-            if(typeof newValue.modelName=="string"){
-                onModelChange?.(newValue.modelName);
-            }
+            onModelChange?.(newValue.modelName);
         }
     }
 

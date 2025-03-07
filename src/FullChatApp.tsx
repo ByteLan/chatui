@@ -28,7 +28,7 @@ import {
     // SmileOutlined,
 } from '@ant-design/icons';
 import {type GetProp, Button, Modal, Row, Col, Input, Flex, FloatButton, Drawer} from 'antd';
-import {SideSheet, Notification, Empty, Toast} from '@douyinfe/semi-ui';
+import {SideSheet, Notification, Empty, Toast, MarkdownRender} from '@douyinfe/semi-ui';
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
@@ -335,6 +335,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         socketReconnectingRef.current = socketReconnecting;
     }, [socketReconnecting]);
     const socketReconnectCountRef = useRef(0);
+    const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
+    const modelListRef = useRef(modelList);
 
     // ==================== Style ====================
     const { styles } = useStyle();
@@ -394,6 +396,20 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }
         });
     }, [activeKey,conversationItems]);
+
+    function setModelNameDefault(){
+        // 获取网址参数中的modelName
+        const urlParams = new URLSearchParams(window.location.search);
+        const modelNameParam = urlParams.get('modelName');
+        if(modelNameParam){
+            modelListRef.current.map((item) => {
+                if(item.key == modelNameParam){
+                    setModelName(modelNameParam);
+                }
+            });
+        }
+        // setModelName("default");
+    }
 
 
     const menuConfig: ConversationsProps['menu'] = (conversation) => ({
@@ -903,8 +919,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     //         return true;
                     //     }
                     // });
-                    setModelName("default");
+                    // setModelName("default");
                     setHistoryRound(10);
+                    setModelNameDefault();
                 }else{
                     setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+data);
                 }
@@ -1409,7 +1426,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 icon={<RightOutlined />} />
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>
-                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={[{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]} modelName={modelName} historyRound={historyRound}></ImChatTitle>
+                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={modelList} modelKey={modelName} historyRound={historyRound}></ImChatTitle>
                 </LazyImportSuspense>):(<></>)}
 
 
@@ -1459,9 +1476,28 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 }
 
             </div>
-            <SideSheet title="滑动侧边栏示例" visible={exampleSideVisible} onCancel={exampleSideChange}>
+            <SideSheet title="交互界面说明" visible={exampleSideVisible} onCancel={exampleSideChange}>
                 <p>你可以在对话框输入以下内容，尝试渲染Markdown和JSX，这些内容都是AI返回到会话的。</p>
                 <p>{example_side_text}</p>
+                <MarkdownRender format="md" raw={`## 模型指定
+
+您可以通过在网址参数中加入modelName来指定默认使用模型，例如
+
+\`\`\`text
+.../chat/?modelName=DeepseekR1Ali
+\`\`\`
+
+支持的模型如下
+
+\`\`\`json
+[{key: "default", name: "多智能体（默认）"},
+{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},
+{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},
+{key: "QwenMax", name: "千问Max - 效果出众"},
+{key: "QwenTurbo", name: "千问Turbo - 速度最快"},
+{key: "QwenLong", name: "千问Long - 适合长文本"},
+{key: "oldMa", name: "多智能体（非流式，弃用）"}]
+\`\`\``}/>
             </SideSheet>
         </div>
     );
