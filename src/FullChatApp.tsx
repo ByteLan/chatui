@@ -660,7 +660,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             return {
                                 key: item.key,
                                 loading: false,
-                                role: 'ai',
+                                role: 'aiProcessing',
                                 content: item.content+messageContent,
                             }
                         }else{
@@ -671,7 +671,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         newMessageItem = [...prevMessageItems, {
                             key: messageId,
                             loading: false,
-                            role: 'ai',
+                            role: 'aiProcessing',
                             content: messageContent,
                         }]
                     }
