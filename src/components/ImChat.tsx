@@ -1,7 +1,7 @@
 import { Prompts, Welcome} from "@ant-design/x";
 import React, {lazy} from "react";
-import { Button, type GetProp, Space} from "antd";
-import {Collapse, MarkdownRender} from "@douyinfe/semi-ui";
+import {Button, Flex, type GetProp, Space} from "antd";
+import {Collapse, MarkdownRender, Col, Row, Popover} from "@douyinfe/semi-ui";
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 import {
     // CloudUploadOutlined,
@@ -19,10 +19,12 @@ import Bubble from "@ant-design-local/x/components/bubble/index.tsx";
 const ImChatSender = lazy(() => import("./ImChatSender.tsx"));
 const AnylogicSimulationDemoPage = lazy(() => import("../components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/simulation-pages/SimulationStarter.tsx"));
+const OverviewPage = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/OverviewPage.tsx"));
 
 import { isEqual } from 'lodash';
 
 import MyTable from "./table.tsx";
+import MessageCardVChart from "./MessageCardVChart.tsx";
 
 let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
 let exampleSideChangeFn: (() => void) | undefined;
@@ -193,6 +195,22 @@ function mdComponentSimulationStarter({children, src}:{children:any, src:string}
     }>{children}</Button>
 }
 
+function mdButtonOverviewShow({children}:{children:any}){
+    return <Button onClick={()=> {
+        checkRightSize?.()
+        if (setRightNodeFn === undefined){
+            return
+        }
+        setRightNodeFn(
+            <LazyImportSuspense><OverviewPage activeConversationKey={activeKeyPublic} /></LazyImportSuspense>
+        )
+    }}>{children}</Button>
+}
+
+function mdVChart({children, src, title}:{children?:any, src?:string, title?:string}){
+    return <MessageCardVChart dataSrc={src} title={title}>{children}</MessageCardVChart>
+}
+
 function mdTable({children}:{children:any}){
     return <MyTable>{children}</MyTable>
 }
@@ -203,6 +221,8 @@ const mdxComponents = {
     'AnylogicSimulationDemoButton':mdComponentAnylogicSimulationDemoButton,
     'ExampleSideSheetShow':mdComponentExampleSideSheetShow,
     'AnylogicSimulationDemo2Button':mdComponentSimulationStarter,
+    'MessageCardVChart':mdVChart,
+    'ButtonOverviewShow':mdButtonOverviewShow,
     'table': mdTable
 };
 
@@ -401,11 +421,44 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
     React.useEffect(() => {
         setDemoButtonNode?.(
             <>
-                {mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}
-                {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
-                {mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}
-                {mdComponentAnylogicSimulationDemoButton({children: "SimulationDemo", src: null})}
-                {mdComponentSimulationStarter({children: "SimulationDemo2", src: ""})}
+                <Popover position="top"
+                         showArrow
+                         trigger="hover"
+                         style={{
+                             // backgroundColor: 'rgba(var(--semi-blue-4),1)',
+                             borderColor: 'rgba(var(--semi-blue-4),1)',
+                             borderStyle: 'solid',
+                             // color: 'var(--semi-color-white)',
+                         }}
+                         content={<Flex vertical>
+                             {mdComponentIFrameButton({children: "Iframe主页", src: "https://www.bytelan.cn/"})}
+                             {mdComponentExampleSideSheetShow({children: "使用指南"})}
+                             {/*<Row gutter={[1,1]} justify="center">*/}
+                             {/*    <Col span={12}>*/}
+                             {/*        {mdComponentIFrameButton({children: "Iframe主页", src: "https://www.bytelan.cn/"})}*/}
+                             {/*    </Col>*/}
+                             {/*    <Col span={12}>*/}
+                             {/*        {mdComponentExampleSideSheetShow({children: "使用指南"})}*/}
+                             {/*    </Col>*/}
+                             {/*</Row>*/}
+                             {mdButtonOverviewShow({children: "Overview"})}
+                             {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
+                             {/*<Row gutter={[1,1]}  justify="center">*/}
+                             {/*    <Col span={12}>*/}
+                             {/*        {mdComponentAnylogicSimulationDemoButton({children: "Sim-old", src: null})}*/}
+                             {/*    </Col>*/}
+                             {/*    <Col span={12}>*/}
+                             {/*        {mdComponentSimulationStarter({children: "Sim-new", src: ""})}*/}
+                             {/*    </Col>*/}
+                             {/*</Row>*/}
+                             {mdComponentSimulationStarter({children: "Sim-new", src: ""})}
+                             {mdComponentAnylogicSimulationDemoButton({children: "Sim-old", src: null})}
+                         </Flex>}>
+                    <Button>调试选项</Button>
+                </Popover>
+
+
+
             </>
         );
 

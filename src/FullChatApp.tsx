@@ -778,6 +778,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 }
 
                 socketRef.current.onclose = () => {
+                    if(socketReconnectingRef.current==true){return}
                     clearInterval(heartbeatInterval);
                     console.error('ws on close');
                     setReconnect();
@@ -796,6 +797,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
         return () => {
             console.log('close socket, tempCkid changed:'+tempCkid);
+            socketReconnectingRef.current=true;
             clearInterval(heartbeatInterval);
             socketRef.current?.close();
             socketRef.current = null;
@@ -1034,7 +1036,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             Toast.error(opts);
             return
         }
-        fetch(hostAddr+'ai_chat/api/send_message',{
+        fetch(hostAddr+'ai_chat/api/query_message',{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

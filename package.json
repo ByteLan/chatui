@@ -20,6 +20,7 @@
     "@nivo/core": "^0.88.0",
     "@nivo/line": "^0.88.0",
     "@types/js-cookie": "^3.0.6",
+    "@visactor/react-vchart": "^1.13.6",
     "antd-style": "^3.7.1",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
