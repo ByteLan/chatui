@@ -177,7 +177,7 @@ const useStyle = createStyles(({token, css}) => {
             background: #1677ff0f;
             border: 1px solid #1677ff34;
             width: calc(100% - 24px);
-            margin: 0 12px 24px 12px;
+            margin: 0 12px 2px 12px;
         `,
     };
 });
@@ -1379,17 +1379,18 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
             </div>
             <Drawer
-                title="会话列表"
+                title="丝路大模型"
                 placement="left"
                 closable={true}
                 onClose={onClickCloseMenu}
-                width={348}
+                width={300}
                 open={menuDrawerOpen}
                 getContainer={false}
+                styles={{body:{padding:0}}}
             >
                 <div className={styles.menu} style={{ width: 300 }} >
                     {/* 🌟 Logo */}
-                    {logoNode}
+                    {/*{logoNode}*/}
                     {/* 🌟 添加会话 */}
                     <Button
                         onClick={onAddConversation}
@@ -1397,6 +1398,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         className={styles.addBtn}
                         icon={<PlusOutlined />}
                         loading={isCreatingConversation}
+                        style={{marginTop:10}}
                     >
                         创建新会话
                     </Button>
@@ -1478,10 +1480,22 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 }
 
             </div>
-            <SideSheet title="交互界面说明" visible={exampleSideVisible} onCancel={exampleSideChange}>
-                <p>你可以在对话框输入以下内容，尝试渲染Markdown和JSX，这些内容都是AI返回到会话的。</p>
-                <p>{example_side_text}</p>
-                <MarkdownRender format="md" raw={`## 模型指定
+            <SideSheet title="交互界面说明" visible={exampleSideVisible} onCancel={exampleSideChange} width='80%'>
+                <MarkdownRender format="md" raw={`
+## 特殊JSX组件
+
+当大模型返回以下内容时，会渲染特定组件
+
+\`\`\`text
+// VChart图表
+(silkroad://chat.messagecard.vchart/数据id/图表标题)
+// 新版仿真
+(silkroad://chat.messagecard.startsimulation2/)
+// 旧版仿真
+(https://anylogic-test.bitcs-silkroad-oe.bbyte.cn/anylogic/platform/demo-test/startRun/1)
+\`\`\`
+
+## 模型指定
 
 您可以通过在网址参数中加入modelName来指定默认使用模型，例如
 
