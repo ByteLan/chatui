@@ -9,12 +9,13 @@ import {hostAddr} from "../serverConfig.tsx";
 export default function UserBar({onLogin, loginState, loginUserName, setLoginState, setLoginUserName, setTempCkid}:{onLogin:()=>void, loginState:boolean, loginUserName:string|null, setLoginState:(state:boolean)=>void, setLoginUserName:(name:string)=>void, setTempCkid:(ckid:string)=>void}) {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
+    const [confirmLogoutLoading, setConfirmLogoutLoading] = useState(false);
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [loginOkTint, setLoginOkTint] = useState('');
     const [userNameStatus, setUserNameStatus] = useState('');
     const [passwordStatus, setPasswordStatus] = useState('');
-
+    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
 
     function login() {
@@ -85,13 +86,97 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
         setLoginModalOpen(false);
     }
 
+    function handleLogoutOk() {
+        setConfirmLogoutLoading(true);
+        fetch(hostAddr+'auth/api/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({})
+        }).then(response => response.json())
+            .then(data => {
+                // setConfirmLogoutLoading(false);
+                if(data.responseStatus === 'success'){
+                    // setLoginModalOpen(false);
+                    // setConfirmLogoutLoading(false);
+                    const opts = {
+                        content: "登出成功！！请重新登录！",
+                        duration: 3,
+                        stack: true,
+                        theme: 'light',
+                    };
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    Toast.success(opts);
+                    // 2秒后刷新页面
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }else{
+                    // setConfirmLogoutLoading(false);
+                    const opts = {
+                        content: "登出失败！！服务器返回异常！正在刷新页面重试！",
+                        duration: 3,
+                        stack: true,
+                        theme: 'light',
+                    };
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    Toast.error(opts);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                    // setLoginModalOpen(false);
+                }
+            })
+            .catch((error) => {
+                // setConfirmLogoutLoading(false);
+                console.error('Error:', error);
+                const opts = {
+                    content: "登出失败！！正在刷新页面重试！",
+                    duration: 3,
+                    stack: true,
+                    theme: 'light',
+                };
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                Toast.error(opts);
+                // setLoginModalOpen(false);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            });
+    }
+
+    function handleLogoutCancel() {
+        if(confirmLogoutLoading){
+            const opts = {
+                content: "正在登出，请稍后......",
+                duration: 2,
+                stack: true,
+                theme: 'light',
+            }
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            Toast.info(opts);
+        }else{
+            setLogoutModalOpen(false);
+        }
+    }
+
 
 
     function onAvatarClick() {
-        setUserNameStatus('');
-        setPasswordStatus('');
-        setLoginOkTint('');
-        login();
+        if(loginState){
+            setLogoutModalOpen(true);
+        }else{
+            setUserNameStatus('');
+            setPasswordStatus('');
+            setLoginOkTint('');
+            login();
+        }
     }
 
     return (
@@ -121,6 +206,15 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
                     </Row>
                     <p style={{color: 'red'}}>{loginOkTint}</p>
                 </Flex>
+            </Modal>
+            <Modal
+                title="登出"
+                open={logoutModalOpen}
+                onOk={handleLogoutOk}
+                confirmLoading={confirmLogoutLoading}
+                onCancel={handleLogoutCancel}
+            >
+                <p>您已登录，是否要退出？</p>
             </Modal>
         </div>
     );

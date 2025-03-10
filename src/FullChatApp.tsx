@@ -719,23 +719,25 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     return;
                 }
                 socketReconnectCountRef.current += 1;
-                if(socketReconnectCountRef.current > 10){
-                    socketReconnectCountRef.current = 10;
+                if(socketReconnectCountRef.current > 20){
+                    socketReconnectCountRef.current = 15;
                 }
                 socketReconnectingRef.current = true;
                 // socketReconnectCountRef.current = 0;
                 setSocketReconnecting(true);
                 setTimeout(() => {
                     connectSocket();
-                }, 5000+socketReconnectCountRef.current*6000);
+                }, 1000+socketReconnectCountRef.current*2000);
                 console.log('ws REconnecting');
             }
 
             if(loginState==false||tempCkid == ''){
+                socketReconnectingRef.current = true;
                 socketRef.current?.close();
                 socketRef.current = null;
             }else{
                 if(socketRef.current != null){
+                    socketReconnectingRef.current = true;
                     socketRef.current.close();
                     socketRef.current = null;
                 }
@@ -785,6 +787,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 }
 
                 socketRef.current.onerror = () => {
+                    if(socketReconnectingRef.current==true){return}
                     clearInterval(heartbeatInterval);
                     console.error('ws on error');
                     setReconnect();
@@ -799,8 +802,13 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             console.log('close socket, tempCkid changed:'+tempCkid);
             socketReconnectingRef.current=true;
             clearInterval(heartbeatInterval);
-            socketRef.current?.close();
-            socketRef.current = null;
+            if(socketRef.current != null){
+                socketRef.current.onclose = null;
+                socketRef.current.onerror = null;
+                socketRef.current.close();
+                socketRef.current = null;
+            }
+
         }
     }, [tempCkid, loginState]);
 
