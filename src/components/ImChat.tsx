@@ -230,9 +230,42 @@ const mdComponents = {
     'table': mdTable
 }
 
-const MemoSemiMarkdownRenderMemo = React.memo(({content}:{content?:string}) => (
-    <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
-), (prevProps, nextProps) => {
+const MemoSemiMarkdownRenderMemo = React.memo(({content}:{content?:string}) => {
+    // 将content中>开头的行提取出来
+    if(content!=null && content.length>0){
+        const contentArr = content.split("\n");
+        let contentReasoning = "";
+        let contentOthers = "";
+        let i=0;
+        for(i=0; i<contentArr.length; i++){
+            if(contentArr[i].startsWith(">")){
+                contentReasoning += contentArr[i] + "\n";
+            }else{
+                break;
+            }
+        }
+        if(i>0){
+            for(let j=i; j<contentArr.length; j++){
+                contentOthers += contentArr[j] + "\n";
+            }
+            return (
+                <>
+                    <Collapse>
+                        <Collapse.Panel header="思考过程" itemKey="1">
+                            <MarkdownRender raw={contentReasoning} format="mdx" components={{...MarkdownRender.defaultComponents, ...mdxComponents}}/>
+                        </Collapse.Panel>
+                    </Collapse>
+                    <MarkdownRender raw={contentOthers} format="mdx" components={{...MarkdownRender.defaultComponents, ...mdxComponents}}/>
+                </>
+            )
+        }else{
+            return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents, ...mdxComponents}}/>
+        }
+
+    }
+    return <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents, ...mdxComponents}}/>
+        // <MarkdownRender raw={content} format="mdx" components={{...MarkdownRender.defaultComponents,...mdxComponents}} />
+}, (prevProps, nextProps) => {
     return isEqual(prevProps, nextProps);
 });
 
