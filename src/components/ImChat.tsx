@@ -406,51 +406,8 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
         </Space>
     );
 
-    // const attachmentsNode = (
-    //     <Badge dot={attachedFiles.length > 0 && !headerOpen}>
-    //         <Button type="text" icon={<PaperClipOutlined />} onClick={() => setHeaderOpen(!headerOpen)} />
-    //     </Badge>
-    // );
 
-    // const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
-    //     setAttachedFiles(info.fileList);
-    //
-    // const senderHeader = (
-    //     <Sender.Header
-    //         title="Attachments"
-    //         open={headerOpen}
-    //         onOpenChange={setHeaderOpen}
-    //         styles={{
-    //             content: {
-    //                 padding: 0,
-    //             },
-    //         }}
-    //     >
-    //         <Attachments
-    //             beforeUpload={() => false}
-    //             items={attachedFiles}
-    //             onChange={handleFileChange}
-    //             placeholder={(type) =>
-    //                 type == 'drop'
-    //                     ? { title: 'Drop file here' }
-    //                     : {
-    //                         icon: <CloudUploadOutlined />,
-    //                         title: 'Upload files',
-    //                         description: 'Click or drag files to this area to upload',
-    //                     }
-    //             }
-    //         />
-    //     </Sender.Header>
-    // );
 
-    // setDemoButtonNode?.(
-    //     <>
-    //         {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
-    //         {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
-    //         {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
-    //         {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
-    //     </>
-    // )
     React.useEffect(() => {
         setDemoButtonNode?.(
             <>
@@ -466,32 +423,13 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                          content={<Flex vertical>
                              {mdComponentIFrameButton({children: "Iframe主页", src: "https://www.bytelan.cn/"})}
                              {mdComponentExampleSideSheetShow({children: "使用指南"})}
-                             {/*<Row gutter={[1,1]} justify="center">*/}
-                             {/*    <Col span={12}>*/}
-                             {/*        {mdComponentIFrameButton({children: "Iframe主页", src: "https://www.bytelan.cn/"})}*/}
-                             {/*    </Col>*/}
-                             {/*    <Col span={12}>*/}
-                             {/*        {mdComponentExampleSideSheetShow({children: "使用指南"})}*/}
-                             {/*    </Col>*/}
-                             {/*</Row>*/}
                              {mdButtonOverviewShow({children: "Overview"})}
-                             {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
-                             {/*<Row gutter={[1,1]}  justify="center">*/}
-                             {/*    <Col span={12}>*/}
-                             {/*        {mdComponentAnylogicSimulationDemoButton({children: "Sim-old", src: null})}*/}
-                             {/*    </Col>*/}
-                             {/*    <Col span={12}>*/}
-                             {/*        {mdComponentSimulationStarter({children: "Sim-new", src: ""})}*/}
-                             {/*    </Col>*/}
-                             {/*</Row>*/}
-                             {mdComponentSimulationStarter({children: "Sim-new", src: ""})}
+                             {mdComponentSimulationStarter({children: "Sim-3", src: "demo3"})}
+                             {mdComponentSimulationStarter({children: "Sim-2", src: "demo2"})}
                              {mdComponentAnylogicSimulationDemoButton({children: "Sim-old", src: null})}
                          </Flex>}>
                     <Button>调试选项</Button>
                 </Popover>
-
-
-
             </>
         );
 
@@ -499,7 +437,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
             // 清理副作用
             setDemoButtonNode?.(<> </>);
         };
-    }, [setDemoButtonNode]);
+    }, [setDemoButtonNode,activeKey]);
 
 
 
