@@ -1,7 +1,7 @@
-import { Prompts, Welcome, Bubble} from "@ant-design/x";
+import { Prompts, Welcome} from "@ant-design/x";
 import React, {lazy} from "react";
 import {Button, Flex, type GetProp, Space} from "antd";
-import {Collapse, MarkdownRender, Popover} from "@douyinfe/semi-ui";
+import {Collapse, MarkdownRender, Col, Row, Popover} from "@douyinfe/semi-ui";
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 import {
     // CloudUploadOutlined,
@@ -15,8 +15,7 @@ import {
 } from "@ant-design/icons";
 // import ImChatTitle from "./ImChatTitle.tsx";
 // import ImChatSender from "./ImChatSender.tsx";
-// import Bubble from "@ant-design-local/x/components/bubble/index.tsx";
-// package.json   "@ant-design-local/x": "file:../../x",
+import Bubble from "@ant-design-local/x/components/bubble/index.tsx";
 const ImChatSender = lazy(() => import("./ImChatSender.tsx"));
 const AnylogicSimulationDemoPage = lazy(() => import("../components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/simulation-pages/SimulationStarter.tsx"));
