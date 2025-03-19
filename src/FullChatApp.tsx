@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, lazy, useCallback} from 'react';
+import React, {useEffect, useRef, lazy, useCallback, useMemo, memo} from 'react';
 import {
     // Attachments,
     // Prompts,
@@ -10,7 +10,7 @@ import {
     ConversationsProps,
 } from '@ant-design/x';
 
-const Conversations = lazy(() => import('@ant-design/x').then(module => ({ default: module.Conversations })));
+const Conversations = memo(lazy(() => import('@ant-design/x').then(module => ({ default: module.Conversations }))));
 // const Bubble = lazy(() => import('@ant-design/x').then(module => ({ default: module.Bubble })));
 
 import { createStyles } from 'antd-style';
@@ -346,7 +346,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     }, []);
 
 
-    const menuConfig: ConversationsProps['menu'] = (conversation) => ({
+    const menuConfig: ConversationsProps['menu'] = useCallback((conversation) => ({
         items: [
             {
                 label: '重命名会话',
@@ -538,7 +538,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }
             console.info(`Click ${conversation.key} - ${menuInfo.key}`);
         },
-    });
+    }),[conversationItems]);
 
 
     const [exampleSideVisible, setEexampleSideVisible] = React.useState(false);
@@ -1149,11 +1149,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     }
 
-    const onConversationClick: GetProp<typeof Conversations, 'onActiveChange'> = (key) => {
+    const onConversationClick: GetProp<typeof Conversations, 'onActiveChange'> = useCallback((key) => {
         setActiveKey(key);
         setMenuDrawerOpen(false);
         console.log('onConversationClick', key, "oldActiveKey: ", activeKey);
-    };
+    }, [activeKey]);
 
     // const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
     //     setAttachedFiles(info.fileList);
@@ -1213,7 +1213,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         onActiveChange={onConversationClick}
                         menu={menuConfig}
                         groupable
-                        styles={{item: {paddingInlineStart: 12}}}
+                        styles={useMemo(()=>({item: {paddingInlineStart: 12}}), [])}
                     />
                 </LazyImportSuspense>
                 {demoButtonNode==null?(<></>):(demoButtonNode)}
@@ -1257,7 +1257,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             onActiveChange={onConversationClick}
                             menu={menuConfig}
                             groupable
-                            styles={{item: {paddingInlineStart: 12}}}
+                            styles={useMemo(()=>({item: {paddingInlineStart: 12}}), [])}
                         />
                     </LazyImportSuspense>
                     {demoButtonNode==null?(<></>):(demoButtonNode)}
