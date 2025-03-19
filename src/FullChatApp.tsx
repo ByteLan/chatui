@@ -271,6 +271,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const socketReconnectCountRef = useRef(0);
     const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
     const modelListRef = useRef(modelList);
+    useEffect(() => {
+        modelListRef.current = modelList;
+    }, [modelList]);
 
     // ==================== Style ====================
     const { styles } = useStyle();
@@ -826,7 +829,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }).catch((error) => {console.error('Error:', error);});
     }, []);
 
-
+    // =========消息收取=========
     useEffect(() => {
         if (activeKey !== undefined && activeKey !== ""){
             setMessageContentReplacementTitle("");
@@ -856,19 +859,33 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             content: item.messageContent,
                         }
                     }));
-                    // // 找到当前activeKey在ConversationItemsRef.current中对应的label
-                    // const index = conversationItemsRef.current.findIndex((item) => {
-                    //     if(item.key == activeKey){
-                    //         if(item.label == null){
-                    //             setChatTitle("");
-                    //         }else{
-                    //             setChatTitle(item.label);
-                    //         }
-                    //         return true;
-                    //     }
-                    // });
-                    // setModelName("default");
-                    setHistoryRound(10);
+
+                    if(data.conversationSelectedHistoryRound){
+                        const hr = toNumber(data.conversationSelectedHistoryRound);
+                        if(hr && hr>0 && hr<201){
+                            setHistoryRound(hr);
+                        }else{
+                            setHistoryRound(10);
+                        }
+                    }else{
+                        setHistoryRound(10);
+                    }
+
+                    if(data.conversationSelectedModel){
+                        let flag = false;
+                        modelListRef.current.map((item) => {
+                            if(item.key == data.conversationSelectedModel){
+                                flag = true;
+                            }
+                        });
+                        if(flag){
+                            setModelName(data.conversationSelectedModel);
+                        }else{
+                            setModelName('default');
+                        }
+                    }else{
+                        setModelName('default');
+                    }
                     setModelNameDefault();
                 }else{
                     setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+data);
@@ -1273,7 +1290,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 icon={<RightOutlined />} />
             <div className={styles.chat} style={{ width: chatWidth}}>
                 {messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>
-                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={modelList} modelKey={modelName} historyRound={historyRound}></ImChatTitle>
+                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={modelList} modelKey={modelName} historyRound={historyRound} activeConversationKey={activeKey}></ImChatTitle>
                 </LazyImportSuspense>):(<></>)}
 
 

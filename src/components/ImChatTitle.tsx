@@ -1,11 +1,12 @@
 import React, {memo, useEffect, useRef} from "react";
-import {Collapse, Form, Tag} from '@douyinfe/semi-ui';
+import {Collapse, Form, Tag, Toast} from '@douyinfe/semi-ui';
 import {Flex} from "antd";
-import {isEqual} from "lodash";
+import {isEqual, toNumber} from "lodash";
+import {hostAddr} from "../serverConfig.tsx";
 
 const {Option} = Form.Select;
 
-const ImChatTitle = memo(({chatTitle, modelList, onModelChange, onHistoryRoundChange, style, modelKey, historyRound }:{chatTitle?:string, modelList?:{key:string, name:string, property?: string[]}[], onModelChange?:(key:string)=>void, onHistoryRoundChange?:(round:number)=>void, style?:React.CSSProperties, modelKey?:string, historyRound?:number}) => {
+const ImChatTitle = memo(({chatTitle, modelList, onModelChange, onHistoryRoundChange, style, modelKey, historyRound, activeConversationKey }:{chatTitle?:string, modelList?:{key:string, name:string, property?: string[]}[], onModelChange?:(key:string)=>void, onHistoryRoundChange?:(round:number)=>void, style?:React.CSSProperties, modelKey?:string, historyRound?:number, activeConversationKey:string}) => {
     const newStyle = {
         width: '100%',
         ...style,
@@ -14,10 +15,133 @@ const ImChatTitle = memo(({chatTitle, modelList, onModelChange, onHistoryRoundCh
     const modelSelectRef = useRef();
     const historyRoundSelectRef = useRef();
     const [modelValue, setModelValue] = React.useState("");
+    const [modelFormDisabled, setModelFormDisabled] = React.useState(false);
+    const [historyRoundFormDisabled, setHistoryRoundFormDisabled] = React.useState(false);
+
+
+    function onHistoryRoundValueChange(newValue:any) {
+        const oldValue = historyRound?historyRound:10;
+        if(newValue!=null&&newValue.round!=null&&(typeof toNumber(newValue.round))=="number"&&onHistoryRoundChange&&toNumber(newValue.round)!=toNumber(historyRound)){
+            setHistoryRoundFormDisabled(true);
+            fetch(hostAddr+'ai_chat/api/set_conversation_selected_history_round',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    conversationId: activeConversationKey,
+                    conversationSelectedHistoryRound: toNumber(newValue.round),
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if(data.responseStatus === 'success'&&data.conversationSelectedHistoryRound) {
+                        const opts = {
+                            content: "[" + chatTitle + "] 修改携带上下文"+toNumber(data.conversationSelectedHistoryRound)+"轮成功！",
+                            duration: 2,
+                            stack: true,
+                            theme: 'light',
+                        }
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-expect-error
+                        Toast.success(opts);
+                        onHistoryRoundChange(toNumber(data.conversationSelectedHistoryRound));
+                    }else{
+                        const opts = {
+                            content: "[" + chatTitle + "] 修改上下文轮数失败！请检查网络或尝试刷新页面！" + JSON.stringify(data),
+                            duration: 3,
+                            stack: true,
+                            theme: 'light',
+                        }
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-expect-error
+                        Toast.error(opts);
+                        onHistoryRoundChange(oldValue);
+                        historyRoundSelectRef.current?.formApi.setValue("round", oldValue);
+                    }
+                    setHistoryRoundFormDisabled(false);
+                })
+                .catch((error) => {
+                    const opts = {
+                        content: "[" + chatTitle + "] 修改上下文轮数异常！请检查网络或尝试刷新页面！" + error,
+                        duration: 3,
+                        stack: true,
+                        theme: 'light',
+                    }
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    Toast.error(opts);
+                    onHistoryRoundChange(oldValue);
+                    historyRoundSelectRef.current?.formApi.setValue("round", oldValue);
+                    setHistoryRoundFormDisabled(false);
+                });
+        }else{
+            setHistoryRoundFormDisabled(false);
+        }
+    }
 
     function onModelValueChange(newValue:any) {
-        if(newValue!=null&&newValue.modelName!=null&&typeof newValue.modelName=="string"){
-            onModelChange?.(newValue.modelName);
+        const oldValue = modelKey?modelKey:"default";
+        if(newValue!=null&&newValue.modelName!=null&&typeof newValue.modelName=="string"&&onModelChange&&newValue.modelName!=modelKey){
+            setModelFormDisabled(true);
+            fetch(hostAddr+'ai_chat/api/set_conversation_selected_model',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    conversationId: activeConversationKey,
+                    conversationSelectedModel: newValue.modelName,
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if(data.responseStatus === 'success'&&data.conversationSelectedModel) {
+                        const opts = {
+                            content: "[" + chatTitle + "] 修改模型成功！",
+                            duration: 2,
+                            stack: true,
+                            theme: 'light',
+                        }
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-expect-error
+                        Toast.success(opts);
+                        onModelChange(data.conversationSelectedModel);
+                    }else{
+                        const opts = {
+                            content: "[" + chatTitle + "] 修改模型失败！请检查网络或尝试刷新页面！" + JSON.stringify(data),
+                            duration: 3,
+                            stack: true,
+                            theme: 'light',
+                        }
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-expect-error
+                        Toast.error(opts);
+                        onModelChange(oldValue);
+                        modelSelectRef.current?.formApi.setValue("modelName", oldValue);
+                    }
+                    setModelFormDisabled(false);
+                })
+                .catch((error) => {
+                    const opts = {
+                        content: "[" + chatTitle + "] 修改模型异常！请检查网络或尝试刷新页面！" + error,
+                        duration: 3,
+                        stack: true,
+                        theme: 'light',
+                    }
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    Toast.error(opts);
+                    onModelChange(oldValue);
+                    modelSelectRef.current?.formApi.setValue("modelName", oldValue);
+                    setModelFormDisabled(false);
+                });
+        }else{
+            setModelFormDisabled(false);
         }
     }
 
@@ -38,7 +162,6 @@ const ImChatTitle = memo(({chatTitle, modelList, onModelChange, onHistoryRoundCh
     }
 
 
-
     return (
         <div style={newStyle}>
                 <Collapse>
@@ -50,13 +173,13 @@ const ImChatTitle = memo(({chatTitle, modelList, onModelChange, onHistoryRoundCh
                         <Flex wrap justify='space-between' align='center'>
                             {modelList!=null&&modelList.length>0&&onModelChange!=null?(
                                 <>
-                                    <Form ref={modelSelectRef} onValueChange={onModelValueChange} style={{ minWidth:260 }}>
-                                        <Form.Select initValue={modelKey} defaultActiveFirstOption={true} field="modelName" label={{ text: '模型选择' }} style={{ minWidth:260 }} >
+                                    <Form ref={modelSelectRef} onValueChange={onModelValueChange} style={{ minWidth:260 }} disabled={modelFormDisabled}>
+                                        <Form.Select initValue={modelKey} defaultActiveFirstOption={true} field="modelName" label={{ text: '模型选择' }} style={{ minWidth:260 }}>
                                             {modelList.map((item)=>{return <Option value={item.key}>{item.name}</Option>})}
                                         </Form.Select>
                                     </Form>
                                     {onHistoryRoundChange!=null?(
-                                        <Form ref={historyRoundSelectRef} onValueChange={(newValue)=>{onHistoryRoundChange(newValue.round)}} style={{ minWidth:260 }}>
+                                        <Form ref={historyRoundSelectRef} onValueChange={onHistoryRoundValueChange} style={{ minWidth:260 }} disabled={historyRoundFormDisabled}>
                                             <Form.Select initValue={historyRound} field="round" label={{ text: '上下文历史轮数' }} style={{ minWidth:260 }}>
                                                 <Option value={5}>5轮</Option>
                                                 <Option value={10}>10轮</Option>
