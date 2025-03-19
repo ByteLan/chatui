@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, lazy} from 'react';
+import React, {useEffect, useRef, lazy, useCallback} from 'react';
 import {
     // Attachments,
     // Prompts,
@@ -251,6 +251,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     windowChatSize = chatSizeConst;
     setChatSizeString = setChatSize;
     setSubPageSizeFn = setSubPageSize;
+    const [appName, setAppName] = React.useState('丝路大模型');
     const [tempCkid, setTempCkid] = React.useState('');
     const [userName, setUserName] = React.useState('');
     const [loginState, setLoginState] = React.useState(false);
@@ -330,7 +331,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         });
     }, [activeKey,conversationItems]);
 
-    function setModelNameDefault(){
+    const setModelNameDefault = React.useCallback(() => {
         // 获取网址参数中的modelName
         const urlParams = new URLSearchParams(window.location.search);
         const modelNameParam = urlParams.get('modelName');
@@ -342,7 +343,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             });
         }
         // setModelName("default");
-    }
+    }, []);
 
 
     const menuConfig: ConversationsProps['menu'] = (conversation) => ({
@@ -747,7 +748,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         }
     }, [tempCkid, loginState]);
 
-    function onLoginOption(){
+    const onLoginOption = useCallback(() => {
         setMessageItems([]);
         setConversationItems([]);
         setMessageContentReplacementTitle("请先选择一个会话或新建一个会话");
@@ -777,7 +778,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             console.error('Error:', error);
             setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+error);
         });
-    }
+    }, []);
 
     // ==================== Runtime ====================
     // const [agent] = useXAgent({
@@ -889,7 +890,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // }, [menuPlacement]);
 
 
-    const handleResize = () => {
+    const handleResize = useCallback(() => {
         console.warn(layoutRef.current);
         if (layoutRef.current) {
             console.warn(layoutRef.current.offsetWidth);
@@ -914,21 +915,22 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 setMenuVisible('hidden');
             }
         }
-    };
+    }, []);
 
-    function onClickOpenMenu(){
+    const onClickOpenMenu = useCallback(() => {
         // setMenuPlacement('Drawer');
         // menuPlacementRef.current = 'Drawer';
         // setMenuWidth('100%');
         setMenuDrawerOpen(true);
         // setMenuVisible('visible');
-    }
-    function onClickCloseMenu(){
+    }, []);
+    
+    const onClickCloseMenu = useCallback(() => {
         // setMenuPlacement('Default');
         // menuPlacementRef.current = 'Default';
         setMenuDrawerOpen(false);
         handleResize();
-    }
+    }, [handleResize]);
 
     // handleResizePublic = handleResize;
 
@@ -1150,7 +1152,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const onConversationClick: GetProp<typeof Conversations, 'onActiveChange'> = (key) => {
         setActiveKey(key);
         setMenuDrawerOpen(false);
-        console.log('onConversationClick', key, "activeKey: ", activeKey);
+        console.log('onConversationClick', key, "oldActiveKey: ", activeKey);
     };
 
     // const handleFileChange: GetProp<typeof Attachments, 'onChange'> = (info) =>
@@ -1169,7 +1171,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 draggable={false}
                 alt="logo"
             />
-            <span>丝路大模型</span>
+            <span>{appName}</span>
         </div>
     );
 
@@ -1222,7 +1224,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
             </div>
             <Drawer
-                title="丝路大模型"
+                title={appName}
                 placement="left"
                 closable={true}
                 onClose={onClickCloseMenu}
