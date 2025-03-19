@@ -1,10 +1,11 @@
-import React, {useEffect, useRef} from "react";
+import React, {memo, useEffect, useRef} from "react";
 import {Collapse, Form, Tag} from '@douyinfe/semi-ui';
 import {Flex} from "antd";
+import {isEqual} from "lodash";
 
 const {Option} = Form.Select;
 
-export default function ImChatTitle({chatTitle, modelList, onModelChange, onHistoryRoundChange, style, modelKey, historyRound }:{chatTitle?:string, modelList?:{key:string, name:string, property?: string[]}[], onModelChange?:(key:string)=>void, onHistoryRoundChange?:(round:number)=>void, style?:React.CSSProperties, modelKey?:string, historyRound?:number}) {
+const ImChatTitle = memo(({chatTitle, modelList, onModelChange, onHistoryRoundChange, style, modelKey, historyRound }:{chatTitle?:string, modelList?:{key:string, name:string, property?: string[]}[], onModelChange?:(key:string)=>void, onHistoryRoundChange?:(round:number)=>void, style?:React.CSSProperties, modelKey?:string, historyRound?:number}) => {
     const newStyle = {
         width: '100%',
         ...style,
@@ -73,4 +74,8 @@ export default function ImChatTitle({chatTitle, modelList, onModelChange, onHist
         </div>
     )
 
-}
+}, (prevProps, nextProps) => {
+    return prevProps.chatTitle==nextProps.chatTitle&&isEqual(prevProps.modelList,nextProps.modelList)&&prevProps.modelKey==nextProps.modelKey&&prevProps.historyRound==nextProps.historyRound&&prevProps.onModelChange==nextProps.onModelChange&&prevProps.onHistoryRoundChange==nextProps.onHistoryRoundChange;
+});
+
+export default ImChatTitle;
