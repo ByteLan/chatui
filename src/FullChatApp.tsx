@@ -37,6 +37,7 @@ import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
+import {toNumber} from "lodash";
 // import ImChatTitle from "./components/ImChatTitle.tsx";
 const ImChatTitle = lazy(() => import('./components/ImChatTitle.tsx'));
 // import ImChat from "./components/ImChat.tsx";
@@ -44,23 +45,6 @@ const ImChat = lazy(() => import('./components/ImChat.tsx'));
 
 // const AnylogicSimulationDemoPage = lazy(() => import("./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 
-// const renderTitle = (icon: React.ReactElement, title: string) => (
-//     <Space align="start">
-//         {icon}
-//         <span>{title}</span>
-//     </Space>
-// );
-
-// const defaultConversationsItems = [
-//     {
-//         key: '1122',
-//         label: 'Conversations 1',
-//     },
-//     {
-//         key: '1011',
-//         label: 'Conversations 2',
-//     }
-// ];
 
 // 隐藏菜单的媒体宽度
 const hideMenuMediaWidth = 850;
@@ -108,6 +92,10 @@ const useStyle = createStyles(({token, css}) => {
             padding: 0 12px;
             flex: 1;
             overflow-y: auto;
+            list-style: none;
+            ul , li {
+                padding-inline-start: 0;
+            }
         `,
         chat: css`
             height: 100%;
@@ -182,82 +170,27 @@ const useStyle = createStyles(({token, css}) => {
     };
 });
 
-// const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
-//     {
-//         key: '1',
-//         label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '标题'),
-//         description: '描述',
-//         children: [
-//             {
-//                 key: '1-1',
-//                 description: `引导问题1`,
-//             },
-//             {
-//                 key: '1-2',
-//                 description: `引导问题2`,
-//             },
-//             {
-//                 key: '1-3',
-//                 description: `引导问题3`,
-//             },
-//         ],
-//     },
-//     {
-//         key: '2',
-//         label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '评估供应链韧性'),
-//         description: '我可以帮助你评估供应链韧性，你可以尝试这样问：',
-//         children: [
-//             {
-//                 key: '2-1',
-//                 icon: <HeartOutlined/>,
-//                 description: `生成供应链网络结构图`,
-//             },
-//             {
-//                 key: '2-2',
-//                 icon: <SmileOutlined/>,
-//                 description: `我要对供应链结构进行仿真`,
-//             },
-//             {
-//                 key: '2-3',
-//                 icon: <CommentOutlined/>,
-//                 description: `666`,
-//             },
-//         ],
-//     },
-//     {
-//         key: '3',
-//         label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '看这里'),
-//         description: '点下面按钮',
-//         children: [
-//             {
-//                 key: '3-1',
-//                 description: `帮助`,
-//             },
-//             {
-//                 key: '3-2',
-//                 description: `使用指导`,
-//             },
-//             {
-//                 key: '3-3',
-//                 description: `help`,
-//             },
-//         ],
-//     },
-// ];
-//
-// const senderPromptsItems: GetProp<typeof Prompts, 'items'> = [
-//     {
-//         key: '1',
-//         description: 'help',
-//         icon: <FireOutlined style={{color: '#FF4D4F'}}/>,
-//     },
-//     {
-//         key: '2',
-//         description: '使用指导',
-//         icon: <ReadOutlined style={{color: '#1890FF'}}/>,
-//     },
-// ];
 
+const ConversationDateGroup = {
+    Today: '一天内',
+    Week: '近七天',
+    Earlier: '更早',
+}
+
+function getConversationGroupByTimeStamp(timeStamp: string|number) {
+    // timeStamp转long数字
+    const time = toNumber(timeStamp);
+    // 获得当前UNIX时间戳
+    const nowTime = Date.now();
+    const diff = nowTime - time;
+    if(diff < 1000 * 60 * 60 * 24){
+        return ConversationDateGroup.Today;
+    }else if(diff < 1000 * 60 * 60 * 24 * 7){
+        return ConversationDateGroup.Week;
+    }else{
+        return ConversationDateGroup.Earlier;
+    }
+}
 
 // let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
 // let exampleSideChangeFn: (() => void) | undefined;
@@ -322,7 +255,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [userName, setUserName] = React.useState('');
     const [loginState, setLoginState] = React.useState(false);
     const [messageItems, setMessageItems] = React.useState<{key:string,loading:boolean,role:string,content:string}[]>([]);
-    const [conversationItems, setConversationItems] = React.useState<{key:string,label:string}[]>([]);
+    const [conversationItems, setConversationItems] = React.useState<{key:string,label:string,group:string}[]>([]);
     const conversationItemsRef = useRef(conversationItems);
     const [isCreatingConversation, setIsCreatingConversation] = React.useState(false);
     const [demoButtonNode, setDemoButtonNode] = React.useState<JSX.Element|null>(<></>);
@@ -463,7 +396,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                             // }
                                             return {
                                                 key: item.key,
-                                                label: renameName.current
+                                                label: renameName.current,
+                                                group: ConversationDateGroup.Today
                                             }
                                         }else{
                                             return item;
@@ -700,7 +634,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 if(item.key == conversationId){
                     return {
                         key: item.key,
-                        label: newConversationName
+                        label: newConversationName,
+                        group: item.group
                     }
                 }else{
                     return item;
@@ -828,9 +763,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         }).then(data => {
             if (data.responseStatus == 'success') {
                 setConversationItems(data.conversationList.map((item) => {
+                    const timeStamp = item.conversationLastUpdateTimeStamp;
                     return {
                         key: item.conversationId,
-                        label: item.conversationName
+                        label: item.conversationName,
+                        group: getConversationGroupByTimeStamp(timeStamp),
                     }
                 }));
             }else{
@@ -1092,6 +1029,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 const index = conversationItems.findIndex((item) => item.key == activeKey);
                 if(index != -1){
                     const upConversationItem = conversationItems[index];
+                    upConversationItem.group = ConversationDateGroup.Today;
                     conversationItems.splice(index, 1);
                     setConversationItems([
                         upConversationItem,
@@ -1173,6 +1111,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     {
                         key: data.conversationId,
                         label: data.conversationName,
+                        group: ConversationDateGroup.Today
                     },
                     ...conversationItems,
                 ]);
@@ -1222,76 +1161,6 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // }
 
     // ==================== Nodes ====================
-    // const placeholderNode = (
-    //     <Space direction="vertical" size={16} className={styles.placeholder}>
-    //         <Welcome
-    //             variant="borderless"
-    //             icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-    //             title="你好，这是一个Chat Demo"
-    //             description="Base on Ant Design, Semi Design."
-    //             extra={
-    //                 <Space>
-    //                     {/*<Button icon={<ShareAltOutlined />} />*/}
-    //                     <Button icon={<EllipsisOutlined />} onClick={()=>openLinkInNewTab("https://www.bytelan.cn/")}/>
-    //                 </Space>
-    //             }
-    //         />
-    //         <Prompts
-    //             title="这是一个默认的提示词面板，发送消息后会自动消失。"
-    //             items={placeholderPromptsItems}
-    //             styles={{
-    //                 list: {
-    //                     width: '100%',
-    //                 },
-    //                 item: {
-    //                     flex: 1,
-    //                 },
-    //             }}
-    //             onItemClick={onPromptsItemClick}
-    //         />
-    //     </Space>
-    // );
-
-    // const items: GetProp<typeof Bubble.List, 'items'> = messages.map(({ id, message, status }) => ({
-    //     key: id,
-    //     loading: status === 'loading',
-    //     role: status === 'local' ? 'local' : 'ai',
-    //     content: message,
-    // }));
-
-    // const attachmentsNode = (
-    //     <Badge dot={attachedFiles.length > 0 && !headerOpen}>
-    //         <Button type="text" icon={<PaperClipOutlined />} onClick={() => setHeaderOpen(!headerOpen)} />
-    //     </Badge>
-    // );
-
-    // const senderHeader = (
-    //     <Sender.Header
-    //         title="Attachments"
-    //         open={headerOpen}
-    //         onOpenChange={setHeaderOpen}
-    //         styles={{
-    //             content: {
-    //                 padding: 0,
-    //             },
-    //         }}
-    //     >
-    //         <Attachments
-    //             beforeUpload={() => false}
-    //             items={attachedFiles}
-    //             onChange={handleFileChange}
-    //             placeholder={(type) =>
-    //                 type == 'drop'
-    //                     ? { title: 'Drop file here' }
-    //                     : {
-    //                         icon: <CloudUploadOutlined />,
-    //                         title: 'Upload files',
-    //                         description: 'Click or drag files to this area to upload',
-    //                     }
-    //             }
-    //         />
-    //     </Sender.Header>
-    // );
 
     const logoNode = (
         <div className={styles.logo}>
@@ -1305,44 +1174,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     );
 
     // ==================== Render =================
-    const example_side_text:string = "<IFrameButton src=\"https://www.bytelan.cn/\">显示主页</IFrameButton>";
+    //const example_side_text:string = "<IFrameButton src=\"https://www.bytelan.cn/\">显示主页</IFrameButton>";
 
-    // 用这个方式渲染菜单，会导致窗口大小变化时反复渲染
-    // function MenuRender(){
-    //     return (
-    //         <div className={styles.menu} style={{ width: menuWidth, visibility: menuVisible }} >
-    //             {/* 🌟 Logo */}
-    //             {logoNode}
-    //             {/* 🌟 添加会话 */}
-    //             <Button
-    //                 onClick={onAddConversation}
-    //                 type="link"
-    //                 className={styles.addBtn}
-    //                 icon={<PlusOutlined />}
-    //                 loading={isCreatingConversation}
-    //             >
-    //                 创建新会话
-    //             </Button>
-    //             {/* 🌟 会话管理 */}
-    //             <LazyImportSuspense style={{ width: '100%', flex: 1}}>
-    //                 <Conversations
-    //                     // items={conversationsItems}
-    //                     items={conversationItems}
-    //                     className={styles.conversations}
-    //                     activeKey={activeKey}
-    //                     onActiveChange={onConversationClick}
-    //                     menu={menuConfig}
-    //                 />
-    //             </LazyImportSuspense>
-    //             {demoButtonNode==null?(<></>):(demoButtonNode)}
-    //             {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
-    //             {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
-    //             {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
-    //             {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
-    //             <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
-    //         </div>
-    //     )
-    // }
 
     useEffect(() => {
         console.warn("modelName changed: "+modelName);
@@ -1377,6 +1210,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         activeKey={activeKey}
                         onActiveChange={onConversationClick}
                         menu={menuConfig}
+                        groupable
+                        styles={{item: {paddingInlineStart: 12}}}
                     />
                 </LazyImportSuspense>
                 {demoButtonNode==null?(<></>):(demoButtonNode)}
@@ -1419,13 +1254,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             activeKey={activeKey}
                             onActiveChange={onConversationClick}
                             menu={menuConfig}
+                            groupable
+                            styles={{item: {paddingInlineStart: 12}}}
                         />
                     </LazyImportSuspense>
                     {demoButtonNode==null?(<></>):(demoButtonNode)}
-                    {/*{mdComponentIFrameButton({children: "弹出主页", src: "https://www.bytelan.cn/"})}*/}
-                    {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
-                    {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
-                    {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
                     <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
                 </div>
             </Drawer>
