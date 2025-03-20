@@ -283,7 +283,6 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //
     // const [inputContent, setInputInputContent] = React.useState('');
 
-    // const [conversationsItems, setConversationsItems] = React.useState(defaultConversationsItems);
 
     const [activeKey, setActiveKey] = React.useState("");
     const activeKeyRef = useRef(activeKey);
@@ -483,7 +482,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                         reject();
                                     }
                                     conversationItemsRef.current.splice(indexToDelete, 1);
-                                    setConversationItems(conversationItemsRef.current);
+                                    setConversationItems([...conversationItemsRef.current]);
                                     setActiveKey('');
                                     const opts = {
                                         content: "["+conversation.label+"] 删除成功！",
@@ -1091,16 +1090,6 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     onRequest(info.data.description as string);
     // };
 
-    // const onAddConversation = () => {
-    //     setConversationsItems([
-    //         ...conversationsItems,
-    //         {
-    //             key: `${conversationsItems.length}`,
-    //             label: `New Conversation ${conversationsItems.length}`,
-    //         },
-    //     ]);
-    //     setActiveKey(`${conversationsItems.length}`);
-    // };
     function onAddConversation(){
         if(loginState == false || tempCkid == ''){
             const opts = {
@@ -1223,7 +1212,6 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {/* 🌟 会话管理 */}
                 <LazyImportSuspense style={{ width: '100%', flex: 1}}>
                     <Conversations
-                        // items={conversationsItems}
                         items={conversationItems}
                         className={styles.conversations}
                         activeKey={activeKey}
@@ -1267,7 +1255,6 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     {/* 🌟 会话管理 */}
                     <LazyImportSuspense style={{ width: '100%', flex: 1}}>
                         <Conversations
-                            // items={conversationsItems}
                             items={conversationItems}
                             className={styles.conversations}
                             activeKey={activeKey}
