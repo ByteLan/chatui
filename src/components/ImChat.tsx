@@ -211,9 +211,9 @@ function mdVChart({children, src, title}:{children?:any, src?:string, title?:str
     return <MessageCardVChart dataSrc={src} title={title}>{children}</MessageCardVChart>
 }
 
-function mdTable({children}:{children:any}){
-    return <MyTable>{children}</MyTable>
-}
+// function mdTable({children}:{children:any}){
+//     return <MyTable>{children}</MyTable>
+// }
 
 const mdxComponents = {
     'MyButton':mdComponentMyButton,
@@ -222,13 +222,10 @@ const mdxComponents = {
     'ExampleSideSheetShow':mdComponentExampleSideSheetShow,
     'AnylogicSimulationDemo2Button':mdComponentSimulationStarter,
     'MessageCardVChart':mdVChart,
-    'ButtonOverviewShow':mdButtonOverviewShow,
-    'table': mdTable
+    'ButtonOverviewShow':mdButtonOverviewShow
 };
 
-const mdComponents = {
-    'table': mdTable
-}
+const mdComponents = {}
 
 const MemoSemiMarkdownRenderMemo = React.memo(({content}:{content?:string}) => {
     // 将content中>开头的行提取出来
