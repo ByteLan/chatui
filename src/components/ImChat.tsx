@@ -23,7 +23,7 @@ const OverviewPage = lazy(() => import("@bytelan/silkroad-platform/src/platform-
 
 import { isEqual } from 'lodash';
 
-import MyTable from "./table.tsx";
+// import MyTable from "./table.tsx";
 import MessageCardVChart from "./MessageCardVChart.tsx";
 
 let setRightNodeFn: ((arg0: JSX.Element) => void) | undefined;
@@ -333,35 +333,49 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
     const roles: GetProp<typeof Bubble.List, 'roles'> = {
         ai: {
             placement: 'start',
+            shape: 'corner',
             // typing: { step: 300, interval: 1 },
             styles: {
                 content: {
                     borderRadius: 16,
+                    backgroundColor: 'rgba(var(--semi-grey-0), 1)',
                 },
             },
             messageRender: semiPureMarkdownRender,
         },
         aiProcessing: {
             placement: 'start',
+            shape: 'corner',
             // typing: { step: 300, interval: 1 },
             styles: {
                 content: {
                     borderRadius: 16,
+                    backgroundColor: 'rgba(var(--semi-grey-0), 1)',
                 },
             },
             messageRender: semiPureMarkdownRenderProcessing,
+
         },
         local: {
             placement: 'end',
             variant: 'shadow',
+            shape: 'corner',
+            styles: {
+                content: {
+                    borderRadius: 16,
+                    backgroundColor: 'rgba(var(--semi-blue-1), 1)',
+                },
+            },
             // messageRender: semiPureMarkdownRender,
         },
         aiMdx: {
             placement: 'start',
+            shape: 'corner',
             // typing: { step: 300, interval: 1 },
             styles: {
                 content: {
                     borderRadius: 16,
+                    backgroundColor: 'rgba(var(--semi-grey-0), 1)',
                 },
             },
             messageRender: semiMarkdownRender,
