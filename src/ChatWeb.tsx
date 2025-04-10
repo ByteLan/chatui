@@ -31,7 +31,7 @@ export default function ChatWeb() {
         </Empty>);
 
     const onSplitterSizeChange = (sizes: number[]) => {
-        console.warn("onSplitterSizeChange: "+sizes);
+        // console.warn("onSplitterSizeChange: "+sizes);
         setChatSizeConst(sizes);
         setChatSize(sizes[0]);
         setSubPageSize(sizes[1]);

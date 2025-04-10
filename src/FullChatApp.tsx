@@ -907,9 +907,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
 
     const handleResize = useCallback(() => {
-        console.warn(layoutRef.current);
+        // console.warn(layoutRef.current);
         if (layoutRef.current) {
-            console.warn(layoutRef.current.offsetWidth);
+            // console.warn(layoutRef.current.offsetWidth);
             const layoutWidth = layoutRef.current.offsetWidth;
             // 根据.layout的宽度设置menu的宽度逻辑
             if (layoutWidth > hideMenuMediaWidth) {
