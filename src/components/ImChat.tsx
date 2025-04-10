@@ -64,43 +64,40 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
     // },
     {
         key: '2',
-        label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '评估供应链韧性'),
-        description: '我可以帮助你评估供应链韧性，你可以尝试这样问：',
+        label: renderTitle(<ReadOutlined style={{color: '#1890FF'}}/>, '供应链韧性助手'),
+        description: '你可以尝试这样问：',
         children: [
             {
                 key: '2-1',
                 icon: <HeartOutlined/>,
-                description: `生成供应链网络结构图`,
+                description: `打开供应链仿真推演`,
             },
             {
                 key: '2-2',
                 icon: <SmileOutlined/>,
-                description: `我要对供应链结构进行仿真`,
+                description: `分析供应链韧性`,
             },
             {
                 key: '2-3',
                 icon: <CommentOutlined/>,
-                description: `666`,
+                description: `生成供应链网络结构图`,
             },
         ],
     },
     {
         key: '3',
-        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '看这里'),
-        description: '点下面按钮',
+        label: renderTitle(<FireOutlined style={{color: '#FF4D4F'}}/>, '平台功能'),
+        description: '打开其他功能面板：',
         children: [
             {
-                key: '3-1',
-                description: `帮助`,
+                key: 'func-overview',
+                description: `供应链概览`,
             },
             {
-                key: '3-2',
-                description: `使用指导`,
+                key: 'func-sim',
+                description: `仿真环境`,
             },
-            {
-                key: '3-3',
-                description: `help`,
-            },
+
         ],
     },
 ];
@@ -184,7 +181,7 @@ function mdComponentSimulationStarter({children, src}:{children:any, src:string}
         }
         if(src == null || src =="") {
             setRightNodeFn(
-                <LazyImportSuspense><SimulationStarter src="demo2" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                <LazyImportSuspense><SimulationStarter src="demo3" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
             )
         }else{
             setRightNodeFn(
@@ -383,7 +380,28 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
     };
 
     const onPromptsItemClick: GetProp<typeof Prompts, 'onItemClick'> = (info) => {
-        onRequest(info.data.description as string);
+        if(info.data.key.startsWith('func-')){
+            if(info.data.key == 'func-overview') {
+                checkRightSize?.()
+                if (setRightNodeFn === undefined){
+                    return
+                }
+                setRightNodeFn(
+                    <LazyImportSuspense><OverviewPage activeConversationKey={activeKeyPublic} /></LazyImportSuspense>
+                )
+            }else if(info.data.key == 'func-sim') {
+                checkRightSize?.()
+                if (setRightNodeFn === undefined){
+                    return
+                }
+                setRightNodeFn(
+                    <LazyImportSuspense><SimulationStarter src="demo3" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                )
+            }
+        }else{
+            onRequest(info.data.description as string);
+        }
+
     };
 
 
@@ -392,8 +410,8 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
             <Welcome
                 variant="borderless"
                 icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-                title="你好，这是一个Chat Demo"
-                description="Base on Ant Design, Semi Design."
+                title="你好，丝路大模型！"
+                description="供应链韧性大模型"
                 extra={
                     <Space>
                         {/*<Button icon={<ShareAltOutlined />} />*/}
@@ -402,7 +420,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 }
             />
             <Prompts
-                title="这是一个默认的提示词面板，发送消息后会自动消失。"
+                title="选择功能或向大模型发送消息"
                 items={placeholderPromptsItems}
                 styles={{
                     list: {
