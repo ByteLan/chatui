@@ -111,14 +111,17 @@ const BubbleListMemo = React.memo(({messageItems, styles, roles, placeholderNode
         content: string
     }[], styles:any, roles:any, placeholderNode:any}) => (
     <Bubble.List
-        items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
+        // items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
+        items={[{ content: placeholderNode, variant: 'borderless' }, ...messageItems]}
         roles={roles}
         className={styles.messages}
     />
-), (prevProps, nextProps) => {
-    // 只在消息变化时重新渲染
-    return isEqual(prevProps.messageItems , nextProps.messageItems);
-});
+));
+// ), (prevProps, nextProps) => {
+//     // 只在消息变化时重新渲染
+//     return isEqual(prevProps.messageItems , nextProps.messageItems);
+// });
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 function mdComponentMyButton({children, onClick}){
@@ -409,7 +412,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
         <Space direction="vertical" size={16} className={styles.placeholder}>
             <Welcome
                 variant="borderless"
-                icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+                // icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
                 title="你好，丝路大模型！"
                 description="供应链韧性大模型"
                 extra={
@@ -422,14 +425,6 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
             <Prompts
                 title="选择功能或向大模型发送消息"
                 items={placeholderPromptsItems}
-                styles={{
-                    list: {
-                        width: '100%',
-                    },
-                    item: {
-                        flex: 1,
-                    },
-                }}
                 onItemClick={onPromptsItemClick}
             />
         </Space>
