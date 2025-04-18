@@ -87,10 +87,10 @@
     resize-observer-polyfill "^1.5.1"
     throttle-debounce "^5.0.0"
 
-"@ant-design/x@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.npmmirror.com/@ant-design/x/-/x-1.0.5.tgz"
-  integrity sha512-St+JqVa6VNDTDjsn79O+GN6hG2rxZ1Skksjbfzn9JFkHNXXBQ+7SK+Vh2lDaZi48IzLPhaiBzFu+D8/4mgw2Ww==
+"@ant-design/x@^1.1.1":
+  version "1.1.1"
+  resolved "https://repo.huaweicloud.com/repository/npm/@ant-design/x/-/x-1.1.1.tgz"
+  integrity sha512-DFzNQfCTdYBhTJxorGI1ylhH/ZODcU5yn64xt/8/11slT0ALMuHC5Afx717KNQiao4RleXjypiEWuP0K1f+Szg==
   dependencies:
     "@ant-design/colors" "^7.1.0"
     "@ant-design/cssinjs" "^1.21.1"
@@ -274,6 +274,7 @@
     "@nivo/line" "^0.88.0"
     "@visactor/react-vchart" "^1.13.5"
     antd-style "^3.7.1"
+    lodash "^4.17.21"
     react "^18.3.1"
     react-countup "^6.5.3"
     react-dom "^18.3.1"
@@ -1564,7 +1565,7 @@ antd-style@^3.7.1:
     "@emotion/utils" "^1.2.1"
     use-merge-value "^1.2.0"
 
-antd@>=5.0.0, antd@>=5.8.1:
+antd@^5.20.3, antd@>=5.8.1:
   version "5.23.1"
   resolved "https://registry.npmmirror.com/antd/-/antd-5.23.1.tgz"
   integrity sha512-rg5xd5LotHw0IRyo/nsiUN/EEV3e+xU4V4UmIb/62hMN9+3APyz1Ohjf17a+fN13jC8sNY1hP1K252SU2Th0xA==
