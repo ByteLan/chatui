@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@ant-design-local/x": "file:../../x",
-    "@ant-design/x": "^1.0.5",
+    "@ant-design/x": "^1.1.1",
     "@bytelan/silkroad-platform": "file:../../silkroad-platform",
     "@douyinfe/semi-ui": "^2.78.0",
     "@nivo/bar": "^0.88.0",

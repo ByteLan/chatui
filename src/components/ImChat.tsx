@@ -15,7 +15,8 @@ import {
 } from "@ant-design/icons";
 // import ImChatTitle from "./ImChatTitle.tsx";
 // import ImChatSender from "./ImChatSender.tsx";
-import Bubble from "@ant-design-local/x/components/bubble/index.tsx";
+// import Bubble from "@ant-design-local/x/components/bubble/index.tsx";
+import {Bubble} from "@ant-design/x";
 const ImChatSender = lazy(() => import("./ImChatSender.tsx"));
 const AnylogicSimulationDemoPage = lazy(() => import("../components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/simulation-pages/SimulationStarter.tsx"));
@@ -104,19 +105,20 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
 
 
 // 解决重复渲染BubbleList
-const BubbleListMemo = React.memo(({messageItems, styles, roles, placeholderNode}:{messageItems:{
-        key: string
-        loading: boolean
-        role: string
-        content: string
-    }[], styles:any, roles:any, placeholderNode:any}) => (
-    <Bubble.List
-        // items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
-        items={[{ content: placeholderNode, variant: 'borderless' }, ...messageItems]}
-        roles={roles}
-        className={styles.messages}
-    />
-));
+// const BubbleListMemo = React.memo(({messageItems, styles, roles, placeholderNode}:{messageItems:{
+//         key: string
+//         loading: boolean
+//         role: string
+//         content: string
+//     }[], styles:any, roles:any, placeholderNode:any}) => (
+//     <Bubble.List
+//         // items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
+//         items={[{ content: placeholderNode, variant: 'borderless' }, ...messageItems]}
+//         roles={roles}
+//         className={styles.messages}
+//     />
+// ));
+
 // ), (prevProps, nextProps) => {
 //     // 只在消息变化时重新渲染
 //     return isEqual(prevProps.messageItems , nextProps.messageItems);
@@ -382,7 +384,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
         },
     };
 
-    const onPromptsItemClick: GetProp<typeof Prompts, 'onItemClick'> = (info) => {
+    const onPromptsItemClick: GetProp<typeof Prompts, 'onItemClick'> = React.useCallback((info) => {
         if(info.data.key.startsWith('func-')){
             if(info.data.key == 'func-overview') {
                 checkRightSize?.()
@@ -405,10 +407,10 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
             onRequest(info.data.description as string);
         }
 
-    };
+    }, [onRequest]);
 
 
-    const placeholderNode = (
+    const placeholderNode = React.useMemo(() => (
         <Space direction="vertical" size={16} className={styles.placeholder}>
             <Welcome
                 variant="borderless"
@@ -426,9 +428,10 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 title="选择功能或向大模型发送消息"
                 items={placeholderPromptsItems}
                 onItemClick={onPromptsItemClick}
+                styles={{list:{overflow: 'auto'}, subList:{overflow: 'auto'}}}
             />
         </Space>
-    );
+    ), [onPromptsItemClick, styles.placeholder]);
 
 
 
@@ -468,7 +471,15 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
 
     return (
         <>
-            <BubbleListMemo messageItems={messageItems} roles={roles} styles={styles} placeholderNode={placeholderNode}/>
+            {/*<BubbleListMemo messageItems={messageItems} roles={roles} styles={styles} placeholderNode={placeholderNode}/>*/}
+
+            <Bubble.List
+                // items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
+                items={[{ content: placeholderNode, variant: 'borderless',  }, ...messageItems]}
+                roles={roles}
+                className={styles.messages}
+            />
+
             {/*<Bubble.List*/}
             {/*    items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}*/}
             {/*    roles={roles}*/}

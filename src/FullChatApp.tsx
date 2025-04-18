@@ -974,7 +974,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     }, [chatSize]);
 
     // ==================== Event ====================
-    function onRequest(nextContent: string) {
+    const onRequest = useCallback((nextContent: string)=> {
         if(activeKey == null || activeKey == ''){
             const opts = {
                 content: "请先选择一个会话或新建一个会话（控件异常）",
@@ -1029,20 +1029,30 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 //         }
                 //     ]);
                 // })
-                setMessageItems([
-                    ...messageItems,
-                    ...data.appendMessages.map((item) => {
-                        return {
-                            key: item.messageId,
-                            loading: convertLoading(item.uid, item.messageStatus),
-                            // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
-                            role: convertRole(item.uid, item.messageType),
-                            // role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
-                            // role: item.uid.startsWith("-")?'ai':'local',
-                            content: item.messageContent,
-                        }
-                    }),
-                ]);
+                setMessageItems((prev)=>{
+                    // 找到prev中是否包含key==item.messageId的元素
+                    const hasItem = prev.find((item) => item.key == data.appendMessages[0].messageId);
+                    if(hasItem){
+                        // 如果有，则不添加
+                        return prev;
+                    }else{
+                        return (
+                            [
+                                ...prev,
+                                ...data.appendMessages.map((item) => {
+                                    return {
+                                        key: item.messageId,
+                                        loading: convertLoading(item.uid, item.messageStatus),
+                                        // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                                        role: convertRole(item.uid, item.messageType),
+                                        // role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
+                                        // role: item.uid.startsWith("-")?'ai':'local',
+                                        content: item.messageContent,
+                                    }
+                                }),
+                            ])
+                    }
+                });
                 // 将当前Conversation更新到最上面
                 const index = conversationItems.findIndex((item) => item.key == activeKey);
                 if(index != -1){
@@ -1077,7 +1087,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             // @ts-expect-error
             Toast.error(opts);
         })
-    }
+    },[activeKey, conversationItems, historyRound, loginState, modelName, tempCkid]);
 
     // const onSubmit = (nextContent: string) => {
     //     if (!nextContent) return;
