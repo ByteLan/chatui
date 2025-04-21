@@ -246,7 +246,7 @@ function convertLoading(messageUid:string, messageStatus:string){
 }
 
 
-function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: any, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
+function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: React.MutableRefObject<{ handleResize: () => void } | null>, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
     // setRightNodeFn = rightNodeFn;
     windowChatSize = chatSizeConst;
     setChatSizeString = setChatSize;
@@ -846,18 +846,21 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             }).then(response => {
                 return response.json();
             }).then(data => {
-                if (data.responseStatus == 'success') {
-                    setMessageItems(data.messageList.map((item) => {
+                if (data.responseStatus == 'success' && data.messageList!=null) {
+                    setMessageItems(data.messageList.map((itemObj:unknown) => {
                         // console.log("role  ",item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local');
                         // role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
-                        return {
-                            key: item.messageId,
-                            loading: convertLoading(item.uid, item.messageStatus),
-                            // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
-                            role: convertRole(item.uid, item.messageType),
-                            content: item.messageContent,
+                        if(itemObj != null && itemObj!= undefined && itemObj instanceof Object && 'uid' in itemObj && 'messageContent' in itemObj && 'messageStatus' in itemObj && 'messageType' in itemObj && 'messageId' in itemObj){
+                            const item = itemObj as {messageId:string, messageContent:string, messageStatus:string, uid:string, messageType:string};
+                            return {
+                                key: item.messageId,
+                                loading: convertLoading(item.uid, item.messageStatus),
+                                // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                                role: convertRole(item.uid, item.messageType),
+                                content: item.messageContent,
+                            }
                         }
-                    }));
+                    }).filter((item:unknown) => item !== undefined));
 
                     if(data.conversationSelectedHistoryRound){
                         const hr = toNumber(data.conversationSelectedHistoryRound);

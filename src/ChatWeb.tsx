@@ -14,7 +14,8 @@ export default function ChatWeb() {
     const [chatSize, setChatSize] = useState<number|string>('100%');
     const [subPageSize, setSubPageSize] = useState<number|string>('0%');
     //使用useRef，类似于创造一个全局变量
-    const chatRef = useRef();
+    // 定义 chatRef 的类型，确保其 current 属性可能有 handleResize 方法
+    const chatRef = useRef<{ handleResize: () => void } | null>(null);
     const [rightNode, setRightNode] = useState(
         <Empty image={<IllustrationNoContent style={{ width: 300 }} />}
                darkModeImage={<IllustrationNoContentDark style={{ width: 300 }} />}
