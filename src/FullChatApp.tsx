@@ -773,6 +773,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         group: getConversationGroupByTimeStamp(timeStamp),
                     }
                 }));
+                import('./components/ImChat.tsx');
+                import('./components/ImChatTitle.tsx');
+                import('./components/ImChatSender.tsx');
             }else{
                 setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+data);
             }
