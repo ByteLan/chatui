@@ -56,7 +56,7 @@ export default function ChatWeb() {
                     </LazyImportSuspense>
                 </Splitter.Panel>
                 <Splitter.Panel collapsible defaultSize='0%' size={subPageSize} style={{overflow: 'hidden', height: '100%', width: '100%', backgroundColor: 'rgba(var(--semi-indigo-0), 1)'}}>
-                    <div style={{marginTop: 6, marginBottom: 6, marginLeft: 6, marginRight: 6,boxSizing: 'border-box', height: 'calc(100% - 12px)', width: 'calc(100% - 12px)', backgroundColor: 'white', borderRadius: '12px', overflow: 'auto'}}>
+                    <div style={{marginTop: 6, marginBottom: 6, marginLeft: 6, marginRight: 6,boxSizing: 'border-box', height: 'calc(100% - 12px)', width: 'calc(100% - 12px)', backgroundColor: 'white', borderRadius: '12px', overflow: 'auto', boxShadow: '0 0 6px rgba(var(--semi-grey-2), 1)'}}>
                         {rightNode}
                     </div>
                 </Splitter.Panel>

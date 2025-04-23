@@ -116,6 +116,7 @@ const useStyle = createStyles(({token, css}) => {
             margin-bottom: 6px;
             margin-left: 6px;
             margin-right: 6px;
+            box-shadow: 0 0 6px rgba(var(--semi-grey-2), 1);
         `,
         messages: css`
             flex: 1;
