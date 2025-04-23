@@ -41,7 +41,7 @@ export default function ChatWeb() {
 
     // return <FullChatApp />
     return (
-        <div style={{height: '100%', width: 'calc(100% - 6px)',}} className={`semi-light-scrollbar`}>
+        <div style={{height: '100%', width: 'calc(100% - 6px)', overflow: 'hidden'}} className={`semi-light-scrollbar`} >
             <Splitter
                 style={{
                     // boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
@@ -55,8 +55,10 @@ export default function ChatWeb() {
                         <FullChatApp rightNodeFn={setRightNode} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
                     </LazyImportSuspense>
                 </Splitter.Panel>
-                <Splitter.Panel collapsible defaultSize='0%' size={subPageSize} style={{overflow: 'auto', height: '100%', width: '100%'}}>
-                    {rightNode}
+                <Splitter.Panel collapsible defaultSize='0%' size={subPageSize} style={{overflow: 'hidden', height: '100%', width: '100%', backgroundColor: 'rgba(var(--semi-indigo-0), 1)'}}>
+                    <div style={{marginTop: 6, marginBottom: 6, marginLeft: 6, marginRight: 6,boxSizing: 'border-box', height: 'calc(100% - 12px)', width: 'calc(100% - 12px)', backgroundColor: 'white', borderRadius: '12px', overflow: 'auto'}}>
+                        {rightNode}
+                    </div>
                 </Splitter.Panel>
             </Splitter>
         </div>

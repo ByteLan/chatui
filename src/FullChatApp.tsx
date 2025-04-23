@@ -57,9 +57,10 @@ const useStyle = createStyles(({token, css}) => {
             min-width: 300px;
             height: 100%;
             min-height: 400px;
-            border-radius: ${token.borderRadius}px;
+            //border-radius: ${token.borderRadius}px;
             display: flex;
             background: ${token.colorBgContainer};
+            background-color: rgba(var(--semi-indigo-0), 1);
             font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
 
             .ant-prompts {
@@ -70,6 +71,7 @@ const useStyle = createStyles(({token, css}) => {
                 //@media (min-width: ${hideMenuMediaWidth}px) {
 
             background: ${token.colorBgLayout}80;
+            background-color: rgba(var(--semi-indigo-0), 1);
             width: 20%;
             max-width: 300px;
             height: 100%;
@@ -98,8 +100,8 @@ const useStyle = createStyles(({token, css}) => {
             }
         `,
         chat: css`
-            height: 100%;
-            width: 80%;
+            height: calc(100% - 12px);
+            width: calc(80% - 12px);
             margin: 0 auto;
             box-sizing: border-box;
             display: flex;
@@ -108,6 +110,12 @@ const useStyle = createStyles(({token, css}) => {
             padding-top: 6px;
             padding-bottom: 8px;
             gap: 6px;
+            background-color: white;
+            border-radius: 12px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            margin-left: 6px;
+            margin-right: 6px;
         `,
         messages: css`
             flex: 1;
@@ -920,7 +928,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             // 根据.layout的宽度设置menu的宽度逻辑
             if (layoutWidth > hideMenuMediaWidth) {
                 setMenuWidth('20%');
-                setChatWidth('80%');
+                setChatWidth('max(calc(80% - 12px) , calc(100% - 312px))');
                 // if(menuVisible!='visible'){
                 //     setMenuVisible('visible');
                 // }
@@ -933,7 +941,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 //     return;
                 // }
                 setMenuWidth('0');
-                setChatWidth('98%');
+                setChatWidth('calc(100% - 12px)');
                 setMenuVisible('hidden');
             }
         }
