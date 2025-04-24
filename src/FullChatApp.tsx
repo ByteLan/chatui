@@ -10,7 +10,10 @@ import {
     ConversationsProps,
 } from '@ant-design/x';
 
-const Conversations = memo(lazy(() => import('@ant-design/x').then(module => ({ default: module.Conversations }))));
+// const Conversations = memo(lazy(() => import('@ant-design/x').then(module => ({ default: module.Conversations }))));
+import Conversations from '@ant-design/x-fix-conversations-item-tooltip/components/conversations/index.tsx';
+const MemoConversations = memo(Conversations);
+// const Conversations = import('@ant-design/x-fix-conversations/components/conversations/index.tsx');
 // const Bubble = lazy(() => import('@ant-design/x').then(module => ({ default: module.Bubble })));
 
 import { createStyles } from 'antd-style';
@@ -1236,7 +1239,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 </Button>
                 {/* 🌟 会话管理 */}
                 <LazyImportSuspense style={{ width: '100%', flex: 1}}>
-                    <Conversations
+                    <MemoConversations
                         items={conversationItems}
                         className={styles.conversations}
                         activeKey={activeKey}
@@ -1279,7 +1282,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     </Button>
                     {/* 🌟 会话管理 */}
                     <LazyImportSuspense style={{ width: '100%', flex: 1}}>
-                        <Conversations
+                        <MemoConversations
                             items={conversationItems}
                             className={styles.conversations}
                             activeKey={activeKey}
