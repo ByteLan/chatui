@@ -24,6 +24,10 @@ const OverviewPage = lazy(() => import("@bytelan/silkroad-platform/src/platform-
 
 import { isEqual } from 'lodash';
 
+// import rehypeKatex from 'rehype-katex';
+import rehypeMathjax from 'rehype-mathjax'
+import remarkMath from 'remark-math';
+
 // import MyTable from "./table.tsx";
 import MessageCardVChart from "./MessageCardVChart.tsx";
 
@@ -297,18 +301,18 @@ const MemoSemiPureMarkdownRender = React.memo(({content, openReasoning}:{content
                 <>
                     <Collapse defaultActiveKey={openReasoning?"1":undefined}>
                         <Collapse.Panel header="思考过程" itemKey="1">
-                            <MarkdownRender raw={contentReasoning} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+                            <MarkdownRender raw={contentReasoning} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}} remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}/>
                         </Collapse.Panel>
                     </Collapse>
-                    <MarkdownRender raw={contentOthers} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+                    <MarkdownRender raw={contentOthers} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}} remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}/>
                 </>
             )
         }else{
-            return <MarkdownRender raw={content} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+            return <MarkdownRender raw={content} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}} remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}/>
         }
 
     }
-    return <MarkdownRender raw={content} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}}/>
+    return <MarkdownRender raw={content} format="md" components={{...MarkdownRender.defaultComponents, ...mdComponents}} remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}/>
 }, (prevProps, nextProps) => {
     return isEqual(prevProps, nextProps);
 });
