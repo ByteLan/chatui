@@ -12,8 +12,8 @@
     "build&preview": "vite build && vite preview"
   },
   "dependencies": {
-    "@ant-design/x-fix-conversations-item-tooltip": "file:../../x-fix-conversations-item-tooltip",
     "@ant-design/x": "^1.1.1",
+    "@ant-design/x-fix-conversations-item-tooltip": "file:../../x-fix-conversations-item-tooltip",
     "@bytelan/silkroad-platform": "file:../../silkroad-platform",
     "@douyinfe/semi-ui": "^2.78.0",
     "@nivo/bar": "^0.88.0",
@@ -25,7 +25,10 @@
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "rehype-katex": "^7.0.1",
+    "rehype-mathjax": "^7.1.0",
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
