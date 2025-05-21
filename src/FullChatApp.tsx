@@ -1326,7 +1326,6 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                         <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                     </div>:<></>}
-                    {/*{loginState?<SemiButton theme="borderless" style={{marginRight:"16px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>}></SemiButton>:<></>}*/}
                 </div>
 
             </div>
@@ -1367,7 +1366,14 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         />
                     </LazyImportSuspense>
                     {demoButtonNode==null?(<></>):(demoButtonNode)}
-                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
+                    <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                        <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}}></UserBar>
+                        {loginState?<div style={{marginRight:"16px"}}>
+                            <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
+                            <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
+                        </div>:<></>}
+                    </div>
+                    {/*<UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>*/}
                 </div>
             </Drawer>
             <FloatButton
