@@ -1,12 +1,12 @@
 import {useState} from 'react';
 import { Avatar } from '@douyinfe/semi-ui';
-import {Toast} from "@douyinfe/semi-ui";
+import {Toast, Button} from "@douyinfe/semi-ui";
 import {Flex, Modal, Row, Col, Input} from "antd";
 import {hostAddr} from "../serverConfig.tsx";
 // import Cookies from "js-cookie";
 
 
-export default function UserBar({onLogin, loginState, loginUserName, setLoginState, setLoginUserName, setTempCkid}:{onLogin:()=>void, loginState:boolean, loginUserName:string|null, setLoginState:(state:boolean)=>void, setLoginUserName:(name:string)=>void, setTempCkid:(ckid:string)=>void}) {
+export default function UserBar({onLogin, loginState, loginUserName, setLoginState, setLoginUserName, setTempCkid, avatarSize, style}:{onLogin:()=>void, loginState:boolean, loginUserName:string|null, setLoginState:(state:boolean)=>void, setLoginUserName:(name:string)=>void, setTempCkid:(ckid:string)=>void, avatarSize?:"large"|"small"|"default", style?:React.CSSProperties}) {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [confirmLogoutLoading, setConfirmLogoutLoading] = useState(false);
@@ -16,7 +16,12 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
     const [userNameStatus, setUserNameStatus] = useState('');
     const [passwordStatus, setPasswordStatus] = useState('');
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-
+    // 默认style
+    const defaultStyle = {
+        color: 'black',
+    };
+    // 合并默认style和传入的style
+    const mergedStyle = {...defaultStyle, ...style};
 
     function login() {
         setLoginModalOpen(true);
@@ -180,14 +185,15 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
     }
 
     return (
-
-        <div style={{margin:12}}>
-            <Flex align='center' style={{height: 64}}>
-                <Avatar color="light-blue" style={{ margin: 4 }} alt='Taylor Joy' onClick={onAvatarClick}>
-                    {loginState?loginUserName:'未登录'}
-                </Avatar>
-                <p onClick={onAvatarClick}>{loginState?loginUserName:'点击登录'}</p>
-            </Flex>
+        <div style={{margin:8}}>
+            <Button theme="borderless" icon={
+                <Flex align='center'>
+                    <Avatar color="light-blue" style={{ margin: 2 }} size={(avatarSize==="large"||avatarSize==="small")?(avatarSize==='large'?'medium':'small'):'default'} >
+                        {loginState?loginUserName:'未登录'}
+                    </Avatar>
+                    <p style={{marginLeft: 4}}>{loginState?loginUserName:'点击登录'}</p>
+                </Flex>
+            } onClick={onAvatarClick} style={{width:'auto', padding:'6px', height: 'auto', color: mergedStyle.color}}></Button>
             <Modal
                 title="登录"
                 open={loginModalOpen}

@@ -32,11 +32,13 @@ import {
 } from '@ant-design/icons';
 import {type GetProp, Button, Modal, Row, Col, Input, Flex, FloatButton, Drawer} from 'antd';
 import {SideSheet, Notification, Empty, Toast, MarkdownRender} from '@douyinfe/semi-ui';
+import {Button as SemiButton} from '@douyinfe/semi-ui';
+import {IconSetting, IconAppCenter} from "@douyinfe/semi-icons";
 import { IllustrationConstruction, IllustrationConstructionDark } from '@douyinfe/semi-illustrations';
 import { JSX } from 'react/jsx-runtime';
 import UserBar from "./components/UserBar.tsx";
 // import Cookies from 'js-cookie';
-import {hostAddr, hostWsAddr} from "./serverConfig.tsx";
+import {hostAddr, hostWsAddr, platformLink} from "./serverConfig.tsx";
 import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
@@ -1318,7 +1320,15 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {/*{mdComponentIFrameButton({children: "弹出BIT邮箱", src: "https://mail.bit.edu.cn/"})}*/}
                 {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
                 {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
-                <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>
+                <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}}></UserBar>
+                    {loginState?<div style={{marginRight:"16px"}}>
+                        <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
+                        <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
+                    </div>:<></>}
+                    {/*{loginState?<SemiButton theme="borderless" style={{marginRight:"16px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>}></SemiButton>:<></>}*/}
+                </div>
+
             </div>
             <Drawer
                 title={appName}
