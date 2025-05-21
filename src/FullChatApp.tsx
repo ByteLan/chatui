@@ -572,6 +572,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
     // 使用 useRef 存储 socket 对象
     const socketRef = useRef<WebSocket | null>(null);
+    const socketReconnectTimeoutRef = useRef<null|NodeJS.Timeout>(null);
     useEffect(() => {
         function updateMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
             console.log("updateMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
@@ -939,6 +940,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         if (layoutRef.current) {
             if (resizeTimeoutRef.current!=null) {
                 clearTimeout(resizeTimeoutRef.current);
+                resizeTimeoutRef.current = null;
             }
             resizeTimeoutRef.current = setTimeout(() => {
                 // console.warn(layoutRef.current.offsetWidth);
@@ -1054,6 +1056,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         handleResize();
         return () => {
             window.removeEventListener('resize', handleResize);
+            console.error("remove resize listener")
+            if(resizeTimeoutRef.current!=null){
+                clearTimeout(resizeTimeoutRef.current);
+            }
+            resizeTimeoutRef.current = null;
         };
     }, []);
 
