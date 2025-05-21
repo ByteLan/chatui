@@ -75,7 +75,9 @@ const useStyle = createStyles(({token, css}) => {
 
             background: ${token.colorBgLayout}80;
             background-color: rgba(var(--semi-indigo-0), 1);
-            width: 20%;
+            // 不使用宽度可变menu
+            //width: 20%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
             max-width: 300px;
             height: 100%;
             display: flex;
@@ -104,7 +106,10 @@ const useStyle = createStyles(({token, css}) => {
         `,
         chat: css`
             height: calc(100% - 12px);
-            width: calc(80% - 12px);
+            // 不使用宽度可变menu
+            // width: calc(80% - 12px);
+            width: calc(100% - 262px);
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
             margin: 0 auto;
             box-sizing: border-box;
             display: flex;
@@ -309,9 +314,10 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     [],
     // );
 
-    const [menuWidth, setMenuWidth] = React.useState('20%');// 初始宽度
-    const [chatWidth, setChatWidth] = React.useState('80%');// 初始宽度
-    const [menuVisible, setMenuVisible] = React.useState<'visible'|'hidden'>('visible');
+    const [menuWidth, setMenuWidth] = React.useState('0px');// 初始宽度
+    const [chatWidth, setChatWidth] = React.useState('calc(100% - 12px)');// 初始宽度
+    const [menuVisible, setMenuVisible] = React.useState<'visible'|'hidden'>('hidden');
+    const [menuFloatButtonVisible, setMenuFloatButtonVisible] = React.useState<'visible'|'hidden'>('visible');
     const layoutRef = React.useRef<HTMLDivElement>(null);
 
     // Modal rename
@@ -923,31 +929,97 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     menuPlacementRef.current = menuPlacement;
     // }, [menuPlacement]);
 
+    const menuVisibleState = useRef(false);
+    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleResize = useCallback(() => {
         // console.warn(layoutRef.current);
         if (layoutRef.current) {
-            // console.warn(layoutRef.current.offsetWidth);
-            const layoutWidth = layoutRef.current.offsetWidth;
-            // 根据.layout的宽度设置menu的宽度逻辑
-            if (layoutWidth > hideMenuMediaWidth) {
-                setMenuWidth('20%');
-                setChatWidth('max(calc(80% - 12px) , calc(100% - 312px))');
-                // if(menuVisible!='visible'){
-                //     setMenuVisible('visible');
-                // }
-                setMenuVisible('visible');
-                // setMenuPlacement('Default');
-                // menuPlacementRef.current = 'Default';
-                setMenuDrawerOpen(false);
-            } else {
-                // if(menuPlacementRef.current == 'Drawer'){
-                //     return;
-                // }
-                setMenuWidth('0');
-                setChatWidth('calc(100% - 12px)');
-                setMenuVisible('hidden');
+            if (resizeTimeoutRef.current!=null) {
+                clearTimeout(resizeTimeoutRef.current);
             }
+            resizeTimeoutRef.current = setTimeout(() => {
+                // console.warn(layoutRef.current.offsetWidth);
+                if(layoutRef.current == null){
+                    return
+                }
+                const layoutWidth = layoutRef.current.offsetWidth;
+                // 根据.layout的宽度设置menu的宽度逻辑
+                if (layoutWidth > hideMenuMediaWidth) {
+                    // 不使用宽度可变menu
+                    // setMenuWidth('20%');
+                    // setChatWidth('max(calc(80% - 12px) , calc(100% - 312px))');
+                    // if(menuVisible!='visible'){
+                    //     setMenuVisible('visible');
+                    // }
+                    // setMenuVisible('visible');
+                    if(!menuVisibleState.current){
+                        // 展示菜单
+                        menuVisibleState.current = true;
+                        setMenuWidth('250px');
+                        setChatWidth('calc(100% - 262px)');
+                        setMenuDrawerOpen(false);
+                        setMenuFloatButtonVisible('hidden');
+                        // 延迟可见
+                        setTimeout(()=>{
+                            if(menuVisibleState.current){
+                                setMenuVisible('visible');
+                            }
+                        }, 1005);
+                    }
+                    // setMenuPlacement('Default');
+                    // menuPlacementRef.current = 'Default';
+                } else { // 收起菜单
+                    // if(menuPlacementRef.current == 'Drawer'){
+                    //     return;
+                    // }
+                    if(menuVisibleState.current){
+                        menuVisibleState.current = false;
+                        setMenuWidth('0');
+                        setChatWidth('calc(100% - 12px)');
+                        setMenuVisible('hidden');
+                        setMenuFloatButtonVisible('visible');
+                    }
+                }
+            }, 500)
+
+            // // console.warn(layoutRef.current.offsetWidth);
+            // const layoutWidth = layoutRef.current.offsetWidth;
+            // // 根据.layout的宽度设置menu的宽度逻辑
+            // if (layoutWidth > hideMenuMediaWidth) {
+            //     // 不使用宽度可变menu
+            //     // setMenuWidth('20%');
+            //     // setChatWidth('max(calc(80% - 12px) , calc(100% - 312px))');
+            //     // if(menuVisible!='visible'){
+            //     //     setMenuVisible('visible');
+            //     // }
+            //     // setMenuVisible('visible');
+            //     if(!menuVisibleState.current){
+            //         // 展示菜单
+            //         menuVisibleState.current = true;
+            //         setMenuWidth('250px');
+            //         setChatWidth('calc(100% - 262px)');
+            //         setMenuDrawerOpen(false);
+            //         // 延迟可见
+            //         setTimeout(()=>{
+            //             if(menuVisibleState.current){
+            //                 setMenuVisible('visible');
+            //             }
+            //         }, 1005);
+            //     }
+            //     // setMenuPlacement('Default');
+            //     // menuPlacementRef.current = 'Default';
+            // } else { // 收起菜单
+            //     // if(menuPlacementRef.current == 'Drawer'){
+            //     //     return;
+            //     // }
+            //     if(menuVisibleState.current){
+            //         menuVisibleState.current = false;
+            //         setMenuWidth('0');
+            //         setChatWidth('calc(100% - 12px)');
+            //         setMenuVisible('hidden');
+            //     }
+            // }
         }
     }, []);
 
@@ -1228,15 +1300,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {/* 🌟 Logo */}
                 {logoNode}
                 {/* 🌟 添加会话 */}
-                <Button
-                    onClick={onAddConversation}
-                    type="link"
-                    className={styles.addBtn}
-                    icon={<PlusOutlined />}
-                    loading={isCreatingConversation}
-                >
-                    创建新会话
-                </Button>
+                {loginState?<Button onClick={onAddConversation} type="link" className={styles.addBtn} icon={<PlusOutlined />} loading={isCreatingConversation}>创建新会话</Button>:<></>}
                 {/* 🌟 会话管理 */}
                 <LazyImportSuspense style={{ width: '100%', flex: 1}}>
                     <MemoConversations
@@ -1270,7 +1334,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     {/* 🌟 Logo */}
                     {/*{logoNode}*/}
                     {/* 🌟 添加会话 */}
-                    <Button
+                    {loginState?<Button
                         onClick={onAddConversation}
                         type="link"
                         className={styles.addBtn}
@@ -1279,7 +1343,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         style={{marginTop:10}}
                     >
                         创建新会话
-                    </Button>
+                    </Button>:<></>}
                     {/* 🌟 会话管理 */}
                     <LazyImportSuspense style={{ width: '100%', flex: 1}}>
                         <MemoConversations
@@ -1299,7 +1363,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             <FloatButton
                 shape="circle"
                 type="primary"
-                style={{ top:12, left:12 , height: 35, width: 35, visibility: (menuVisible==='hidden' && !menuDrawerOpen)?'visible':'hidden'}}
+                style={{ top:12, left:12 , height: 35, width: 35, opacity: (menuFloatButtonVisible === 'visible' && !menuDrawerOpen) ? 1 : 0, visibility: (menuFloatButtonVisible==='visible' && !menuDrawerOpen)?'visible':'hidden', transition: 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1), visibility 1s cubic-bezier(0.4, 0, 0.2, 1)'}}
                 tooltip={<div>展开列表</div>}
                 onClick={onClickOpenMenu}
                 icon={<RightOutlined />} />
@@ -1365,7 +1429,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 // VChart图表
 (silkroad://chat.messagecard.vchart/数据id/图表标题)
 // 新版仿真
-(silkroad://chat.messagecard.startsimulation2/)
+(silkroad://chat.messagecard.startsimulation2/demo3/按钮标题)
 // 旧版仿真
 (https://anylogic-test.bitcs-silkroad-oe.bbyte.cn/anylogic/platform/demo-test/startRun/1)
 \`\`\`
