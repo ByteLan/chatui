@@ -283,10 +283,10 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [menuDrawerOpen, setMenuDrawerOpen] = React.useState(false);
 
     const [socketReconnecting, setSocketReconnecting] = React.useState(false);
-    const socketReconnectingRef = useRef(socketReconnecting);
-    useEffect(() => {
-        socketReconnectingRef.current = socketReconnecting;
-    }, [socketReconnecting]);
+    // const socketReconnectingRef = useRef(socketReconnecting);
+    // useEffect(() => {
+    //     socketReconnectingRef.current = socketReconnecting;
+    // }, [socketReconnecting]);
     const socketReconnectCountRef = useRef(0);
     const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
     const modelListRef = useRef(modelList);
@@ -671,32 +671,45 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         let heartbeatInterval: NodeJS.Timeout;
 
         function connectSocket(){
-            socketReconnectingRef.current = false;
+            // socketReconnectingRef.current = false;
+            if(socketReconnectTimeoutRef.current != null){
+                clearTimeout(socketReconnectTimeoutRef.current);
+                socketReconnectTimeoutRef.current = null;
+            }
 
             function setReconnect(){
-                if(socketReconnectingRef.current==true){
+                if(socketReconnectTimeoutRef.current == null){
                     return;
                 }
+                // if(socketReconnectingRef.current==true){
+                //     return;
+                // }
                 socketReconnectCountRef.current += 1;
-                if(socketReconnectCountRef.current > 20){
-                    socketReconnectCountRef.current = 15;
+                if(socketReconnectCountRef.current > 5){
+                    socketReconnectCountRef.current = 3;
                 }
-                socketReconnectingRef.current = true;
+                // socketReconnectingRef.current = true;
                 // socketReconnectCountRef.current = 0;
                 setSocketReconnecting(true);
-                setTimeout(() => {
-                    connectSocket();
-                }, 1000+socketReconnectCountRef.current*2000);
                 console.log('ws REconnecting');
+                // setTimeout(() => {
+                connectSocket();
+                // }, 1000+socketReconnectCountRef.current*1000);
             }
 
             if(loginState==false||tempCkid == ''){
-                socketReconnectingRef.current = true;
+                if(socketReconnectTimeoutRef.current != null){
+                    clearTimeout(socketReconnectTimeoutRef.current);
+                    socketReconnectTimeoutRef.current = null;
+                }
                 socketRef.current?.close();
                 socketRef.current = null;
             }else{
                 if(socketRef.current != null){
-                    socketReconnectingRef.current = true;
+                    if(socketReconnectTimeoutRef.current != null){
+                        clearTimeout(socketReconnectTimeoutRef.current);
+                        socketReconnectTimeoutRef.current = null;
+                    }
                     socketRef.current.close();
                     socketRef.current = null;
                 }
@@ -705,7 +718,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 socketRef.current.onopen = () => {
                     socketReconnectCountRef.current = 0;
                     setSocketReconnecting(false);
-                    socketReconnectingRef.current = false;
+                    // socketReconnectingRef.current = false;
+                    if(socketReconnectTimeoutRef.current != null){
+                        clearTimeout(socketReconnectTimeoutRef.current);
+                        socketReconnectTimeoutRef.current = null;
+                    }
                     console.log('ws opened');
                     socketRef.current?.send(JSON.stringify({
                         requestType: 'setActiveCkid',
@@ -739,17 +756,25 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 }
 
                 socketRef.current.onclose = () => {
-                    if(socketReconnectingRef.current==true){return}
+                    // if(socketReconnectingRef.current==true){return}
+                    if(socketReconnectTimeoutRef.current != null){
+                        clearTimeout(socketReconnectTimeoutRef.current);
+                        socketReconnectTimeoutRef.current = null;
+                    }
                     clearInterval(heartbeatInterval);
                     console.error('ws on close');
-                    setReconnect();
+                    socketReconnectTimeoutRef.current = setTimeout(setReconnect, 1000+socketReconnectCountRef.current*2000);
+                    // setReconnect();
                 }
 
                 socketRef.current.onerror = () => {
-                    if(socketReconnectingRef.current==true){return}
+                    if(socketReconnectTimeoutRef.current != null){
+                        clearTimeout(socketReconnectTimeoutRef.current);
+                        socketReconnectTimeoutRef.current = null;
+                    }
                     clearInterval(heartbeatInterval);
-                    console.error('ws on error');
-                    setReconnect();
+                    console.error('ws on close');
+                    socketReconnectTimeoutRef.current = setTimeout(setReconnect, 1000+socketReconnectCountRef.current*2000);
                 }
             }
         }
@@ -759,7 +784,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 
         return () => {
             console.log('close socket, tempCkid changed:'+tempCkid);
-            socketReconnectingRef.current=true;
+            // socketReconnectingRef.current=true;
             clearInterval(heartbeatInterval);
             if(socketRef.current != null){
                 socketRef.current.onclose = null;
@@ -767,9 +792,210 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 socketRef.current.close();
                 socketRef.current = null;
             }
-
+            if(socketReconnectTimeoutRef.current!= null){
+                clearTimeout(socketReconnectTimeoutRef.current);
+                socketReconnectTimeoutRef.current = null;
+            }
         }
     }, [tempCkid, loginState]);
+
+    // useEffect(() => {
+    //     function updateMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
+    //         console.log("updateMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
+    //         if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId){
+    //             setMessageItems(prevMessageItems => {
+    //                 let hasItem = false;
+    //                 let newMessageItems = prevMessageItems.map((item) => {
+    //                     if(item.key == messageId){
+    //                         hasItem = true;
+    //                         //role: messageUid.startsWith("-")?(messageType=='ai_mdx'?'aiMdx':'ai'):'local',
+    //                         return {
+    //                             key: item.key,
+    //                             loading: convertLoading(messageUid, messageStatus),
+    //                             // loading: messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete'),
+    //                             role: convertRole(messageUid, messageType),
+    //                             content: messageContent,
+    //                         }
+    //                     }else{
+    //                         return item;
+    //                     }
+    //                 });
+    //                 if(!hasItem){
+    //                     newMessageItems = [...prevMessageItems, {
+    //                         key: messageId,
+    //                         loading: convertLoading(messageUid, messageStatus),
+    //                         role: convertRole(messageUid, messageType),
+    //                         content: messageContent,
+    //                     }]
+    //                 }
+    //                 console.info(newMessageItems);
+    //                 return newMessageItems;
+    //             });
+    //         }
+    //     }
+    //
+    //     function updateStreamMessage(messageId:string, messageContent:string, conversationId:string){
+    //         if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId){
+    //             setMessageItems(prevMessageItems => {
+    //                 let hasItem = false;
+    //                 let newMessageItem = prevMessageItems.map((item) => {
+    //                     if(item.key == messageId){
+    //                         hasItem = true;
+    //                         return {
+    //                             key: item.key,
+    //                             loading: false,
+    //                             role: 'aiProcessing',
+    //                             content: item.content+messageContent,
+    //                         }
+    //                     }else{
+    //                         return item;
+    //                     }
+    //                 })
+    //                 if (!hasItem){
+    //                     newMessageItem = [...prevMessageItems, {
+    //                         key: messageId,
+    //                         loading: false,
+    //                         role: 'aiProcessing',
+    //                         content: messageContent,
+    //                     }]
+    //                 }
+    //                 return newMessageItem;
+    //             });
+    //         }
+    //     }
+    //
+    //     function createNewMessage(messageId:string, messageContent:string, conversationId:string, messageStatus:string, messageUid:string, messageType:string){
+    //         console.log("createMessage: "+messageId+" "+messageContent+" "+conversationId+" "+messageStatus+" "+messageUid+" "+activeKeyRef.current);
+    //         if(activeKeyRef.current != null && activeKeyRef.current != '' && activeKeyRef.current == conversationId) {
+    //             setMessageItems(prevMessageItems => {
+    //                 return [...prevMessageItems, {
+    //                     key: messageId,
+    //                     loading: convertLoading(messageUid, messageStatus),
+    //                     role: convertRole(messageUid, messageType),
+    //                     content: messageContent,
+    //                 }]
+    //             });
+    //         }
+    //     }
+    //
+    //     function updateConversationName(conversationId:string, newConversationName:string){
+    //         console.log("fun updateConversationName: "+conversationId+" "+newConversationName);
+    //         const newConversationItems = conversationItemsRef.current.map((item) => {
+    //             if(item.key == conversationId){
+    //                 return {
+    //                     key: item.key,
+    //                     label: newConversationName,
+    //                     group: item.group
+    //                 }
+    //             }else{
+    //                 return item;
+    //             }
+    //         });
+    //         setConversationItems(newConversationItems);
+    //     }
+    //
+    //     let heartbeatInterval: NodeJS.Timeout;
+    //
+    //     function connectSocket(){
+    //         socketReconnectingRef.current = false;
+    //
+    //         function setReconnect(){
+    //             if(socketReconnectingRef.current==true){
+    //                 return;
+    //             }
+    //             socketReconnectCountRef.current += 1;
+    //             if(socketReconnectCountRef.current > 20){
+    //                 socketReconnectCountRef.current = 15;
+    //             }
+    //             socketReconnectingRef.current = true;
+    //             // socketReconnectCountRef.current = 0;
+    //             setSocketReconnecting(true);
+    //             setTimeout(() => {
+    //                 connectSocket();
+    //             }, 1000+socketReconnectCountRef.current*2000);
+    //             console.log('ws REconnecting');
+    //         }
+    //
+    //         if(loginState==false||tempCkid == ''){
+    //             socketReconnectingRef.current = true;
+    //             socketRef.current?.close();
+    //             socketRef.current = null;
+    //         }else{
+    //             if(socketRef.current != null){
+    //                 socketReconnectingRef.current = true;
+    //                 socketRef.current.close();
+    //                 socketRef.current = null;
+    //             }
+    //             socketRef.current = new WebSocket(hostWsAddr+'ai_chat/ws');
+    //
+    //             socketRef.current.onopen = () => {
+    //                 socketReconnectCountRef.current = 0;
+    //                 setSocketReconnecting(false);
+    //                 socketReconnectingRef.current = false;
+    //                 console.log('ws opened');
+    //                 socketRef.current?.send(JSON.stringify({
+    //                     requestType: 'setActiveCkid',
+    //                     activeCkid: tempCkid,
+    //                 }));
+    //                 heartbeatInterval = setInterval(() => {
+    //                     socketRef.current?.send('{}');
+    //                 }, 20000);
+    //             }
+    //
+    //             socketRef.current.onmessage = (event) => {
+    //                 console.info("onMessage: "+event.data);
+    //                 try{
+    //                     if (event.data != null){
+    //                         const jd = JSON.parse(event.data);
+    //                         if(jd.responseType !=null) {
+    //                             if(jd.responseType == 'updateMessageWithMessageIdAndConversationId'){
+    //                                 updateMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType);
+    //                             }else if(jd.responseType == 'updateConversationName'){
+    //                                 updateConversationName(jd.conversationId, jd.updateNewConversationName);
+    //                             }else if(jd.responseType == 'createNewMessage'){
+    //                                 createNewMessage(jd.messageId, jd.updateMessageContent, jd.conversationId, jd.messageStatus, jd.messageUid, jd.messageType)
+    //                             }else if(jd.responseType == 'updateStreamMessage') {
+    //                                 updateStreamMessage(jd.messageId, jd.updateStreamMessageContent, jd.conversationId);
+    //                             }
+    //                         }
+    //                     }
+    //                 }catch (e) {
+    //                     console.error("onMessageError: "+e);
+    //                 }
+    //             }
+    //
+    //             socketRef.current.onclose = () => {
+    //                 if(socketReconnectingRef.current==true){return}
+    //                 clearInterval(heartbeatInterval);
+    //                 console.error('ws on close');
+    //                 setReconnect();
+    //             }
+    //
+    //             socketRef.current.onerror = () => {
+    //                 if(socketReconnectingRef.current==true){return}
+    //                 clearInterval(heartbeatInterval);
+    //                 console.error('ws on error');
+    //                 setReconnect();
+    //             }
+    //         }
+    //     }
+    //
+    //     connectSocket();
+    //
+    //
+    //     return () => {
+    //         console.log('close socket, tempCkid changed:'+tempCkid);
+    //         socketReconnectingRef.current=true;
+    //         clearInterval(heartbeatInterval);
+    //         if(socketRef.current != null){
+    //             socketRef.current.onclose = null;
+    //             socketRef.current.onerror = null;
+    //             socketRef.current.close();
+    //             socketRef.current = null;
+    //         }
+    //
+    //     }
+    // }, [tempCkid, loginState]);
 
     const onLoginOption = useCallback(() => {
         setMessageItems([]);
@@ -968,6 +1194,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         setTimeout(()=>{
                             if(menuVisibleState.current){
                                 setMenuVisible('visible');
+                                setMenuDrawerOpen(false);
                             }
                         }, 1005);
                     }
@@ -985,7 +1212,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         setMenuFloatButtonVisible('visible');
                     }
                 }
-            }, 500)
+            }, 500);
 
             // // console.warn(layoutRef.current.offsetWidth);
             // const layoutWidth = layoutRef.current.offsetWidth;
