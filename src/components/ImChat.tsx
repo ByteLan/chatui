@@ -96,13 +96,16 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
         children: [
             {
                 key: 'func-overview',
-                description: `供应链概览`,
+                description: `供应链全景`,
             },
             {
                 key: 'func-sim',
                 description: `仿真环境`,
             },
-
+            {
+                key: 'func-neograph',
+                description: '供应链孪生',
+            }
         ],
     },
 ];
@@ -406,6 +409,12 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 setRightNodeFn(
                     <LazyImportSuspense><SimulationStarter src="demo3" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
                 )
+            }else if(info.data.key == 'func-neograph') {
+                checkRightSize?.()
+                if (setRightNodeFn === undefined){
+                    return
+                }
+                setRightNodeFn(<iframe src = 'http://ai.bitcs.bbyte.cn/xchat/neograph.html' style={{width: '100%', height: '100%', border: 'none', outline: 'none', boxSizing: 'border-box', margin: 0, padding: 0}}></iframe>)
             }
         }else{
             onRequest(info.data.description as string);
@@ -470,8 +479,17 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
         };
     }, [setDemoButtonNode,activeKey]);
 
-
-
+    // 对messageItem中的元素，根据key去重
+    const uniqueMessageItems = React.useMemo(() => {
+        const seenKeys = new Set();
+        return messageItems.filter(item => {
+            if (seenKeys.has(item.key)) {
+                return false;
+            }
+            seenKeys.add(item.key);
+            return true;
+        });
+    }, [messageItems]);
 
     return (
         <>
@@ -479,7 +497,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
 
             <Bubble.List
                 // items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
-                items={[{ content: placeholderNode, variant: 'borderless',  }, ...messageItems]}
+                items={[{ content: placeholderNode, variant: 'borderless',  }, ...uniqueMessageItems]}
                 roles={roles}
                 className={styles.messages}
             />

@@ -288,7 +288,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     socketReconnectingRef.current = socketReconnecting;
     // }, [socketReconnecting]);
     const socketReconnectCountRef = useRef(0);
-    const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
+    const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "test1", name: "测试1"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
     const modelListRef = useRef(modelList);
     useEffect(() => {
         modelListRef.current = modelList;
@@ -1355,6 +1355,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 //         }
                 //     ]);
                 // })
+
+                // 以下代码可以注释，防止重复增加msg
                 setMessageItems((prev)=>{
                     // 找到prev中是否包含key==item.messageId的元素
                     const hasItem = prev.find((item) => item.key == data.appendMessages[0].messageId);
@@ -1379,6 +1381,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             ])
                     }
                 });
+
                 // 将当前Conversation更新到最上面
                 const index = conversationItems.findIndex((item) => item.key == activeKey);
                 if(index != -1){
