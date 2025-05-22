@@ -1,8 +1,8 @@
 // import FullChatApp from './FullChatApp.tsx'
-import {useRef, useState, lazy} from "react";
+import {useRef, useState, lazy, useCallback} from "react";
 import { Splitter } from "antd";
 import {IllustrationNoContent, IllustrationNoContentDark} from "@douyinfe/semi-illustrations";
-import {Empty} from "@douyinfe/semi-ui";
+import {Empty, Spin} from "@douyinfe/semi-ui";
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 
 const FullChatApp = lazy(() => import('./FullChatApp.tsx'));
@@ -31,13 +31,25 @@ export default function ChatWeb() {
 
         </Empty>);
 
-    const onSplitterSizeChange = (sizes: number[]) => {
+    const onSplitterSizeChange = useCallback((sizes: number[]) => {
         // console.warn("onSplitterSizeChange: "+sizes);
         setChatSizeConst(sizes);
         setChatSize(sizes[0]);
         setSubPageSize(sizes[1]);
         chatRef.current?.handleResize();
-    }
+    }, []);
+
+    const setRightNodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const setRightNodeDelay = useCallback((node: JSX.Element) => {
+        setRightNode(<Spin style={{height:'100%', width:'100%'}} tip="加载中......" size="large"></Spin>);
+        if (setRightNodeTimeoutRef.current) {
+            clearTimeout(setRightNodeTimeoutRef.current);
+        }
+        setRightNodeTimeoutRef.current = setTimeout(() => {
+            setRightNode(node);
+        }, 600);
+    }, []);
 
     // return <FullChatApp />
     return (
@@ -52,7 +64,7 @@ export default function ChatWeb() {
             >
                 <Splitter.Panel collapsible size={chatSize} defaultSize="100%" min={320} >
                     <LazyImportSuspense>
-                        <FullChatApp rightNodeFn={setRightNode} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
+                        <FullChatApp rightNodeFn={setRightNodeDelay} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
                     </LazyImportSuspense>
                 </Splitter.Panel>
                 <Splitter.Panel collapsible defaultSize='0%' size={subPageSize} style={{overflow: 'hidden', height: '100%', width: '100%', backgroundColor: 'rgba(var(--semi-indigo-0), 1)'}}>
