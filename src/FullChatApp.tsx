@@ -270,7 +270,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     windowChatSize = chatSizeConst;
     setChatSizeString = setChatSize;
     setSubPageSizeFn = setSubPageSize;
-    const [appName, setAppName] = React.useState('丝路大模型');
+    const [appName, setAppName] = React.useState('大模型');
     const [tempCkid, setTempCkid] = React.useState('');
     const [userName, setUserName] = React.useState('');
     const [loginState, setLoginState] = React.useState(false);
@@ -1072,6 +1072,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     // Cookies.set('localckid',data.newCkid, { expires: 3 });
                     setTempCkid(data.newCkid);
                     setUserName(data.userName);
+                    setAppName(data.appName);
                     setLoginState(true);
                     onLoginOption();
                 }
@@ -1558,7 +1559,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
                 {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
                 <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}}></UserBar>
+                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName}></UserBar>
                     {loginState?<div style={{marginRight:"16px"}}>
                         <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                         <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
@@ -1604,7 +1605,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     </LazyImportSuspense>
                     {demoButtonNode==null?(<></>):(demoButtonNode)}
                     <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                        <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}}></UserBar>
+                        <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName}></UserBar>
                         {loginState?<div style={{marginRight:"16px"}}>
                             <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                             <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
