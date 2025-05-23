@@ -234,7 +234,7 @@ function AnylogicSimulationDemoPage({simAddr}: { simAddr: string | null }) {
         return (
             <div style={{height: '100%', width: '100%', overflow: 'hidden', border: 0 }}>
                 <div style={{height: 'calc(100% + 50px)', width: '100%'}}>
-                    <iframe src={simAddr} width='100%' height='100%'></iframe>
+                    <iframe src={simAddr} width='100%' height='100%' style={{border: 'none', outline: 'none'}}></iframe>
                 </div>
 
             </div>

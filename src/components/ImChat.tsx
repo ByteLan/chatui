@@ -147,7 +147,7 @@ function mdComponentIFrameButton({children, src}){
         if (setRightNodeFn === undefined){
             return
         }
-        setRightNodeFn(<iframe src = {src} width="100%" height="100%"></iframe>)
+        setRightNodeFn(<iframe src = {src} width="100%" height="100%" style={{border: 'none', outline: 'none'}}></iframe>)
     }}> {children} </Button>
 }
 

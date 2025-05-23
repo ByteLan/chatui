@@ -188,7 +188,7 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
     }
 
     return (
-        <div style={{margin:8}}>
+        <div style={{margin:6}}>
             <Button theme="borderless" icon={
                 <Flex align='center'>
                     <Avatar color="light-blue" style={{ margin: 2 }} size={(avatarSize==="large"||avatarSize==="small")?(avatarSize==='large'?'medium':'small'):'default'} >
@@ -196,7 +196,7 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
                     </Avatar>
                     <p style={{marginLeft: 4}}>{loginState?loginUserName:'点击登录'}</p>
                 </Flex>
-            } onClick={onAvatarClick} style={{width:'auto', padding:'6px', height: 'auto', color: mergedStyle.color}}></Button>
+            } onClick={onAvatarClick} style={{width:'auto', padding:'4px', height: 'auto', color: mergedStyle.color}}></Button>
             <Modal
                 title="登录"
                 open={loginModalOpen}
