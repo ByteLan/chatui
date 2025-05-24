@@ -204,15 +204,25 @@ function mdComponentSimulationStarter({children, src}:{children:any, src:string}
     }>{children}</Button>
 }
 
-function mdButtonOverviewShow({children}:{children:any}){
+function mdButtonOverviewShow({children, askCompanyName}:{children:any, askCompanyName?:string}){
     return <Button onClick={()=> {
         checkRightSize?.()
         if (setRightNodeFn === undefined){
             return
         }
-        setRightNodeFn(
-            <LazyImportSuspense><OverviewPage activeConversationKey={activeKeyPublic} /></LazyImportSuspense>
-        )
+        if(askCompanyName == undefined || askCompanyName == ""){
+            setRightNodeFn(
+                <LazyImportSuspense><OverviewPage activeConversationKey={activeKeyPublic} /></LazyImportSuspense>
+            )
+        }else{
+            console.log("askCompanyName:"+askCompanyName);
+            setRightNodeFn(
+                <LazyImportSuspense><OverviewPage activeConversationKey={activeKeyPublic} askCompanyName={askCompanyName} /></LazyImportSuspense>
+            )
+        }
+        // setRightNodeFn(
+        //     <LazyImportSuspense><OverviewPage activeConversationKey={activeKeyPublic} /></LazyImportSuspense>
+        // )
     }}>{children}</Button>
 }
 
