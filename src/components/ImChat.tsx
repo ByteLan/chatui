@@ -20,7 +20,7 @@ import {Bubble} from "@ant-design/x";
 const ImChatSender = lazy(() => import("./ImChatSender.tsx"));
 const AnylogicSimulationDemoPage = lazy(() => import("../components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/simulation-pages/SimulationStarter.tsx"));
-const OverviewPage = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/OverviewPage.tsx"));
+const OverviewPage = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/overview/OverviewPage.tsx"));
 
 import { isEqual } from 'lodash';
 
