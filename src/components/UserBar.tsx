@@ -6,7 +6,7 @@ import {hostAddr} from "../serverConfig.tsx";
 // import Cookies from "js-cookie";
 
 
-export default function UserBar({onLogin, loginState, loginUserName, setLoginState, setLoginUserName, setTempCkid, avatarSize, style, setChatAppName}:{onLogin:()=>void, loginState:boolean, loginUserName:string|null, setLoginState:(state:boolean)=>void, setLoginUserName:(name:string)=>void, setTempCkid:(ckid:string)=>void, avatarSize?:"large"|"small"|"default", style?:React.CSSProperties, setChatAppName?:(name:string)=>void}) {
+export default function UserBar({onLogin, loginState, loginUserName, setLoginState, setLoginUserName, setTempCkid, avatarSize, style, setChatAppName, setChatAppDescription}:{onLogin:()=>void, loginState:boolean, loginUserName:string|null, setLoginState:(state:boolean)=>void, setLoginUserName:(name:string)=>void, setTempCkid:(ckid:string)=>void, avatarSize?:"large"|"small"|"default", style?:React.CSSProperties, setChatAppName?:(name:string)=>void, setChatAppDescription?(description:string):void}) {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [confirmLogoutLoading, setConfirmLogoutLoading] = useState(false);
@@ -63,8 +63,13 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
                 // Cookies.set('localckid', data.setCkid, { expires: 3 });
                 setLoginState(true);
                 setTempCkid(data.setCkid);
-                if(setChatAppName){
+                if(setChatAppName&&data.appName){
                     setChatAppName(data.appName);
+                }
+                if(setChatAppDescription&&data.appDescription){
+                    if(setChatAppDescription){
+                        setChatAppDescription(data.appDescription);
+                    }
                 }
                 onLogin();
                 const opts = {

@@ -271,6 +271,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     setChatSizeString = setChatSize;
     setSubPageSizeFn = setSubPageSize;
     const [appName, setAppName] = React.useState('大模型');
+    const [appDescription, setAppDescription] = React.useState('欢迎使用大模型交互系统！');
     const [tempCkid, setTempCkid] = React.useState('');
     const [userName, setUserName] = React.useState('');
     const [loginState, setLoginState] = React.useState(false);
@@ -1072,7 +1073,13 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     // Cookies.set('localckid',data.newCkid, { expires: 3 });
                     setTempCkid(data.newCkid);
                     setUserName(data.userName);
-                    setAppName(data.appName);
+                    if(data.appName){
+                        setAppName(data.appName);
+                    }
+                    // setAppName(data.appName);
+                    if(data.appDescription){
+                        setAppDescription(data.appDescription);
+                    }
                     setLoginState(true);
                     onLoginOption();
                 }
@@ -1361,9 +1368,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 setMessageItems((prev)=>{
                     // 找到prev中是否包含key==item.messageId的元素
                     // const hasItem = prev.find((item) => item.key == data.appendMessages[0].messageId);
-                    const dataToAppend = [];
+                    const dataToAppend: { key: string; loading: boolean; role: string; content: string; }[] = [];
                     const hasItem = data.appendMessages.map((msg) => {
-                        if(prev.find((item) => {
+                        if(prev.some((item) => {
                             return item.key == msg.messageId;
                         })){
                             return true;
@@ -1377,7 +1384,10 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             return false;
                         }
                     });
-                    const needAddItem = hasItem.find((item) => item == undefined||item == false);
+                    const needAddItem = hasItem.some((item) => item == undefined||item == false);
+                    console.log("needAddItem: ", needAddItem);
+                    console.log("hasItem: ", hasItem);
+                    console.log("dataToAppend: ", dataToAppend);
                     if(!needAddItem){
                     // if(hasItem){
                         // 如果有，则不添加
@@ -1624,7 +1634,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     </LazyImportSuspense>
                     {demoButtonNode==null?(<></>):(demoButtonNode)}
                     <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                        <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName}></UserBar>
+                        <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription}></UserBar>
                         {loginState?<div style={{marginRight:"16px"}}>
                             <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                             <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
@@ -1675,6 +1685,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                                     setRightNodeF={rightNodeFn}
                                     messageItems={messageItems}
                                     setDemoButtonNode={setDemoButtonNode}
+                                    appName={appName}
+                                    appDescription={appDescription}
                                 >
                                 </ImChat>
                             </LazyImportSuspense>

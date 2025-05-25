@@ -345,7 +345,7 @@ const semiPureMarkdownRenderProcessing = (content?: string) => {
 }
 
 
-const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, checkRightSizeF, setRightNodeF, onRequest, exampleSideChangeF, setDemoButtonNode}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSizeF: (() => void) | undefined, setRightNodeF: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeF: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined}) {
+const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, checkRightSizeF, setRightNodeF, onRequest, exampleSideChangeF, setDemoButtonNode, appName, appDescription}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSizeF: (() => void) | undefined, setRightNodeF: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeF: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined, appName?:string, appDescription?:string})  {
     checkRightSize = checkRightSizeF;
     setRightNodeFn = setRightNodeF;
     exampleSideChangeFn = exampleSideChangeF;
@@ -450,8 +450,8 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
             <Welcome
                 variant="borderless"
                 // icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-                title="你好，丝路大模型！"
-                description="供应链韧性大模型"
+                title={appName?"你好，"+appName+"！":"你好！"}
+                description={appDescription?appDescription:"欢迎使用大模型交互系统"}
                 extra={
                     <Space>
                         {/*<Button icon={<ShareAltOutlined />} />*/}
@@ -466,7 +466,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 styles={{list:{overflow: 'auto'}, subList:{overflow: 'auto'}}}
             />
         </Space>
-    ), [onPromptsItemClick, styles.placeholder]);
+    ), [onPromptsItemClick, styles.placeholder, appName, appDescription]);
 
 
 
