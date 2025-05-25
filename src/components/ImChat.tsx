@@ -105,6 +105,10 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
             {
                 key: 'func-neograph',
                 description: '供应链孪生',
+            },
+            {
+                key: 'func-sim3',
+                description: '仿真环境(v3)',
             }
         ],
     },
@@ -193,7 +197,7 @@ function mdComponentSimulationStarter({children, src}:{children:any, src:string}
         }
         if(src == null || src =="") {
             setRightNodeFn(
-                <LazyImportSuspense><SimulationStarter src="demo3" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                <LazyImportSuspense><SimulationStarter src="demo4" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
             )
         }else{
             setRightNodeFn(
@@ -417,7 +421,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                     return
                 }
                 setRightNodeFn(
-                    <LazyImportSuspense><SimulationStarter src="demo3" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                    <LazyImportSuspense><SimulationStarter src="demo4" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
                 )
             }else if(info.data.key == 'func-neograph') {
                 checkRightSize?.()
@@ -425,6 +429,14 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                     return
                 }
                 setRightNodeFn(<iframe src = 'http://ai.bitcs.bbyte.cn/xchat/neograph.html' style={{width: '100%', height: '100%', border: 'none', outline: 'none', boxSizing: 'border-box', margin: 0, padding: 0}}></iframe>)
+            }else if(info.data.key == 'func-sim3') {
+                checkRightSize?.()
+                if (setRightNodeFn === undefined){
+                    return
+                }
+                setRightNodeFn(
+                    <LazyImportSuspense><SimulationStarter src="demo3" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                )
             }
         }else{
             onRequest(info.data.description as string);
