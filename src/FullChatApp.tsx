@@ -1360,25 +1360,44 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 // 以下代码可以注释，防止重复增加msg
                 setMessageItems((prev)=>{
                     // 找到prev中是否包含key==item.messageId的元素
-                    const hasItem = prev.find((item) => item.key == data.appendMessages[0].messageId);
-                    if(hasItem){
+                    // const hasItem = prev.find((item) => item.key == data.appendMessages[0].messageId);
+                    const dataToAppend = [];
+                    const hasItem = data.appendMessages.map((msg) => {
+                        if(prev.find((item) => {
+                            return item.key == msg.messageId;
+                        })){
+                            return true;
+                        }else{
+                            dataToAppend.push({
+                                key: msg.messageId,
+                                loading: convertLoading(msg.uid, msg.messageStatus),
+                                role: convertRole(msg.uid, msg.messageType),
+                                content: msg.messageContent,
+                            })
+                            return false;
+                        }
+                    });
+                    const needAddItem = hasItem.find((item) => item == undefined||item == false);
+                    if(!needAddItem){
+                    // if(hasItem){
                         // 如果有，则不添加
                         return prev;
                     }else{
                         return (
                             [
                                 ...prev,
-                                ...data.appendMessages.map((item) => {
-                                    return {
-                                        key: item.messageId,
-                                        loading: convertLoading(item.uid, item.messageStatus),
-                                        // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
-                                        role: convertRole(item.uid, item.messageType),
-                                        // role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
-                                        // role: item.uid.startsWith("-")?'ai':'local',
-                                        content: item.messageContent,
-                                    }
-                                }),
+                                ...dataToAppend,
+                                // ...data.appendMessages.map((item) => {
+                                //     return {
+                                //         key: item.messageId,
+                                //         loading: convertLoading(item.uid, item.messageStatus),
+                                //         // loading: item.uid.startsWith("-") && !item.messageStatus.startsWith('ai_complete'),
+                                //         role: convertRole(item.uid, item.messageType),
+                                //         // role: item.uid.startsWith("-")?(item.messageType=='ai_mdx'?'aiMdx':'ai'):'local',
+                                //         // role: item.uid.startsWith("-")?'ai':'local',
+                                //         content: item.messageContent,
+                                //     }
+                                // }),
                             ])
                     }
                 });
