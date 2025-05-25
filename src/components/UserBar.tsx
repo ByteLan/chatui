@@ -63,13 +63,11 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
                 // Cookies.set('localckid', data.setCkid, { expires: 3 });
                 setLoginState(true);
                 setTempCkid(data.setCkid);
-                if(setChatAppName&&data.appName){
+                if(setChatAppName&&data.appName&&typeof data.appName == 'string'&&data.appName.length>0){
                     setChatAppName(data.appName);
                 }
-                if(setChatAppDescription&&data.appDescription){
-                    if(setChatAppDescription){
-                        setChatAppDescription(data.appDescription);
-                    }
+                if(setChatAppDescription&&data.appDescription&&typeof data.appDescription =='string'&&data.appDescription.length>0){
+                    setChatAppDescription(data.appDescription);
                 }
                 onLogin();
                 const opts = {

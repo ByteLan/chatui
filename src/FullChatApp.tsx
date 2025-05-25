@@ -1073,11 +1073,11 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     // Cookies.set('localckid',data.newCkid, { expires: 3 });
                     setTempCkid(data.newCkid);
                     setUserName(data.userName);
-                    if(data.appName){
+                    if(data.appName&&typeof data.appName == "string" && data.appName.length>0){
                         setAppName(data.appName);
                     }
                     // setAppName(data.appName);
-                    if(data.appDescription){
+                    if(data.appDescription && typeof data.appDescription == "string" && data.appDescription.length>0){
                         setAppDescription(data.appDescription);
                     }
                     setLoginState(true);
