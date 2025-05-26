@@ -1078,6 +1078,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     }
                     // setAppName(data.appName);
                     if(data.appDescription && typeof data.appDescription == "string" && data.appDescription.length>0){
+                        // console.warn(data.appDescription);
                         setAppDescription(data.appDescription);
                     }
                     setLoginState(true);
@@ -1588,7 +1589,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
                 {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
                 <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName}></UserBar>
+                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription}></UserBar>
                     {loginState?<div style={{marginRight:"16px"}}>
                         <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                         <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>

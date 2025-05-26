@@ -444,7 +444,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
 
     }, [onRequest]);
 
-
+    // console.log("appDescription: "+appDescription);
     const placeholderNode = React.useMemo(() => (
         <Space direction="vertical" size={16} className={styles.placeholder}>
             <Welcome
