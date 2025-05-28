@@ -289,7 +289,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     socketReconnectingRef.current = socketReconnecting;
     // }, [socketReconnecting]);
     const socketReconnectCountRef = useRef(0);
-    const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "test1", name: "测试1"},{key: "test2", name: "测试2"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
+    // const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "test1", name: "测试1"},{key: "test2", name: "测试2"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
+    const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "模型获取失败，请联系开发者！"}]);
     const modelListRef = useRef(modelList);
     useEffect(() => {
         modelListRef.current = modelList;
@@ -998,10 +999,47 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     //     }
     // }, [tempCkid, loginState]);
 
-    const onLoginOption = useCallback(() => {
-        setMessageItems([]);
-        setConversationItems([]);
-        setMessageContentReplacementTitle("请先选择一个会话或新建一个会话");
+    const requestChatModelList = useCallback(() => {
+        fetch(hostAddr+'ai_chat/api/get_chat_model_list',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: '{}'
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            if (data.responseStatus =='success') {
+                const newModelList = data.modelList.map((item:{modelKey:string,modelName:string}) => {
+                    if(item.modelKey&&item.modelName&&item.modelKey.length>0&&item.modelName.length>0){
+                        return {
+                            key: item.modelKey,
+                            name: item.modelName,
+                        }
+                    }else{
+                        return undefined;
+                    }
+                })
+                // 去除undefined
+                const newModelList2 = newModelList.filter((item) => item != undefined);
+                if(newModelList2.length>0){
+                    console.info(newModelList2);
+                    setModelList(newModelList2);
+                }else{
+                    throw new Error("模型列表为空");
+                }
+            }else{
+                console.error('Error:', data)
+                setMessageContentReplacementTitle("读取模型列表失败，请刷新页面重试\n"+data);
+            }
+        }).catch((error) => {
+            console.error('Error:', error);
+            setMessageContentReplacementTitle("读取模型列表失败，请刷新页面重试\n"+error);
+        });
+    },[])
+
+    const requestConversationItems = useCallback(() => {
         fetch(hostAddr+'ai_chat/api/query_conversation_list',{
             method: 'POST',
             headers: {
@@ -1021,6 +1059,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         group: getConversationGroupByTimeStamp(timeStamp),
                     }
                 }));
+                requestChatModelList();
                 import('./components/ImChat.tsx');
                 import('./components/ImChatTitle.tsx');
                 import('./components/ImChatSender.tsx');
@@ -1031,7 +1070,14 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             console.error('Error:', error);
             setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+error);
         });
-    }, []);
+    },[]);
+
+    const onLoginOption = useCallback(() => {
+        setMessageItems([]);
+        setConversationItems([]);
+        setMessageContentReplacementTitle("请先选择一个会话或新建一个会话");
+        requestConversationItems();
+    }, [requestConversationItems]);
 
     // ==================== Runtime ====================
     // const [agent] = useXAgent({
@@ -1055,7 +1101,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // });
 
 
-
+    // 初始登录检查
     useEffect(() => {
         // http请求
         fetch(hostAddr+'auth/api/ckidCheck',{
@@ -1426,7 +1472,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 }
             }else{
                 const opts = {
-                    content: "发送消息失败！"+data,
+                    content: "发送消息失败！"+JSON.stringify(data),
                     duration: 0,
                     stack: true,
                     theme: 'light',
