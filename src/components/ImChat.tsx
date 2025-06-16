@@ -345,7 +345,7 @@ const semiPureMarkdownRenderProcessing = (content?: string) => {
 }
 
 
-const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, checkRightSizeF, setRightNodeF, onRequest, exampleSideChangeF, setDemoButtonNode, appName, appDescription}: {styles: any, messageItems: { key: string , loading: boolean , role: string , content: string }[], activeKey: string, checkRightSizeF: (() => void) | undefined, setRightNodeF: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeF: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined, appName?:string, appDescription?:string})  {
+const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, checkRightSizeF, setRightNodeF, onRequest, exampleSideChangeF, setDemoButtonNode, appName, appDescription, style, placeholderMargin}: {styles: any, messageItems: { key?: string , loading?: boolean , role?: string , content: string|JSX.Element, variant?: any }[], activeKey: string, checkRightSizeF: (() => void) | undefined, setRightNodeF: ((arg0: JSX.Element) => void) | undefined, onRequest: (nextContent: string) => void, exampleSideChangeF: (() => void) | undefined, setDemoButtonNode: ((arg0: JSX.Element) => void) | undefined, appName?:string, appDescription?:string, style?:React.CSSProperties, placeholderMargin?:number})   {
     checkRightSize = checkRightSizeF;
     setRightNodeFn = setRightNodeF;
     exampleSideChangeFn = exampleSideChangeF;
@@ -447,6 +447,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
     // console.log("appDescription: "+appDescription);
     const placeholderNode = React.useMemo(() => (
         <Space direction="vertical" size={16} className={styles.placeholder}>
+            {placeholderMargin?(<div style={{height: placeholderMargin}}></div>):(<></>)}
             <Welcome
                 variant="borderless"
                 // icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
@@ -466,7 +467,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 styles={{list:{overflow: 'auto'}, subList:{overflow: 'auto'}}}
             />
         </Space>
-    ), [onPromptsItemClick, styles.placeholder, appName, appDescription]);
+    ), [onPromptsItemClick, styles.placeholder, appName, appDescription, placeholderMargin]);
 
 
 
@@ -514,9 +515,8 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
     }, [messageItems]);
 
     return (
-        <>
+        <div style={style}>
             {/*<BubbleListMemo messageItems={messageItems} roles={roles} styles={styles} placeholderNode={placeholderNode}/>*/}
-
             <Bubble.List
                 // items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}
                 items={[{ content: placeholderNode, variant: 'borderless',  }, ...uniqueMessageItems]}
@@ -542,7 +542,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
             {/*    loading={false}*/}
             {/*    className={styles.sender}*/}
             {/*/>*/}
-        </>
+        </div>
     )
 });
 

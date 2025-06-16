@@ -43,10 +43,12 @@ import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 import {toNumber} from "lodash";
+// import ImWindow from "./components/ImWindow.tsx";
+const ImWindow = lazy(() => import('./components/ImWindow.tsx'));
 // import ImChatTitle from "./components/ImChatTitle.tsx";
-const ImChatTitle = lazy(() => import('./components/ImChatTitle.tsx'));
+// const ImChatTitle = lazy(() => import('./components/ImChatTitle.tsx'));
 // import ImChat from "./components/ImChat.tsx";
-const ImChat = lazy(() => import('./components/ImChat.tsx'));
+// const ImChat = lazy(() => import('./components/ImChat.tsx'));
 
 // const AnylogicSimulationDemoPage = lazy(() => import("./components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 
@@ -116,10 +118,10 @@ const useStyle = createStyles(({token, css}) => {
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            padding: 16px;
-            padding-top: 6px;
-            padding-bottom: 8px;
-            gap: 6px;
+            //padding: 16px;
+            //padding-top: 6px;
+            //padding-bottom: 8px;
+            //gap: 6px;
             background-color: white;
             border-radius: 12px;
             margin-top: 6px;
@@ -264,6 +266,15 @@ function convertLoading(messageUid:string, messageStatus:string){
     return messageUid.startsWith("-") && !messageStatus.startsWith('ai_complete');
 }
 
+function EmptyMessageWindow({title}:{title:string}){
+    return <Empty
+        image={<IllustrationConstruction style={{ width: 150, height: 150 }} />}
+        darkModeImage={<IllustrationConstructionDark style={{ width: 150, height: 150 }} />}
+        title={title}
+        style={{height: '100%', width: '100%'}}
+    />
+}
+
 
 function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: React.MutableRefObject<{ handleResize: () => void } | null>, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
     // setRightNodeFn = rightNodeFn;
@@ -308,8 +319,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const [activeKey, setActiveKey] = React.useState("");
     const activeKeyRef = useRef(activeKey);
     const [chatTitle, setChatTitle] = React.useState<string>("");
-    const [messageContentReplacementTitle, setMessageContentReplacementTitle] = React.useState("请先登录");
-    const messageContentReplacementTitleRef = useRef(messageContentReplacementTitle);
+    // const [messageContentReplacementTitle, setMessageContentReplacementTitle] = React.useState("请先登录");
+    const [messageWindowElement, setMessageWindowElement] = React.useState<JSX.Element|null>(<EmptyMessageWindow title="请先登录" />);
+    // const messageContentReplacementTitleRef = useRef(messageContentReplacementTitle);
 
     const [modelName, setModelName] = React.useState<string>("default");
     const [historyRound, setHistoryRound] = React.useState<number>(10);
@@ -333,9 +345,9 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
         activeKeyRef.current = activeKey;
     }, [activeKey]);
 
-    useEffect(() => {
-        messageContentReplacementTitleRef.current = messageContentReplacementTitle;
-    }, [messageContentReplacementTitle]);
+    // useEffect(() => {
+    //     messageContentReplacementTitleRef.current = messageContentReplacementTitle;
+    // }, [messageContentReplacementTitle]);
 
     useEffect(() => {
         conversationItemsRef.current = conversationItems;
@@ -1031,11 +1043,13 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 }
             }else{
                 console.error('Error:', data)
-                setMessageContentReplacementTitle("读取模型列表失败，请刷新页面重试\n"+data);
+                // setMessageContentReplacementTitle("读取模型列表失败，请刷新页面重试\n"+data);
+                setMessageWindowElement(<EmptyMessageWindow title={"读取模型列表失败，请刷新页面重试\n"+data} />);
             }
         }).catch((error) => {
             console.error('Error:', error);
-            setMessageContentReplacementTitle("读取模型列表失败，请刷新页面重试\n"+error);
+            // setMessageContentReplacementTitle("读取模型列表失败，请刷新页面重试\n"+error);
+            setMessageWindowElement(<EmptyMessageWindow title={"读取模型列表失败，请刷新页面重试\n"+error} />);
         });
     },[])
 
@@ -1060,22 +1074,26 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     }
                 }));
                 requestChatModelList();
-                import('./components/ImChat.tsx');
-                import('./components/ImChatTitle.tsx');
-                import('./components/ImChatSender.tsx');
+                // import('./components/ImChat.tsx');
+                // import('./components/ImChatTitle.tsx');
+                // import('./components/ImChatSender.tsx');
+                import('./components/ImWindow.tsx');
             }else{
-                setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+data);
+                // setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+data);
+                setMessageWindowElement(<EmptyMessageWindow title={"读取会话列表失败，请刷新页面重试\n"+data} />);
             }
         }).catch((error) => {
             console.error('Error:', error);
-            setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+error);
+            // setMessageContentReplacementTitle("读取会话列表失败，请刷新页面重试\n"+error);
+            setMessageWindowElement(<EmptyMessageWindow title={"读取会话列表失败，请刷新页面重试\n"+error} />);
         });
     },[]);
 
     const onLoginOption = useCallback(() => {
         setMessageItems([]);
         setConversationItems([]);
-        setMessageContentReplacementTitle("请先选择一个会话或新建一个会话");
+        // setMessageContentReplacementTitle("请先选择一个会话或新建一个会话");
+        setMessageWindowElement(<EmptyMessageWindow title={"请先选择一个会话或新建一个会话"} />);
         requestConversationItems();
     }, [requestConversationItems]);
 
@@ -1136,7 +1154,8 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // =========消息收取=========
     useEffect(() => {
         if (activeKey !== undefined && activeKey !== ""){
-            setMessageContentReplacementTitle("");
+            // setMessageContentReplacementTitle("");
+            setMessageWindowElement(null);
             // 这里应该要取历史消息，或者放入一个开场欢迎语
             // setMessages([]);
             fetch(hostAddr+'ai_chat/api/query_conversation_messages',{
@@ -1195,16 +1214,19 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     }
                     setModelNameDefault();
                 }else{
-                    setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+data);
+                    // setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+data);
+                    setMessageWindowElement(<EmptyMessageWindow title={"读取消息列表失败，请刷新页面重试\n"+data} />);
                 }
             }).catch((error) => {
                 console.error('Error:', error);
-                setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+error);
+                // setMessageContentReplacementTitle("读取消息列表失败，请刷新页面重试\n"+error);
+                setMessageWindowElement(<EmptyMessageWindow title={"读取消息列表失败，请刷新页面重试\n"+error} />);
             })
         }else{
-            if(messageContentReplacementTitleRef.current == ""){
-                setMessageContentReplacementTitle("请选择一个会话或新建一个会话");
-            }
+            // if(messageContentReplacementTitleRef.current == ""){
+            //     setMessageContentReplacementTitle("请选择一个会话或新建一个会话");
+                setMessageWindowElement(<EmptyMessageWindow title={"请选择一个会话或新建一个会话"} />);
+            // }
         }
     }, [activeKey]);
 
@@ -1693,20 +1715,44 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             <FloatButton
                 shape="circle"
                 type="primary"
-                style={{ top:12, left:12 , height: 35, width: 35, opacity: (menuFloatButtonVisible === 'visible' && !menuDrawerOpen) ? 1 : 0, visibility: (menuFloatButtonVisible==='visible' && !menuDrawerOpen)?'visible':'hidden', transition: 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1), visibility 1s cubic-bezier(0.4, 0, 0.2, 1)'}}
+                style={{ top:12, left:12 , height: 32, width: 32, opacity: (menuFloatButtonVisible === 'visible' && !menuDrawerOpen) ? 1 : 0, visibility: (menuFloatButtonVisible==='visible' && !menuDrawerOpen)?'visible':'hidden', transition: 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1), visibility 1s cubic-bezier(0.4, 0, 0.2, 1)'}}
                 tooltip={<div>展开列表</div>}
                 onClick={onClickOpenMenu}
                 icon={<RightOutlined />} />
             <div className={styles.chat} style={{ width: chatWidth}}>
-                {messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>
-                    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={modelList} modelKey={modelName} historyRound={historyRound} activeConversationKey={activeKey}></ImChatTitle>
-                </LazyImportSuspense>):(<></>)}
+                {messageWindowElement!=null?messageWindowElement:(
+                    <LazyImportSuspense style={{ flex:1}}>
+                        <ImWindow
+                            styles={styles}
+                            messageItems={messageItems}
+                            activeKey={activeKey}
+                            checkRightSizeFn={checkRightSize}
+                            setRightNodeFn={rightNodeFn}
+                            onRequest={onRequest}
+                            exampleSideChangeFn={exampleSideChange}
+                            setDemoButtonNode={setDemoButtonNode}
+                            appName={appName}
+                            appDescription={appDescription}
+                            chatTitle={chatTitle}
+                            modelList={modelList}
+                            onModelChange={setModelName}
+                            modelKey={modelName}
+                            historyRound={historyRound}
+                            onHistoryRoundChange={setHistoryRound}
+                            socketReconnecting={socketReconnecting}
+                        />
+                    </LazyImportSuspense>
+                )}
 
-
-                {socketReconnecting?(<div style={{ marginLeft:20, backgroundColor: 'rgba(var(--semi-pink-1), 1)' , width: 'calc(100% - 40px)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(var(--semi-red-7), 1)' , borderRadius: '6px'  }}><p style={{margin: 0}}>长连接断开，消息接收可能异常，重连中...您也可以尝试刷新页面...</p></div>):(<></>)}
-                {
-                    (messageContentReplacementTitle == "")?(
-                        <>
+                {/*{messageContentReplacementTitle==""?(<LazyImportSuspense style={{height:50}}>*/}
+                {/*    <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={setHistoryRound} onModelChange={setModelName} modelList={modelList} modelKey={modelName} historyRound={historyRound} activeConversationKey={activeKey}></ImChatTitle>*/}
+                {/*</LazyImportSuspense>):(<></>)}*/}
+                
+                
+                {/*{socketReconnecting?(<div style={{ marginLeft:20, backgroundColor: 'rgba(var(--semi-pink-1), 1)' , width: 'calc(100% - 40px)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(var(--semi-red-7), 1)' , borderRadius: '6px'  }}><p style={{margin: 0}}>长连接断开，消息接收可能异常，重连中...您也可以尝试刷新页面...</p></div>):(<></>)}*/}
+                {/*{*/}
+                {/*    (messageContentReplacementTitle == "")?(*/}
+                {/*        <>*/}
                             {/*<Bubble.List*/}
                             {/*    items={messageItems.length > 0 ? messageItems : [{ content: placeholderNode, variant: 'borderless' }]}*/}
                             {/*    roles={roles}*/}
@@ -1722,33 +1768,33 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                             {/*    loading={false}*/}
                             {/*    className={styles.sender}*/}
                             {/*/>*/}
-                            <LazyImportSuspense>
-                                <ImChat
-                                    styles={styles}
-                                    checkRightSizeF={checkRightSize}
-                                    exampleSideChangeF={exampleSideChange}
-                                    onRequest={onRequest}
-                                    activeKey={activeKey}
-                                    setRightNodeF={rightNodeFn}
-                                    messageItems={messageItems}
-                                    setDemoButtonNode={setDemoButtonNode}
-                                    appName={appName}
-                                    appDescription={appDescription}
-                                >
-                                </ImChat>
-                            </LazyImportSuspense>
-                        </>
-                        ):(
-                            <>
-                                <Empty
-                                    image={<IllustrationConstruction style={{ width: 150, height: 150 }} />}
-                                    darkModeImage={<IllustrationConstructionDark style={{ width: 150, height: 150 }} />}
-                                    title={messageContentReplacementTitle}
-                                    style={{height: '100%', width: '100%'}}
-                                />
-                            </>
-                        )
-                }
+                {/*            <LazyImportSuspense>*/}
+                {/*                <ImChat*/}
+                {/*                    styles={styles}*/}
+                {/*                    checkRightSizeF={checkRightSize}*/}
+                {/*                    exampleSideChangeF={exampleSideChange}*/}
+                {/*                    onRequest={onRequest}*/}
+                {/*                    activeKey={activeKey}*/}
+                {/*                    setRightNodeF={rightNodeFn}*/}
+                {/*                    messageItems={messageItems}*/}
+                {/*                    setDemoButtonNode={setDemoButtonNode}*/}
+                {/*                    appName={appName}*/}
+                {/*                    appDescription={appDescription}*/}
+                {/*                >*/}
+                {/*                </ImChat>*/}
+                {/*            </LazyImportSuspense>*/}
+                {/*        </>*/}
+                {/*        ):(*/}
+                {/*            <>*/}
+                {/*                <Empty*/}
+                {/*                    image={<IllustrationConstruction style={{ width: 150, height: 150 }} />}*/}
+                {/*                    darkModeImage={<IllustrationConstructionDark style={{ width: 150, height: 150 }} />}*/}
+                {/*                    title={messageContentReplacementTitle}*/}
+                {/*                    style={{height: '100%', width: '100%'}}*/}
+                {/*                />*/}
+                {/*            </>*/}
+                {/*        )*/}
+                {/*}*/}
 
             </div>
             <SideSheet title="交互界面说明" visible={exampleSideVisible} onCancel={exampleSideChange} width='80%'>

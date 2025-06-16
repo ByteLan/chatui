@@ -161,15 +161,31 @@ const ImChatTitle = memo(({chatTitle, modelList, onModelChange, onHistoryRoundCh
         return <></>
     }
 
+    const HeaderNode = memo(({chatTitle, modelValue}:{chatTitle?:string, modelValue?:string}) => {
+        return (
+            <div style={{width:'100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <span style={{marginLeft: 24}}>{chatTitle==null?"":chatTitle.length>8?chatTitle.substring(0,8)+"...":chatTitle}</span>
+                {modelValue?<Tag color="violet" style={{ marginRight: 6 }}>
+                    {modelValue}
+                </Tag>:<></>}
+            </div>
+        )
+    });
 
     return (
         <div style={newStyle}>
                 <Collapse>
-                    <Collapse.Panel style={{paddingLeft: 18}} header={chatTitle==null?"":chatTitle.length>8?chatTitle.substring(0,8)+"...":chatTitle} itemKey="1" disabled={modelList==null || modelList.length==0} extra={
-                        <Tag color="violet" style={{ margin: 0 }}>
-                            {modelValue}
-                        </Tag>
-                    }>
+                    <Collapse.Panel
+                        style={{paddingLeft: 2, paddingRight: 2, borderRadius:12 }}
+                        header={<HeaderNode chatTitle={chatTitle} modelValue={modelValue} />}
+                        itemKey="1"
+                        disabled={modelList==null || modelList.length==0}
+                        // extra={
+                        //     <Tag color="violet" style={{ margin: 0 }}>
+                        //         {modelValue}
+                        //     </Tag>
+                        // }
+                    >
                         <Flex wrap justify='space-between' align='center'>
                             {modelList!=null&&modelList.length>0&&onModelChange!=null?(
                                 <>
