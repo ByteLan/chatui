@@ -79,6 +79,7 @@ const ImWindow = memo(({
             width: '100%',
             padding: 0,
             paddingBottom: 0,
+            borderRadius: newStyle.borderRadius,
         }}>
             {/*悬浮标题*/}
             <div style={{
@@ -89,7 +90,7 @@ const ImWindow = memo(({
                 background: 'rgba(255,255,255,0.7)',
                 WebkitBackdropFilter: 'blur(6px)',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                borderRadius: 12
+                borderRadius: newStyle.borderRadius
             }}>
                 <ImChatTitle chatTitle={chatTitle} onHistoryRoundChange={onHistoryRoundChange} onModelChange={onModelChange}
                              modelList={modelList} modelKey={modelKey} historyRound={historyRound}
