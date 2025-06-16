@@ -17,7 +17,8 @@ import {
 // import ImChatSender from "./ImChatSender.tsx";
 // import Bubble from "@ant-design-local/x/components/bubble/index.tsx";
 import {Bubble} from "@ant-design/x";
-const ImChatSender = lazy(() => import("./ImChatSender.tsx"));
+// const ImChatSender = lazy(() => import("./ImChatSender.tsx"));
+import ImChatSender from "./ImChatSender.tsx";
 const AnylogicSimulationDemoPage = lazy(() => import("../components/anylogic-simulation-demo/AnylogicSimulationDemoPage.tsx"));
 const SimulationStarter = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/simulation-pages/SimulationStarter.tsx"));
 const OverviewPage = lazy(() => import("@bytelan/silkroad-platform/src/platform-pages/overview/OverviewPage.tsx"));
@@ -529,9 +530,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
             {/*    roles={roles}*/}
             {/*    className={styles.messages}*/}
             {/*/>*/}
-            <LazyImportSuspense>
-                <ImChatSender onRequest={onRequest} activeKey={activeKey} styles={styles} />
-            </LazyImportSuspense>
+            <ImChatSender onRequest={onRequest} activeKey={activeKey} styles={styles} />
             {/*<Prompts styles={{item:{paddingTop:2, paddingBottom:2}}} items={senderPromptsItems} onItemClick={onPromptsItemClick} />*/}
             {/*<Sender*/}
             {/*    value={inputContent}*/}
