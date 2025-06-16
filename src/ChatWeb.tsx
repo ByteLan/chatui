@@ -62,7 +62,7 @@ export default function ChatWeb() {
                 }}
                 onResize={onSplitterSizeChange}
             >
-                <Splitter.Panel collapsible size={chatSize} defaultSize="100%" min={320} >
+                <Splitter.Panel collapsible size={chatSize} defaultSize="100%" min={320} style={{overflow:"hidden"}}>
                     <LazyImportSuspense>
                         <FullChatApp rightNodeFn={setRightNodeDelay} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
                     </LazyImportSuspense>
