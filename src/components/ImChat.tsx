@@ -198,7 +198,7 @@ function mdComponentSimulationStarter({children, src}:{children:any, src:string}
         }
         if(src == null || src =="") {
             setRightNodeFn(
-                <LazyImportSuspense><SimulationStarter src="demo4" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                <LazyImportSuspense><SimulationStarter src="demo5" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
             )
         }else{
             setRightNodeFn(
@@ -422,7 +422,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                     return
                 }
                 setRightNodeFn(
-                    <LazyImportSuspense><SimulationStarter src="demo4" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                    <LazyImportSuspense><SimulationStarter src="demo5" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
                 )
             }else if(info.data.key == 'func-neograph') {
                 checkRightSize?.()
@@ -488,8 +488,8 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                              {mdComponentIFrameButton({children: "Iframe主页", src: "https://www.bytelan.cn/"})}
                              {mdComponentExampleSideSheetShow({children: "使用指南"})}
                              {mdButtonOverviewShow({children: "Overview"})}
-                             {mdComponentSimulationStarter({children: "Sim-3", src: "demo3"})}
-                             {mdComponentSimulationStarter({children: "Sim-2", src: "demo2"})}
+                             {mdComponentSimulationStarter({children: "Sim-5", src: "demo5"})}
+                             {mdComponentSimulationStarter({children: "Sim-4", src: "demo4"})}
                              {mdComponentAnylogicSimulationDemoButton({children: "Sim-old", src: null})}
                          </Flex>}>
                     <Button>调试选项</Button>

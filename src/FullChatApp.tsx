@@ -1807,7 +1807,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
 // VChart图表
 (silkroad://chat.messagecard.vchart/数据id/图表标题)
 // 新版仿真
-(silkroad://chat.messagecard.startsimulation2/demo3/按钮标题)
+(silkroad://chat.messagecard.startsimulation2/demo5/按钮标题)
 // 旧版仿真
 (https://anylogic-test.bitcs-silkroad-oe.bbyte.cn/anylogic/platform/demo-test/startRun/1)
 \`\`\`
