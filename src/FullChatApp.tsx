@@ -43,6 +43,8 @@ import bit_logo from './assets/logo_01.svg';
 import { DeleteOutlined, EditOutlined} from '@ant-design/icons';
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
 import {toNumber} from "lodash";
+// import SettingsPage from "./components/settings/SettingsPage.tsx";
+const SettingsPageLazy = lazy(() => import('./components/settings/SettingsPage.tsx'));
 // import ImWindow from "./components/ImWindow.tsx";
 const ImWindow = lazy(() => import('./components/ImWindow.tsx'));
 // import ImChatTitle from "./components/ImChatTitle.tsx";
@@ -275,6 +277,14 @@ function EmptyMessageWindow({title}:{title:string}){
     />
 }
 
+export interface ModelListItemType{
+    key: string,
+    name: string,
+    description?: string,
+    type?: string,
+    status?: string,
+    sortOrder?: number,
+}
 
 function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: React.MutableRefObject<{ handleResize: () => void } | null>, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
     // setRightNodeFn = rightNodeFn;
@@ -301,7 +311,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     // }, [socketReconnecting]);
     const socketReconnectCountRef = useRef(0);
     // const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "多智能体（默认）"},{key: "DeepseekR1Ali", name: "Deepseek R1 - 阿里云"},{key: "DeepseekR1AliSilkroad", name: "Deepseek R1 - 供应链专家"},{key: "QwenMax", name: "千问Max - 效果出众"},{key: "QwenTurbo", name: "千问Turbo - 速度最快"},{key: "QwenLong", name: "千问Long - 适合长文本"},{key: "test1", name: "测试1"},{key: "test2", name: "测试2"},{key: "oldMa", name: "多智能体（非流式，弃用）"}]);
-    const [modelList, setModelList] = React.useState<{key:string, name:string, property?: string[]}[]>([{key: "default", name: "模型获取失败，请联系开发者！"}]);
+    const [modelList, setModelList] = React.useState<ModelListItemType[]>([{key: "default", name: "模型获取失败，请联系开发者！"}]);
     const modelListRef = useRef(modelList);
     useEffect(() => {
         modelListRef.current = modelList;
@@ -320,7 +330,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     const activeKeyRef = useRef(activeKey);
     const [chatTitle, setChatTitle] = React.useState<string>("");
     // const [messageContentReplacementTitle, setMessageContentReplacementTitle] = React.useState("请先登录");
-    const [messageWindowElement, setMessageWindowElement] = React.useState<JSX.Element|null>(<EmptyMessageWindow title="请先登录" />);
+    const [messageWindowElement, setMessageWindowElement] = React.useState<JSX.Element|null|string>(<EmptyMessageWindow title="请先登录" />);
     // const messageContentReplacementTitleRef = useRef(messageContentReplacementTitle);
 
     const [modelName, setModelName] = React.useState<string>("default");
@@ -1023,11 +1033,15 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
             return response.json();
         }).then(data => {
             if (data.responseStatus =='success') {
-                const newModelList = data.modelList.map((item:{modelKey:string,modelName:string}) => {
+                const newModelList = data.modelList.map((item:{modelKey:string,modelName:string,modelDescription?:string,modelType?:string, modelStatus?:string, modelSortOrder?:number}) => {
                     if(item.modelKey&&item.modelName&&item.modelKey.length>0&&item.modelName.length>0){
                         return {
                             key: item.modelKey,
                             name: item.modelName,
+                            description: item.modelDescription,
+                            type: item.modelType,
+                            status: item.modelStatus,
+                            sortOrder: item.modelSortOrder,
                         }
                     }else{
                         return undefined;
@@ -1660,7 +1674,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription}></UserBar>
                     {loginState?<div style={{marginRight:"16px"}}>
                         <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
-                        <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
+                        <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{setMessageWindowElement("settingsPage")}} ></SemiButton>
                     </div>:<></>}
                 </div>
 
@@ -1706,7 +1720,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription}></UserBar>
                         {loginState?<div style={{marginRight:"16px"}}>
                             <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
-                            <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
+                            <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{setMessageWindowElement("settingsPage")}} ></SemiButton>
                         </div>:<></>}
                     </div>
                     {/*<UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid}></UserBar>*/}
@@ -1720,7 +1734,19 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 onClick={onClickOpenMenu}
                 icon={<RightOutlined />} />
             <div className={styles.chat} style={{ width: chatWidth}}>
-                {messageWindowElement!=null?messageWindowElement:(
+                {messageWindowElement!=null?(
+                    typeof messageWindowElement === 'string' ? (
+                        messageWindowElement == "settingsPage"?(
+                            <LazyImportSuspense>
+                                <SettingsPageLazy modelList={modelList} refreshModelList={requestChatModelList}/>
+                            </LazyImportSuspense>
+                        ):(
+                            <p>{messageWindowElement}</p>
+                        )
+                    ) : (
+                        messageWindowElement
+                    )
+                    ):(
                     <LazyImportSuspense style={{ flex:1}}>
                         <ImWindow
                             styles={styles}
