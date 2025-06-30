@@ -100,17 +100,21 @@ const placeholderPromptsItems: GetProp<typeof Prompts, 'items'> = [
                 description: `供应链全景`,
             },
             {
-                key: 'func-sim',
-                description: `仿真环境`,
+                key: 'func-sim6',
+                description: `仿真环境（自定义参数）`,
+            },
+            {
+                key: 'func-sim5',
+                description: `仿真环境（默认参数）`,
             },
             {
                 key: 'func-neograph',
                 description: '供应链孪生',
             },
-            {
-                key: 'func-sim3',
-                description: '仿真环境(v3)',
-            }
+            // {
+            //     key: 'func-sim3',
+            //     description: '仿真环境(v3)',
+            // }
         ],
     },
 ];
@@ -190,7 +194,7 @@ function mdComponentAnylogicSimulationDemoButton({children, src}){
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
-function mdComponentSimulationStarter({children, src}:{children:any, src:string}){
+function mdComponentSimulationStarter({children, src, simData}:{children:any, src:string, simData?:string}){
     return <Button onClick={()=> {
         checkRightSize?.()
         if (setRightNodeFn === undefined){
@@ -198,11 +202,11 @@ function mdComponentSimulationStarter({children, src}:{children:any, src:string}
         }
         if(src == null || src =="") {
             setRightNodeFn(
-                <LazyImportSuspense><SimulationStarter src="demo5" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                <LazyImportSuspense><SimulationStarter src="demo5" activeConversationKey={activeKeyPublic} simDataId={simData}/></LazyImportSuspense>
             )
         }else{
             setRightNodeFn(
-                <LazyImportSuspense><SimulationStarter src={src} activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                <LazyImportSuspense><SimulationStarter src={src} activeConversationKey={activeKeyPublic} simDataId={simData}/></LazyImportSuspense>
             )
         }
     }
@@ -416,7 +420,7 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 setRightNodeFn(
                     <LazyImportSuspense><OverviewPage activeConversationKey={activeKeyPublic} /></LazyImportSuspense>
                 )
-            }else if(info.data.key == 'func-sim') {
+            }else if(info.data.key == 'func-sim5') {
                 checkRightSize?.()
                 if (setRightNodeFn === undefined){
                     return
@@ -437,6 +441,14 @@ const ImChat = React.memo(function ImChatF({styles, messageItems, activeKey, che
                 }
                 setRightNodeFn(
                     <LazyImportSuspense><SimulationStarter src="demo3" activeConversationKey={activeKeyPublic}/></LazyImportSuspense>
+                )
+            }else if(info.data.key == 'func-sim6') {
+                checkRightSize?.()
+                if (setRightNodeFn === undefined){
+                    return
+                }
+                setRightNodeFn(
+                    <LazyImportSuspense><SimulationStarter src="demo6" activeConversationKey={activeKeyPublic} simDataId={"123"}/></LazyImportSuspense>
                 )
             }
         }else{
