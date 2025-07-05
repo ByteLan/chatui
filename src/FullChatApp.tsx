@@ -1608,6 +1608,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
     }
 
     const onConversationClick: GetProp<typeof Conversations, 'onActiveChange'> = useCallback((key) => {
+        setMessageWindowElement(null);
         setActiveKey(key);
         setMenuDrawerOpen(false);
         console.log('onConversationClick', key, "oldActiveKey: ", activeKey);
