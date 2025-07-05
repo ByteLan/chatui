@@ -15,7 +15,7 @@ export default function AboutMe(){
         <div id="aboutMe" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <h2>关于</h2>
             <p style={{color:'rgba(var(--semi-grey-9), .62)', margin: 0}}>帮助文档</p>
-            <Text link={{href: todoDocLink, target: "_blank"}} icon={<IconLink />} underline>开发进展</Text>
+            <Text link={{href: todoDocLink, target: "_blank"}} icon={<IconLink />} underline>帮助文档汇总与开发进展</Text>
             {/*<Text link={{href: modelSettingDocLink, target: "_blank"}} icon={<IconLink />} underline>模型配置文档</Text>*/}
             <span></span>
             <span><p style={{ margin: 0}}>{footerCopyrightText}</p></span>
