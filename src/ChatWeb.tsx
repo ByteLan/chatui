@@ -4,6 +4,7 @@ import { Splitter } from "antd";
 import {IllustrationNoContent, IllustrationNoContentDark} from "@douyinfe/semi-illustrations";
 import {Empty, Spin} from "@douyinfe/semi-ui";
 import LazyImportSuspense from "@bytelan/silkroad-platform/src/LazyImportSuspense.tsx";
+import { Watermark } from '@arco-design/web-react';
 
 const FullChatApp = lazy(() => import('./FullChatApp.tsx'));
 
@@ -13,6 +14,7 @@ export default function ChatWeb() {
     const [chatSizeConst, setChatSizeConst] = useState([1,0]);
     const [chatSize, setChatSize] = useState<number|string>('100%');
     const [subPageSize, setSubPageSize] = useState<number|string>('0%');
+    const [waterMarkText, setWaterMarkText] = useState<string>('【BIT】');
     //使用useRef，类似于创造一个全局变量
     // 定义 chatRef 的类型，确保其 current 属性可能有 handleResize 方法
     const chatRef = useRef<{ handleResize: () => void } | null>(null);
@@ -51,6 +53,10 @@ export default function ChatWeb() {
         }, 600);
     }, []);
 
+    const setWatermark = useCallback((text:string)=>{
+        setWaterMarkText(text);
+    },[]);
+
     // return <FullChatApp />
     return (
         <div style={{height: '100%', width: 'calc(100% - 6px)', overflow: 'hidden'}} className={`semi-light-scrollbar`} >
@@ -64,7 +70,7 @@ export default function ChatWeb() {
             >
                 <Splitter.Panel collapsible size={chatSize} defaultSize="100%" min={320} style={{overflow:"hidden"}}>
                     <LazyImportSuspense>
-                        <FullChatApp rightNodeFn={setRightNodeDelay} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
+                        <FullChatApp setWatermark={setWatermark} rightNodeFn={setRightNodeDelay} innerRef={chatRef} chatSizeConst={chatSizeConst} setChatSize={setChatSize} chatSize={chatSize} setSubPageSize={setSubPageSize}></FullChatApp>
                     </LazyImportSuspense>
                 </Splitter.Panel>
                 <Splitter.Panel collapsible defaultSize='0%' size={subPageSize} style={{overflow: 'hidden', height: '100%', width: '100%', backgroundColor: 'rgba(var(--semi-indigo-0), 1)'}}>
@@ -73,6 +79,7 @@ export default function ChatWeb() {
                     </div>
                 </Splitter.Panel>
             </Splitter>
+            <Watermark content={waterMarkText} getContainer={() => document.querySelector("#ChatRoot")} fontStyle={{fontSize:10}} gap={[150,200]}/>
         </div>
     );
 

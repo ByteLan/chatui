@@ -14,6 +14,7 @@
   "dependencies": {
     "@ant-design/x": "^1.1.1",
     "@ant-design/x-fix-conversations-item-tooltip": "file:../../x-fix-conversations-item-tooltip",
+    "@arco-design/web-react": "^2.66.1",
     "@bytelan/silkroad-platform": "file:../../silkroad-platform",
     "@douyinfe/semi-ui": "^2.78.0",
     "@nivo/bar": "^0.88.0",

@@ -6,7 +6,7 @@ import {hostAddr} from "../serverConfig.tsx";
 // import Cookies from "js-cookie";
 
 
-export default function UserBar({onLogin, loginState, loginUserName, setLoginState, setLoginUserName, setTempCkid, avatarSize, style, setChatAppName, setChatAppDescription}:{onLogin:()=>void, loginState:boolean, loginUserName:string|null, setLoginState:(state:boolean)=>void, setLoginUserName:(name:string)=>void, setTempCkid:(ckid:string)=>void, avatarSize?:"large"|"small"|"default", style?:React.CSSProperties, setChatAppName?:(name:string)=>void, setChatAppDescription?:(description:string)=>void}) {
+export default function UserBar({onLogin, loginState, loginUserName, setLoginState, setLoginUserName, setTempCkid, avatarSize, style, setChatAppName, setChatAppDescription, setWatermark}:{onLogin:()=>void, loginState:boolean, loginUserName:string|null, setLoginState:(state:boolean)=>void, setLoginUserName:(name:string)=>void, setTempCkid:(ckid:string)=>void, avatarSize?:"large"|"small"|"default", style?:React.CSSProperties, setChatAppName?:(name:string)=>void, setChatAppDescription?:(description:string)=>void, setWatermark?:(text:string)=>void}) {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [confirmLogoutLoading, setConfirmLogoutLoading] = useState(false);
@@ -72,6 +72,14 @@ export default function UserBar({onLogin, loginState, loginUserName, setLoginSta
                 if(setChatAppDescription&&data.appDescription&&typeof data.appDescription =='string'&&data.appDescription.length>0){
                     // console.warn(data.appDescription);
                     setChatAppDescription(data.appDescription);
+                }
+                if(setWatermark){
+                    if(data.watermarkText&&typeof data.watermarkText =='string'&&data.watermarkText.length>0){
+                        // console.warn(data.waterMarkText);
+                        setWatermark(data.watermarkText);
+                    }else{
+                        setWatermark("");
+                    }
                 }
                 onLogin();
                 const opts = {

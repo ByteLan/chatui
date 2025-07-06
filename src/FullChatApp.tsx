@@ -286,7 +286,7 @@ export interface ModelListItemType{
     sortOrder?: number,
 }
 
-function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize}: { rightNodeFn: (node: JSX.Element) => void, innerRef: React.MutableRefObject<{ handleResize: () => void } | null>, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any }) {
+function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSize, setSubPageSize, setWatermark}: { rightNodeFn: (node: JSX.Element) => void, innerRef: React.MutableRefObject<{ handleResize: () => void } | null>, chatSizeConst: number[], setChatSize: any, chatSize: any, setSubPageSize: any, setWatermark?:(text:string)=>void }) {
     // setRightNodeFn = rightNodeFn;
     windowChatSize = chatSizeConst;
     setChatSizeString = setChatSize;
@@ -1159,6 +1159,13 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                         // console.warn(data.appDescription);
                         setAppDescription(data.appDescription);
                     }
+                    if(setWatermark){
+                        if(data.watermarkText && typeof data.watermarkText == "string" && data.watermarkText.length>0){
+                            setWatermark(data.watermarkText);
+                        }else{
+                            setWatermark("");
+                        }
+                    }
                     setLoginState(true);
                     onLoginOption();
                 }
@@ -1672,7 +1679,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                 {/*{mdComponentExampleSideSheetShow({children: "弹出示例侧边栏"})}*/}
                 {/*{mdComponentAnylogicSimulationDemoButton({children: "AnylogicDemo", src: null})}*/}
                 <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription}></UserBar>
+                    <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription} setWatermark={setWatermark}></UserBar>
                     {loginState?<div style={{marginRight:"16px"}}>
                         <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                         <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{setMessageWindowElement("settingsPage")}} ></SemiButton>
@@ -1718,7 +1725,7 @@ function FullChatApp ({rightNodeFn, innerRef, chatSizeConst, setChatSize, chatSi
                     </LazyImportSuspense>
                     {demoButtonNode==null?(<></>):(demoButtonNode)}
                     <div style={{width: "100%", height: 'auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                        <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription}></UserBar>
+                        <UserBar onLogin={onLoginOption} loginState={loginState} loginUserName={userName} setLoginState={setLoginState} setLoginUserName={setUserName} setTempCkid={setTempCkid} style={{color: 'rgba(var(--semi-light-blue-7), 1)'}} setChatAppName={setAppName} setChatAppDescription={setAppDescription} setWatermark={setWatermark}></UserBar>
                         {loginState?<div style={{marginRight:"16px"}}>
                             <SemiButton theme="borderless" style={{marginRight:"2px", color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconAppCenter/>} onClick={()=>{window.open(platformLink)}} ></SemiButton>
                             <SemiButton theme="borderless" style={{color:'rgba(var(--semi-light-blue-7), 1)'}} icon={<IconSetting/>} onClick={()=>{setMessageWindowElement("settingsPage")}} ></SemiButton>
